@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { Brain, TrendingUp, Network, Shield, ArrowRight, Trophy, Star, Target, Zap, ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 
 // Theme colors based on provided values
 const theme = {
@@ -104,15 +105,15 @@ function Home() {
               <div className="text-sm text-gray-400">User Rating</div>
             </div>
           </div>
-          <a 
-            href={`${process.env.NEXT_PUBLIC_BASE_URL}/layoff_risk`}
+          <Link 
+            href={"/layoff_risk"}
             className="inline-flex items-center px-10 py-4 text-xl font-semibold rounded-full shadow-lg transition-all duration-300 hover:shadow-xl hover:translate-y-[-2px]"
             style={{ 
               background: `linear-gradient(to right, ${theme.periwinkle}, ${theme.lilac})`,
             }}
           >
             Start Your Journey <ArrowRight className="ml-2" />
-          </a>
+          </Link>
           <div className="absolute bottom-10 left-0 right-0 flex justify-center">
             <button onClick={scrollToFeatures} className="p-3 hover:opacity-70 transition-all">
               <ChevronDown className="w-6 h-6" />
@@ -209,15 +210,15 @@ function Home() {
             <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
               Join thousands of professionals who are turning their careers into an exciting journey of growth and achievement.
             </p>
-            <a 
-              href={`${process.env.NEXT_PUBLIC_BASE_URL}/layoff_risk`}
+            <Link
+              href={"/layoff_risk"}
               className="inline-flex items-center px-10 py-4 text-base font-medium transition-all duration-300 hover:opacity-90 rounded-full"
               style={{ 
                 background: `linear-gradient(to right, ${theme.periwinkle}, ${theme.lilac})`,
               }}
             >
               Begin Your Adventure <ArrowRight className="ml-2" />
-            </a>
+            </Link>
           </div>
         </div>
       </div>
