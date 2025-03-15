@@ -23,7 +23,7 @@ const LayoffRisk = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-12">
         <h1 className="text-4xl font-bold mb-4">Layoff Risk Assessment</h1>
-        <p className="text-gray-400">Monitor your company's health and industry trends.</p>
+        <p className="text-gray-400">Monitor your company&apos;s health and industry trends.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

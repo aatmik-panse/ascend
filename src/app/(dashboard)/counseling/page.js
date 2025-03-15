@@ -40,7 +40,7 @@ const Counseling = () => {
                     <Bot className="h-5 w-5" />
                   </div>
                   <div className="bg-gray-800/50 rounded-lg p-3">
-                    <p>Hello! I'm your AI career assistant. How can I help you today?</p>
+                    <p>Hello! I&apos;m your AI career assistant. How can I help you today?</p>
                   </div>
                 </div>
               </div>
