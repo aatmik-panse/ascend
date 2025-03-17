@@ -132,7 +132,7 @@ function Home() {
             </div>
           </div>
           <Link 
-            href={"/layoff_risk"}
+            href={"/sign-up"}
             className="inline-flex items-center px-10 py-4 text-xl font-semibold rounded-full shadow-lg transition-all duration-300 hover:shadow-xl hover:translate-y-[-2px]"
             style={{ 
               background: `linear-gradient(to right, ${theme.periwinkle}, ${theme.lilac})`,
@@ -237,7 +237,7 @@ function Home() {
               Join thousands of professionals who are turning their careers into an exciting journey of growth and achievement.
             </p>
             <Link
-              href={"/layoff_risk"}
+              href={"/sign-up"}
               className="inline-flex items-center px-10 py-4 text-base font-medium transition-all duration-300 hover:opacity-90 rounded-full"
               style={{ 
                 background: `linear-gradient(to right, ${theme.periwinkle}, ${theme.lilac})`,

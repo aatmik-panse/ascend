@@ -7,8 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { signInWithMagicLink } from "./actions";
 import { useActionState, useState } from "react";
-import { ActionState } from "@/lib/auth/middleware";
-// import SVGLogo from "@/components/svg-logo";
 import { createClient } from "@/utils/supabase/client";
 import config from "@/utils/config";
 
@@ -42,16 +40,19 @@ export function Login({ mode = "signin" }) {
   );
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-white to-gray-50 flex items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
         <div className="flex justify-center">
-          {/* <SVGLogo /> */}
+          {/* Logo placeholder - add your dark mode logo here */}
+          <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center">
+            <span className="text-white text-xl font-bold">A</span>
+          </div>
         </div>
 
-        <h1 className="mt-10 text-2xl font-semibold tracking-tight text-center text-gray-900">
-          {mode === "signin" ? "Welcome back" : "Create your account"}
+        <h1 className="mt-8 text-3xl font-bold tracking-tight text-center text-white">
+          {mode === "signin" ? "Welcome Back" : "Create Account"}
         </h1>
-        <p className="mt-2 text-sm text-center text-gray-600">
+        <p className="mt-2 text-sm text-center text-gray-400">
           {mode === "signin"
             ? "Sign in to continue to your account"
             : "Get started with your new account"}
@@ -59,24 +60,40 @@ export function Login({ mode = "signin" }) {
 
         <div className="mt-10">
           {magicLinkState?.success ? (
-            <div className="p-6 text-center bg-green-50 rounded-lg">
-              <h3 className="text-sm font-medium text-green-800">
+            <div className="p-6 text-center bg-emerald-900/30 border border-emerald-700 rounded-xl">
+              <h3 className="text-sm font-medium text-emerald-400">
                 Check your email
               </h3>
-              <p className="mt-2 text-sm text-green-700">
-                We&apos;ve sent you a magic link to sign in to your account.
+              <p className="mt-2 text-sm text-emerald-300">
+                We've sent you a magic link to sign in to your account.
               </p>
             </div>
           ) : (
             <div className="space-y-6">
               <form action={magicLinkAction} className="space-y-4">
-                <Input
-                  name="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  required
-                  className="px-4 h-12 bg-white rounded-lg border-gray-200 shadow-sm transition-colors focus:border-blue-500 focus:ring-blue-500"
-                />
+                <div className="relative">
+                  <Input
+                    name="email"
+                    type="email"
+                    placeholder="name@example.com"
+                    required
+                    className="px-4 pl-10 h-12 bg-gray-800/50 text-gray-100 rounded-xl border-gray-700 shadow-lg transition-colors focus:border-blue-500 focus:ring-blue-500/30 focus:ring-2"
+                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
                 <input type="hidden" name="priceId" value={priceId || ""} />
                 <input
                   type="hidden"
@@ -86,7 +103,7 @@ export function Login({ mode = "signin" }) {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 font-medium text-white bg-blue-600 rounded-lg transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="w-full h-12 font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl transition-all hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-600/20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
                 >
                   {pending ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -98,10 +115,10 @@ export function Login({ mode = "signin" }) {
 
               <div className="relative">
                 <div className="flex absolute inset-0 items-center">
-                  <div className="w-full border-t border-gray-200" />
+                  <div className="w-full border-t border-gray-700" />
                 </div>
                 <div className="flex relative justify-center">
-                  <span className="px-4 text-sm text-gray-500 bg-gradient-to-b from-white to-gray-50">
+                  <span className="px-4 text-sm text-gray-500 bg-gradient-to-b from-gray-900 to-gray-950">
                     or
                   </span>
                 </div>
@@ -109,7 +126,7 @@ export function Login({ mode = "signin" }) {
 
               <Button
                 onClick={handleGoogleSignIn}
-                className="w-full h-12 font-medium text-gray-700 bg-white rounded-lg border border-gray-200 shadow-sm transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="w-full h-12 font-medium text-gray-300 bg-gray-800/70 rounded-xl border border-gray-700 shadow-lg transition-all hover:bg-gray-700/70 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
               >
                 {loading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -141,12 +158,12 @@ export function Login({ mode = "signin" }) {
           )}
 
           {magicLinkState?.error && (
-            <div className="mt-4 text-sm text-red-600">
+            <div className="mt-4 p-3 text-sm text-red-300 bg-red-900/30 border border-red-700/50 rounded-lg">
               {magicLinkState.error}
             </div>
           )}
 
-          <p className="mt-8 text-sm text-center text-gray-600">
+          <p className="mt-8 text-sm text-center text-gray-400">
             {mode === "signin"
               ? "New to our platform? "
               : "Already have an account? "}
@@ -154,7 +171,7 @@ export function Login({ mode = "signin" }) {
               href={`${mode === "signin" ? "/sign-up" : "/sign-in"}${
                 redirect ? `?redirect=${redirect}` : ""
               }${priceId ? `&priceId=${priceId}` : ""}`}
-              className="font-medium text-blue-600 hover:text-blue-500"
+              className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
             >
               {mode === "signin" ? "Create an account" : "Sign in"}
             </Link>

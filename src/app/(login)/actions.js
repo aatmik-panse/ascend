@@ -182,7 +182,7 @@ export const signInWithMagicLink = validatedAction(
       options: {
         emailRedirectTo: `${redirectTo}?priceId=${encodeURIComponent(
           priceId || ""
-        )}&redirect=${encodeURIComponent("/layoff")}`,
+        )}&redirect=${encodeURIComponent("/layoff_risk")}`,
       },
     });
     if (error) {
