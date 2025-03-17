@@ -1,100 +1,104 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { getUser } from "@/queries/user";
+import { createClient } from "@/utils/supabase/server";
+import { NextResponse } from "next/server";
 import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
 
 export async function GET(request) {
-  const requestUrl = new URL(request.url);
-  const code = requestUrl.searchParams.get('code');
-  const redirect = requestUrl.searchParams.get('redirect') || '/';
-  const priceId = requestUrl.searchParams.get('priceId');
-  const discountCode = requestUrl.searchParams.get('discountCode');
+  try {
+    const requestUrl = new URL(request.url);
+    const code = requestUrl.searchParams.get("code");
+    const encodedRedirectTo = requestUrl.searchParams.get("redirect") || "/layoff_risk";
+    const priceId = decodeURIComponent(requestUrl.searchParams.get("priceId") || "");
+    const discountCode = decodeURIComponent(requestUrl.searchParams.get("discountCode") || "");
+    const redirectTo = decodeURIComponent(encodedRedirectTo);
 
-  if (code) {
-    const supabase = createRouteHandlerClient({ cookies });
-    
-    try {
-      // Exchange the code for a session
-      const { data: { session }, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
-      
-      if (sessionError) {
-        console.error('Session error:', sessionError);
-        return NextResponse.redirect(`${requestUrl.origin}/signin?error=session_error`);
-      }
-
-      // Get user data from the session
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError) {
-        console.error('User error:', userError);
-        return NextResponse.redirect(`${requestUrl.origin}/signin?error=user_error`);
-      }
-
-      // Check if user profile exists
-      const { data: existingProfile, error: profileError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (profileError && profileError.code !== 'PGRST116') {
-        console.error('Profile check error:', profileError);
-        return NextResponse.redirect(`${requestUrl.origin}/signin?error=profile_error`);
-      }
-
-      // If no profile exists, create one with all relevant user data
-      if (!existingProfile) {
-        const { error: insertError } = await supabase
-          .from('users')
-          .insert({
-            user_id: user.id,
-            email: user.email,
-            full_name: user.user_metadata?.full_name || user.user_metadata?.name,
-            avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
-            auth_provider: user.app_metadata?.provider || 'email',
-            email_verified: user.email_confirmed_at ? true : false,
-            phone: user.phone || null,
-            phone_verified: user.user_metadata?.phone_verified || false,
-            created_at: user.created_at,
-            last_sign_in_at: user.last_sign_in_at,
-            updated_at: user.updated_at,
-            provider_id: user.user_metadata?.provider_id || null,
-            provider_sub: user.user_metadata?.sub || null,
-            is_anonymous: user.is_anonymous || false,
-            role: user.role || 'user'
-          });
-
-        if (insertError) {
-          console.error('Profile creation error:', insertError);
-          return NextResponse.redirect(`${requestUrl.origin}/signin?error=profile_creation_error`);
-        }
-      }
-
-      // Handle subscription if priceId is provided
-      if (priceId) {
-        const { error: subscriptionError } = await supabase
-          .from('subscriptions')
-          .insert({
-            user_id: user.id,
-            price_id: priceId,
-            status: 'active',
-            discount_code: discountCode || null,
-            created_at: new Date().toISOString()
-          });
-
-        if (subscriptionError) {
-          console.error('Subscription error:', subscriptionError);
-          return NextResponse.redirect(`${requestUrl.origin}/signin?error=subscription_error`);
-        }
-      }
-
-      // Redirect to the intended page
-      return NextResponse.redirect(`${requestUrl.origin}${redirect}`);
-    } catch (error) {
-      console.error('Callback error:', error);
-      return NextResponse.redirect(`${requestUrl.origin}/signin?error=callback_error`);
+    if (!code) {
+      return NextResponse.redirect(new URL('/login?error=no_code', request.url));
     }
-  }
 
-  // If no code, redirect to signin
-  return NextResponse.redirect(`${requestUrl.origin}/signin`);
+    const supabase = await createClient();
+    const cookieStore = cookies();
+
+    // Exchange the code for a session
+    const { data: { session }, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+    if (exchangeError) {
+      console.error('Error exchanging code for session:', exchangeError);
+      return NextResponse.redirect(new URL('/login?error=auth_failed', request.url));
+    }
+
+    if (!session) {
+      console.error('No session created after code exchange');
+      return NextResponse.redirect(new URL('/login?error=session_failed', request.url));
+    }
+
+    // Get the user data
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      console.error('Error getting user:', userError);
+      return NextResponse.redirect(new URL('/login?error=user_not_found', request.url));
+    }
+
+    // Check if user exists in the users table
+    const { data: existingProfile, error: profileError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+    console.log("user data from sb " , user)
+    // Create user profile if it doesn't exist
+    if (!existingProfile) {
+      const { error: insertError } = await supabase
+      .from('users')
+      .insert({
+        user_id: user.id,
+        email: user.email,
+        full_name: user.user_metadata?.full_name || user.user_metadata?.name,
+        avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
+        auth_provider: user.app_metadata?.provider || 'email',
+        email_verified: user.email_confirmed_at ? true : false,
+        phone: user.phone || null,
+        created_at: user.created_at ? new Date(user.created_at).toISOString() : new Date().toISOString(),
+        provider_sub: user.user_metadata?.iss || null,
+        is_anonymous: user.is_anonymous || false,
+        role: user.role || 'user'
+      });
+
+      if (insertError) {
+        console.error('Error creating user profile:', insertError);
+        // Log the error but continue with redirect
+      }
+    }
+
+    // Set session cookies
+    const response = NextResponse.redirect(`${requestUrl.origin}${redirectTo}`);
+    
+    // Set the session cookie
+    response.cookies.set('sb-access-token', session.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7 // 1 week
+    });
+
+    // Set the refresh token cookie
+    response.cookies.set('sb-refresh-token', session.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7 // 1 week
+    });
+
+    // Handle priceId if present (for subscription flow)
+    if (priceId && priceId !== "") {
+      // Add your subscription logic here
+      // await createCheckoutSession({ priceId, discountCode });
+    }
+
+    return response;
+  } catch (error) {
+    console.error('Auth callback error:', error);
+    return NextResponse.redirect(new URL('/login?error=auth_failed', request.url));
+  }
 }

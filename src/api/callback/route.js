@@ -10,9 +10,15 @@ export async function GET(request) {
   const discountCode = requestUrl.searchParams.get('discountCode');
 
   if (code) {
-    const supabase = createRouteHandlerClient({ cookies });
-    
     try {
+      // Create a response to modify cookies
+      const response = NextResponse.redirect(`${requestUrl.origin}${redirect}`);
+      
+      // Create Supabase client with cookie handling
+      const supabase = createRouteHandlerClient({ 
+        cookies: () => cookies(),
+      });
+      
       // Exchange the code for a session
       const { data: { session }, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
       
@@ -53,10 +59,9 @@ export async function GET(request) {
             auth_provider: user.app_metadata?.provider || 'email',
             email_verified: user.email_confirmed_at ? true : false,
             phone: user.phone || null,
-            phone_verified: user.user_metadata?.phone_verified || false,
-            created_at: user.created_at,
-            last_sign_in_at: user.last_sign_in_at,
-            updated_at: user.updated_at,
+            created_at: user.created_at ? new Date(user.created_at).toISOString() : new Date().toISOString(),
+            last_sign_in_at: user.last_sign_in_at ? new Date(user.last_sign_in_at).toISOString() : new Date().toISOString(),
+            updated_at: user.updated_at ? new Date(user.updated_at).toISOString() : new Date().toISOString(),
             provider_id: user.user_metadata?.provider_id || null,
             provider_sub: user.user_metadata?.sub || null,
             is_anonymous: user.is_anonymous || false,
@@ -78,7 +83,8 @@ export async function GET(request) {
             price_id: priceId,
             status: 'active',
             discount_code: discountCode || null,
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           });
 
         if (subscriptionError) {
@@ -87,8 +93,24 @@ export async function GET(request) {
         }
       }
 
-      // Redirect to the intended page
-      return NextResponse.redirect(`${requestUrl.origin}${redirect}`);
+      // Set the session cookies
+      response.cookies.set('sb-access-token', session.access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7 // 1 week
+      });
+
+      response.cookies.set('sb-refresh-token', session.refresh_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7 // 1 week
+      });
+
+      return response;
     } catch (error) {
       console.error('Callback error:', error);
       return NextResponse.redirect(`${requestUrl.origin}/signin?error=callback_error`);
