@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Brain, TrendingUp, Network, Shield, ArrowRight, Trophy, Star, Target, Zap, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
+import { checkBackendHealth } from '@/utils/api';
 
 // Theme colors based on provided values
 const theme = {
@@ -14,9 +15,21 @@ function Home() {
   const [achievementUnlocked, setAchievementUnlocked] = useState(false);
   const [careerScore, setCareerScore] = useState(0);
   const [isVisible, setIsVisible] = useState({});
+  const [healthStatus, setHealthStatus] = useState(null);
   const featuresRef = useRef(null);
   const achievementsRef = useRef(null);
   const ctaRef = useRef(null);
+
+  // Check backend health
+  useEffect(() => {
+    const checkHealth = async () => {
+      const status = await checkBackendHealth();
+      setHealthStatus(status);
+    };
+    checkHealth();
+    const interval = setInterval(checkHealth, 30000); // Check every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   // Handle scroll progress
   useEffect(() => {
@@ -58,6 +71,19 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
+      {/* Health Status Indicator */}
+      {healthStatus && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className={`px-3 py-1 rounded-full text-sm ${
+            healthStatus.status === 'ok' 
+              ? 'bg-green-500/20 text-green-400' 
+              : 'bg-red-500/20 text-red-400'
+          }`}>
+            {healthStatus.status === 'ok' ? 'Backend Healthy' : 'Backend Unhealthy'}
+          </div>
+        </div>
+      )}
+
       {/* Progress Bar */}
       <div className="fixed top-0 left-0 w-full h-1 z-50">
         <div 
