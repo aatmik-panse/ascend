@@ -5,13 +5,14 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-import { signInWithMagicLink } from "./actions";
+import { signInWithMagicLink, signIn, signUp } from "./actions";
 import { useActionState, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import config from "@/utils/config";
 
 export function Login({ mode = "signin" }) {
   const [loading, setLoading] = useState(false);
+  const [authMethod, setAuthMethod] = useState("password"); // "password" or "magic"
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
   const priceId = searchParams.get("priceId");
@@ -31,12 +32,24 @@ export function Login({ mode = "signin" }) {
         )}&redirect=${encodeURIComponent("/layoff_risk")}`,
       },
     });
+    console.log('redirectTo', redirectTo)
+    console.log("supabase user ", supabase)
     setLoading(false);
   };
 
   const [magicLinkState, magicLinkAction, pending] = useActionState(
     signInWithMagicLink,
     { error: "", success: "" }
+  );
+
+  const [passwordState, passwordAction, passwordPending] = useActionState(
+    signIn,
+    { error: "" }
+  );
+
+  const [signUpState, signUpAction, signUpPending] = useActionState(
+    signUp,
+    { error: "", success: "", requiresConfirmation: false }
   );
 
   return (
@@ -59,59 +72,151 @@ export function Login({ mode = "signin" }) {
         </p>
 
         <div className="mt-10">
-          {magicLinkState?.success ? (
+          {(magicLinkState?.success || signUpState?.success) ? (
             <div className="p-6 text-center bg-emerald-900/30 border border-emerald-700 rounded-xl">
               <h3 className="text-sm font-medium text-emerald-400">
                 Check your email
               </h3>
               <p className="mt-2 text-sm text-emerald-300">
-                We've sent you a magic link to sign in to your account.
+                {magicLinkState?.success || signUpState?.success}
               </p>
             </div>
           ) : (
             <div className="space-y-6">
-              <form action={magicLinkAction} className="space-y-4">
-                <div className="relative">
-                  <Input
-                    name="email"
-                    type="email"
-                    placeholder="name@example.com"
-                    required
-                    className="px-4 pl-10 h-12 bg-gray-800/50 text-gray-100 rounded-xl border-gray-700 shadow-lg transition-colors focus:border-blue-500 focus:ring-blue-500/30 focus:ring-2"
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-                <input type="hidden" name="priceId" value={priceId || ""} />
-                <input
-                  type="hidden"
-                  name="discountCode"
-                  value={discountCode || ""}
-                />
-
+              {/* Auth Method Toggle */}
+              <div className="flex justify-center space-x-4 mb-6">
                 <Button
-                  type="submit"
-                  className="w-full h-12 font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl transition-all hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-600/20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                  type="button"
+                  variant={authMethod === "password" ? "default" : "outline"}
+                  onClick={() => setAuthMethod("password")}
+                  className="flex-1"
                 >
-                  {pending ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    "Continue with Email"
-                  )}
+                  Password
                 </Button>
-              </form>
+                <Button
+                  type="button"
+                  variant={authMethod === "magic" ? "default" : "outline"}
+                  onClick={() => setAuthMethod("magic")}
+                  className="flex-1"
+                >
+                  Magic Link
+                </Button>
+              </div>
+
+              {/* Password Form */}
+              {authMethod === "password" && (
+                <form action={mode === "signin" ? passwordAction : signUpAction} className="space-y-4">
+                  <div className="relative">
+                    <Input
+                      name="email"
+                      type="email"
+                      placeholder="name@example.com"
+                      required
+                      className="px-4 pl-10 h-12 bg-gray-800/50 text-gray-100 rounded-xl border-gray-700 shadow-lg transition-colors focus:border-blue-500 focus:ring-blue-500/30 focus:ring-2"
+                    />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      name="password"
+                      type="password"
+                      placeholder="Password"
+                      required
+                      className="px-4 pl-10 h-12 bg-gray-800/50 text-gray-100 rounded-xl border-gray-700 shadow-lg transition-colors focus:border-blue-500 focus:ring-blue-500/30 focus:ring-2"
+                    />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full h-12 font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl transition-all hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-600/20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                  >
+                    {mode === "signin" ? (
+                      passwordPending ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        "Sign in with Password"
+                      )
+                    ) : (
+                      signUpPending ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        "Create Account"
+                      )
+                    )}
+                  </Button>
+                </form>
+              )}
+
+              {/* Magic Link Form */}
+              {authMethod === "magic" && (
+                <form action={magicLinkAction} className="space-y-4">
+                  <div className="relative">
+                    <Input
+                      name="email"
+                      type="email"
+                      placeholder="name@example.com"
+                      required
+                      className="px-4 pl-10 h-12 bg-gray-800/50 text-gray-100 rounded-xl border-gray-700 shadow-lg transition-colors focus:border-blue-500 focus:ring-blue-500/30 focus:ring-2"
+                    />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <input type="hidden" name="priceId" value={priceId || ""} />
+                  <input
+                    type="hidden"
+                    name="discountCode"
+                    value={discountCode || ""}
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full h-12 font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl transition-all hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-600/20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                  >
+                    {pending ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      "Continue with Magic Link"
+                    )}
+                  </Button>
+                </form>
+              )}
 
               <div className="relative">
                 <div className="flex absolute inset-0 items-center">
@@ -157,9 +262,9 @@ export function Login({ mode = "signin" }) {
             </div>
           )}
 
-          {magicLinkState?.error && (
+          {(magicLinkState?.error || passwordState?.error) && (
             <div className="mt-4 p-3 text-sm text-red-300 bg-red-900/30 border border-red-700/50 rounded-lg">
-              {magicLinkState.error}
+              {magicLinkState?.error || passwordState?.error}
             </div>
           )}
 

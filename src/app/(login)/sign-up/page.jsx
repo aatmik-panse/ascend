@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 export default async function SignUpPage() {
   const user = await getUser();
   if (user) {
-    return redirect("/app");
+    return redirect("/layoff_risk");
   }
 
   return <Login mode="signup" />;

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Shield, Brain, Network, CreditCard, MessageSquare, User, Settings, ChevronRight, LogOut, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { signOut } from '@/app/(login)/actions';
 
 const Navbar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -45,6 +46,14 @@ const Navbar = () => {
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   const NavContent = () => (
@@ -113,8 +122,11 @@ const Navbar = () => {
                 <Settings className="h-4 w-4" />
                 <span>Settings</span>
               </button>
-              <button className="w-full flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-[var(--color-lilac)] transition-colors">
-                <LogOut className="h-4 w-4" />
+              <button onClick={handleSignOut}  className="w-full flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-[var(--color-lilac)] transition-colors cursor-pointer">
+                <LogOut 
+                  className="h-4 w-4 cursor-pointer hover:text-red-500 transition-colors" 
+                  
+                />
                 <span>Logout</span>
               </button>
             </div>
