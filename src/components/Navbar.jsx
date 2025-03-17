@@ -1,9 +1,10 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { Shield, Brain, Network, CreditCard, MessageSquare, User, Settings, ChevronRight, LogOut, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from '@/app/(login)/actions';
+import { createClient } from '@/utils/supabase/client';
 
 const Navbar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -11,6 +12,34 @@ const Navbar = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const [userData, setUserData] = useState(null);
+
+  useLayoutEffect(() => {
+    const fetchUserData = async () => {
+      const supabase = createClient();
+      const { data: { user }, error } = await supabase.auth.getUser();
+      
+      if (user) {
+        // Get additional user data from the users table
+        const { data: profileData, error: profileError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+          
+        if (profileData) {
+          setUserData({
+            ...user,
+            ...profileData
+          });
+        } else {
+          setUserData(user);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -29,6 +58,7 @@ const Navbar = () => {
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
+
 
   const navItems = [
     { to: '/layoff_risk', icon: Shield, label: 'Layoff Risk' },
@@ -100,13 +130,21 @@ const Navbar = () => {
               showProfileMenu ? 'bg-gray-800/70 text-[var(--color-lilac)]' : ''
             }`}
           >
-            <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[var(--color-periwinkle)]/40 to-[var(--color-lilac)]/30 flex items-center justify-center flex-shrink-0 shadow-md">
-              <User className="h-5 w-5" />
+            <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[var(--color-periwinkle)]/40 to-[var(--color-lilac)]/30 flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden">
+              {userData?.avatar_url ? (
+                <img 
+                  src={userData.avatar_url} 
+                  alt={userData.full_name || 'User'} 
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <User className="h-5 w-5" />
+              )}
             </div>
             {(isExpanded || mobileMenuOpen) && (
               <div className="flex-1 text-left">
-                <p className="font-medium">John Doe</p>
-                <p className="text-xs text-gray-400">Premium Plan</p>
+                <p className="font-medium">{userData?.full_name || userData?.user_metadata?.full_name || 'User'}</p>
+                <p className="text-xs text-gray-400">Free Plan</p>
               </div>
             )}
             {(isExpanded || mobileMenuOpen) && (
