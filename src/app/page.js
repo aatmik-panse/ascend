@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Brain, TrendingUp, Network, Shield, ArrowRight, Trophy, Star, Target, Zap, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { checkBackendHealth } from '@/utils/api';
+import Footer from '@/components/Footer';
 
 // Theme colors based on provided values
 const theme = {
@@ -132,7 +133,7 @@ function Home() {
             </div>
           </div>
           <Link 
-            href={"/sign-up"}
+            href={"/layoff_risk"}
             className="inline-flex items-center px-10 py-4 text-xl font-semibold rounded-full shadow-lg transition-all duration-300 hover:shadow-xl hover:translate-y-[-2px]"
             style={{ 
               background: `linear-gradient(to right, ${theme.periwinkle}, ${theme.lilac})`,
@@ -237,7 +238,7 @@ function Home() {
               Join thousands of professionals who are turning their careers into an exciting journey of growth and achievement.
             </p>
             <Link
-              href={"/sign-up"}
+              href={"/layoff_risk"}
               className="inline-flex items-center px-10 py-4 text-base font-medium transition-all duration-300 hover:opacity-90 rounded-full"
               style={{ 
                 background: `linear-gradient(to right, ${theme.periwinkle}, ${theme.lilac})`,
@@ -260,6 +261,7 @@ function Home() {
           animation: pulse-slow 3s ease-in-out infinite;
         }
       `}</style>
+      <Footer />
     </div>
   );
 }

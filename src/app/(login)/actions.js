@@ -189,5 +189,5 @@ export const signInWithGoogle = async (event) => {
 export const signOut = async () => {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect("/sign-in");
+  redirect("/");
 };

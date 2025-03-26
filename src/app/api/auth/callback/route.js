@@ -21,6 +21,7 @@ export async function GET(request) {
 
     // Exchange the code for a session
     const { data: { session }, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+    cookies().getAll();
     if (exchangeError) {
       console.error('Error exchanging code for session:', exchangeError);
       return NextResponse.redirect(new URL('/login?error=auth_failed', request.url));
