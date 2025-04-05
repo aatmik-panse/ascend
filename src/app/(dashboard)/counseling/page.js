@@ -87,10 +87,6 @@ const Counseling = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black -z-10 opacity-60"></div>
       
       <div className="mb-12 text-center">
-        <div className="inline-block p-1 px-3 rounded-full text-sm font-medium mb-3" 
-          style={{ background: `linear-gradient(135deg, ${theme.periwinkle}20 0%, ${theme.lilac}20 100%)` }}>
-          AI-POWERED CAREER ADVICE
-        </div>
         <h1 className="text-5xl font-bold mb-4 bg-clip-text text-transparent"
           style={{ 
             backgroundImage: `linear-gradient(135deg, ${theme.periwinkle} 0%, ${theme.lilac} 100%)` 

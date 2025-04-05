@@ -29,18 +29,7 @@ export default function DashboardLayout({ children }) {
   return (
     <div className="flex min-h-screen">
       <Navbar isLoggedIn={!!user} />
-      <main className="flex-1 ml-24 relative">
-        {isProtectedRoute && !user && (
-          <div 
-            onClick={handleBlurClick}
-            className="absolute inset-0 backdrop-blur-md bg-black/30 z-10 flex items-center justify-center cursor-pointer"
-          >
-            <div className="bg-gray-800 p-6 rounded-lg text-center">
-              <h3 className="text-xl font-semibold text-white mb-2">Premium Feature</h3>
-              <p className="text-gray-300">Please subscribe to access this feature</p>
-            </div>
-          </div>
-        )}
+      <main className="">
         {children}
       </main>
     </div>

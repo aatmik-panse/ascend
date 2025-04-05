@@ -69,9 +69,9 @@ const Navbar = ({ isLoggedIn }) => {
 
   const navItems = [
     { to: '/layoff_risk', icon: Shield, label: 'Layoff Risk' },
-    { to: '/career_pivot', icon: Brain, label: 'Career Pivot', requiresAuth: true },
-    { to: '/networking', icon: Network, label: 'Networking', requiresAuth: true },
-    { to: '/counseling', icon: MessageSquare, label: 'Counseling', requiresAuth: true },
+    { to: '/career_pivot', icon: Brain, label: 'Career Pivot' },
+    { to: '/networking', icon: Network, label: 'Networking' },
+    { to: '/counseling', icon: MessageSquare, label: 'Counseling' },
     { to: '/pricing', icon: CreditCard, label: 'Pricing' },
   ];
 
