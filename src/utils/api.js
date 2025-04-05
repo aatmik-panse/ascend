@@ -1,6 +1,7 @@
-export const API_BASE_URL = 'http://localhost:1234';
-
 import { createClient } from '@/utils/supabase/client';
+
+// Use relative paths instead of hardcoded URL
+export const API_BASE_URL = '';
 
 export async function checkBackendHealth() {
   console.log('Checking backend health');
@@ -30,24 +31,20 @@ export async function checkBackendHealth() {
  * @returns {Promise<Object>} - The user data
  */
 export async function fetchUserData(userId) {
+  if (!userId) {
+    console.error('User ID is required');
+    return null;
+  }
+  
   try {
-    const supabase = createClient();
-    
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-    
-    if (error) {
-      console.error('Error fetching user data:', error);
-      throw error;
+    const response = await fetch(`${API_BASE_URL}/api/user/${userId}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
-    
-    return data;
+    return await response.json();
   } catch (error) {
-    console.error('Failed to fetch user data:', error);
-    throw error;
+    console.error('Error fetching user data:', error);
+    return null;
   }
 }
 
@@ -58,42 +55,26 @@ export async function fetchUserData(userId) {
  * @returns {Promise<Array>} - Array of career insights
  */
 export async function fetchCareerInsights(userId, options = {}) {
+  if (!userId) {
+    console.error('User ID is required');
+    return { insights: [] };
+  }
+  
+  const { limit = 10, page = 1, category } = options;
+  let url = `${API_BASE_URL}/api/insights/${userId}?limit=${limit}&page=${page}`;
+  
+  if (category) {
+    url += `&category=${encodeURIComponent(category)}`;
+  }
+  
   try {
-    const supabase = createClient();
-    
-    let query = supabase
-      .from('career_insights')
-      .select('*')
-      .eq('user_id', userId);
-    
-    // Apply additional filters if provided in options
-    if (options.category) {
-      query = query.eq('category', options.category);
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
-    
-    if (options.limit) {
-      query = query.limit(options.limit);
-    }
-    
-    if (options.orderBy) {
-      query = query.order(options.orderBy.column, { 
-        ascending: options.orderBy.ascending 
-      });
-    } else {
-      // Default sorting by created_at in descending order
-      query = query.order('created_at', { ascending: false });
-    }
-    
-    const { data, error } = await query;
-    
-    if (error) {
-      console.error('Error fetching career insights:', error);
-      throw error;
-    }
-    
-    return data;
+    return await response.json();
   } catch (error) {
-    console.error('Failed to fetch career insights:', error);
-    throw error;
+    console.error('Error fetching career insights:', error);
+    return { insights: [] };
   }
 }
