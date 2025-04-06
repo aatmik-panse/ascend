@@ -1,10 +1,13 @@
 'use client'
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, CheckCircle, Briefcase, Building, Clock, TrendingUp, DollarSign, Award, Calendar, Linkedin, AlertCircle } from 'lucide-react';
+import { ChevronRight, ChevronLeft, CheckCircle, Briefcase, Building, Clock, TrendingUp, DollarSign, Award, Calendar, Linkedin, AlertCircle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 
 export default function CareerOnboarding() {
   const [currentStep, setCurrentStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState(null);
   const [formData, setFormData] = useState({
     jobTitle: '',
     company: '',
@@ -43,13 +46,47 @@ export default function CareerOnboarding() {
     });
   };
 
-  const nextStep = () => {
-    if (currentStep < totalSteps) {
+  const submitFormData = async () => {
+    setIsSubmitting(true);
+    setSubmissionError(null);
+    
+    try {
+      const response = await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save onboarding data');
+      }
+      
+      // Move to the completion step after successful submission
       setCurrentStep(currentStep + 1);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmissionError(error.message || 'Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const nextStep = () => {
+    console.log('Next button clicked, current step:', currentStep);
+    if (currentStep < totalSteps) {
+      // If it's the final step (confirmation), submit data to backend
+      if (currentStep === 5) {
+        submitFormData();
+      } else {
+        setCurrentStep(currentStep + 1);
+      }
     }
   };
 
   const prevStep = () => {
+    console.log('Back button clicked, current step:', currentStep);
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
@@ -354,6 +391,13 @@ export default function CareerOnboarding() {
                 </div>
               </div>
             </div>
+            
+            {submissionError && (
+              <div className="bg-red-900/20 border border-red-800 rounded-lg p-3 text-red-300 text-sm flex items-start">
+                <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
+                <span>{submissionError}</span>
+              </div>
+            )}
           </motion.div>
         );
       case 6:
@@ -424,9 +468,9 @@ export default function CareerOnboarding() {
                 key={i}
                 className="absolute w-1 h-1 rounded-full bg-white"
                 style={{
-                  top: `${Math.random() * 100}%`,
-                  left: `${Math.random() * 100}%`,
-                  opacity: Math.random() * 0.5,
+                  top: `${100}%`,
+                  left: `${100}%`,
+                  opacity: 0.7 + 0.3,
                   boxShadow: '0 0 4px 1px rgba(255, 255, 255, 0.3)'
                 }}
               ></div>
@@ -490,7 +534,7 @@ export default function CareerOnboarding() {
         {/* Right column - with form content */}
         <div className={`w-full ${currentStep === 0 || currentStep === 6 ? 'lg:w-full' : 'lg:w-7/12'} bg-[#0f0f1a] backdrop-blur-xl p-8 rounded-r-2xl relative ${currentStep === 0 || currentStep === 6 ? 'lg:rounded-l-2xl' : ''}`}>
           {/* Background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a2e]/10 to-transparent rounded-r-2xl"></div>
+          {/* <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a2e]/10 to-transparent rounded-r-2xl"></div> */}
           
           {/* Progress bar - mobile only */}
           <div className="lg:hidden mb-8 relative">
@@ -515,20 +559,37 @@ export default function CareerOnboarding() {
           {currentStep > 0 && currentStep < 6 && (
             <div className="flex justify-between mt-12">
               <button
-                onClick={prevStep}
-                className="flex items-center text-gray-400 hover:text-white transition-colors px-4 py-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  prevStep();
+                }}
+                className="flex items-center text-gray-400 hover:text-white transition-colors px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-lg"
+                disabled={isSubmitting}
+                type="button"
               >
                 <ChevronLeft className="w-5 h-5 mr-1" /> Back
               </button>
               
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={nextStep}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-2.5 px-7 rounded-xl flex items-center transition-all duration-300 shadow-lg shadow-purple-900/20"
+              <Button
+                // whileHover={{ scale: isSubmitting ? 1 : 1.03 }}
+                // whileTap={{ scale: isSubmitting ? 1 : 0.97 }}
+                onClick={(e) => {
+                  nextStep();
+                }}
+                disabled={isSubmitting}
+                className={`bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-2.5 px-7 rounded-xl flex items-center transition-all duration-300 shadow-lg shadow-purple-900/20 ${isSubmitting ? 'opacity-80 cursor-not-allowed' : ''} focus:outline-none focus:ring-2 focus:ring-purple-500`}
               >
-                {currentStep === 5 ? 'Complete' : 'Continue'} <ChevronRight className="ml-1 w-5 h-5" />
-              </motion.button>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
+                  </>
+                ) : (
+                  <>
+                    {currentStep === 5 ? 'Complete' : 'Continue'} <ChevronRight className="ml-1 w-5 h-5" />
+                  </>
+                )}
+              </Button>
             </div>
           )}
         </div>

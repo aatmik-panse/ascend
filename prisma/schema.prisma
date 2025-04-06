@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String           @id @default(uuid())
+  created_at       DateTime         @default(now())
+  user_id          String?          @unique // For external provider IDs
+  email            String           @unique
+  full_name        String?
+  avatar_url       String?
+  auth_provider    String?
+  email_verified   Boolean          @default(false)
+  phone            String?
+  last_sign_in_at  DateTime?
+  updated_at       DateTime         @updatedAt
+  provider_id      String?
+  provider_sub     String?
+  is_anonymous     Boolean          @default(false)
+  role             String?          @default("user")
+  refresh_token    String?
+  onboardingData   OnboardingData[]
+}
+
+model OnboardingData {
+  id             String   @id @default(uuid())
+  userId         String?  // Optional until auth is implemented
+  user           User?    @relation(fields: [userId], references: [id])
+  jobTitle       String
+  company        String?
+  experience     String?
+  jobStability   Int      @default(3)
+  salaryRange    String?
+  topSkills      String[] // Array of skills
+  timeForGrowth  String?
+  linkedinUrl    String?
+  biggestConcern String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+}
