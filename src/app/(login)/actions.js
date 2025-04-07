@@ -55,7 +55,7 @@ export const signIn = validatedAction(signInSchema, async (data) => {
     }
 
     // Successful sign in, redirect to dashboard
-    redirect("/layoff_risk");
+    redirect("/onboarding");
   } catch (error) {
     console.error("Unexpected error during sign in:", error);
     return { error: "An unexpected error occurred. Please try again." };
@@ -151,7 +151,7 @@ export const signInWithMagicLink = validatedAction(
       options: {
         emailRedirectTo: `${redirectTo}?priceId=${encodeURIComponent(
           priceId || ""
-        )}&redirect=${encodeURIComponent("/layoff_risk")}`,
+        )}&redirect=${encodeURIComponent("/onboarding")}`,
       },
     });
     if (error) {
@@ -175,7 +175,7 @@ export const signInWithGoogle = async (event) => {
       options: {
         redirectTo: `${redirectTo}?priceId=${encodeURIComponent(
           priceId || ""
-        )}&redirect=/layoff_risk`,
+        )}&redirect=/onboarding`,
       },
     });
     if (signInError) {

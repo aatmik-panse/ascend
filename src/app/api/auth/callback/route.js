@@ -7,37 +7,38 @@ export async function GET(request) {
   try {
     const requestUrl = new URL(request.url);
     const code = requestUrl.searchParams.get("code");
-    const encodedRedirectTo = requestUrl.searchParams.get("redirect") || "/layoff_risk";
+    const encodedRedirectTo = requestUrl.searchParams.get("redirect") || "/onboarding";
     const priceId = decodeURIComponent(requestUrl.searchParams.get("priceId") || "");
     const discountCode = decodeURIComponent(requestUrl.searchParams.get("discountCode") || "");
     const redirectTo = decodeURIComponent(encodedRedirectTo);
 
     if (!code) {
-      return NextResponse.redirect(new URL('/login?error=no_code', request.url));
+      return NextResponse.redirect(new URL('/sign-in?error=no_code', request.url));
     }
 
     const supabase = await createClient();
     const cookieStore = await cookies();
+    // await cookies().getAll();
 
     // Exchange the code for a session
     const { data: { session }, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-    // await cookies().getAll();
+    await cookies().getAll();
 
     if (exchangeError) {
       console.error('Error exchanging code for session:', exchangeError);
-      return NextResponse.redirect(new URL('/login?error=auth_failed', request.url));
+      return NextResponse.redirect(new URL('/sign-in?error=auth_failed', request.url));
     }
 
     if (!session) {
       console.error('No session created after code exchange');
-      return NextResponse.redirect(new URL('/login?error=session_failed', request.url));
+      return NextResponse.redirect(new URL('/sign-in?error=session_failed', request.url));
     }
 
     // Get the user data
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
       console.error('Error getting user:', userError);
-      return NextResponse.redirect(new URL('/login?error=user_not_found', request.url));
+      return NextResponse.redirect(new URL('/sign-in?error=user_not_found', request.url));
     }
 
     // Set full_name to email part before @ if no name is provided
@@ -76,6 +77,26 @@ export async function GET(request) {
         is_anonymous: user.is_anonymous || false,
         role: user.role || 'user'
       });
+      
+      await prisma.user.create({
+        data: {
+          user_id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || user.user_metadata?.name,
+          avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
+          auth_provider: user.app_metadata?.provider || 'email',
+          email_verified: user.email_confirmed_at ? true : false,
+          phone: user.phone || null,
+          created_at: user.created_at ? new Date(user.created_at).toISOString() : new Date().toISOString(),
+          last_sign_in_at: user.last_sign_in_at ? new Date(user.last_sign_in_at).toISOString() : new Date().toISOString(),
+          updated_at: user.updated_at ? new Date(user.updated_at).toISOString() : new Date().toISOString(),
+          provider_id: user.user_metadata?.provider_id || null,
+          provider_sub: user.user_metadata?.sub || null,
+          is_anonymous: user.is_anonymous || false,
+          role: user.role || 'user'
+        }
+      });
+
 
       if (insertError) {
         console.error('Error creating user profile:', insertError);
@@ -113,6 +134,6 @@ export async function GET(request) {
     return response;
   } catch (error) {
     console.error('Auth callback error:', error);
-    return NextResponse.redirect(new URL('/login?error=auth_failed', request.url));
+    return NextResponse.redirect(new URL('/sign-in?error=auth_failed', request.url));
   }
 }

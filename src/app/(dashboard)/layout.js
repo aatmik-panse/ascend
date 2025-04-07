@@ -27,7 +27,7 @@ export default function DashboardLayout({ children }) {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-zinc-900">
       <Navbar isLoggedIn={!!user} />
       <main className="flex-1 ml-24 relative">
         {children}

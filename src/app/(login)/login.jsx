@@ -29,7 +29,7 @@ export function Login({ mode = "signin" }) {
           priceId || ""
         )}&discountCode=${encodeURIComponent(
           discountCode || ""
-        )}&redirect=${encodeURIComponent("/layoff_risk")}`,
+        )}&redirect=${encodeURIComponent("/onboarding")}`,
       },
     });
     // Removed setLoading(false) as it won't execute due to the redirect

@@ -70,6 +70,25 @@ export async function GET(request) {
             role: user.role || 'user'
           });
 
+          await prisma.user.create({
+            data: {
+              user_id: user.id,
+              email: user.email,
+              full_name: user.user_metadata?.full_name || user.user_metadata?.name,
+              avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
+              auth_provider: user.app_metadata?.provider || 'email',
+              email_verified: user.email_confirmed_at ? true : false,
+              phone: user.phone || null,
+              created_at: user.created_at ? new Date(user.created_at).toISOString() : new Date().toISOString(),
+              last_sign_in_at: user.last_sign_in_at ? new Date(user.last_sign_in_at).toISOString() : new Date().toISOString(),
+              updated_at: user.updated_at ? new Date(user.updated_at).toISOString() : new Date().toISOString(),
+              provider_id: user.user_metadata?.provider_id || null,
+              provider_sub: user.user_metadata?.sub || null,
+              is_anonymous: user.is_anonymous || false,
+              role: user.role || 'user'
+            }
+          });
+
         if (insertError) {
           console.error('Profile creation error:', insertError);
           return NextResponse.redirect(`${requestUrl.origin}/signin?error=profile_creation_error`);
