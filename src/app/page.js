@@ -221,7 +221,7 @@ function TestimonialCard({ name, role, quote, company, index = 0 }) {
         </div>
         
         <div className="flex-grow">
-          <p className="text-gray-300 mb-6 text-base leading-relaxed">"{quote}"</p>
+          <p className="text-gray-300 mb-6 text-base leading-relaxed">&apos;{quote}&apos;</p>
         </div>
         
         <div className="pt-4 border-t border-white/5 flex items-center">
@@ -640,7 +640,7 @@ function Home() {
                     <span className="text-blue-500 text-sm uppercase tracking-wider mb-3 block font-medium">Data-Driven Career Navigation</span>
                     <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white leading-tight">Tools that transform volatility into advantage</h2>
                     <p className="text-gray-400 mb-10 leading-relaxed text-lg">
-                      Our platform's intelligent systems analyze market patterns, industry shifts, and your unique skillset to guide you toward optimal career moves.
+                      Our platform&apos;s intelligent systems analyze market patterns, industry shifts, and your unique skillset to guide you toward optimal career moves.
                     </p>
                     
                     <div className="space-y-8">
@@ -887,7 +887,7 @@ function Home() {
                   Ready to secure your career future?
                 </h2>
                 <p className="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
-                  Join thousands of professionals who've transformed uncertainty into opportunity with certcy.
+                  Join thousands of professionals who&apos;ve transformed uncertainty into opportunity with certcy.
                 </p>
               </div>
               
