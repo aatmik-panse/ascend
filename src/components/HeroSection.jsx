@@ -5,6 +5,52 @@ import { motion } from 'framer-motion';
 import { cn } from "@/lib/utils";
 import { GridPattern } from "@/registry/magicui/grid-pattern";
 
+// Add the Ripple component definition
+const Ripple = React.memo(function Ripple({
+  mainCircleSize = 210,
+  mainCircleOpacity = 0.24,
+  numCircles = 8,
+  className,
+  ...props
+}) {
+  return (
+    <div
+      className={cn(
+        "pointer-events-none absolute inset-0 select-none",
+        className,
+      )}
+      {...props}
+    >
+      {Array.from({ length: numCircles }, (_, i) => {
+        const size = mainCircleSize + i * 70;
+        const opacity = mainCircleOpacity - i * 0.03;
+        const borderStyle = i === numCircles - 1 ? "dashed" : "solid";
+        const borderOpacity = 5 + i * 5;
+
+        return (
+          <div
+            key={i}
+            className={`absolute rounded-full border bg-foreground/25 shadow-xl`}
+            style={{
+              width: `${size}px`,
+              height: `${size}px`,
+              opacity,
+              borderStyle,
+              borderWidth: "1px",
+              borderColor: `rgba(255, 255, 255, ${borderOpacity / 100})`,
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%) scale(1)",
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+});
+
+Ripple.displayName = "Ripple";
+
 const CareerHeroSection = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -71,6 +117,13 @@ const CareerHeroSection = () => {
         className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
         style={{ opacity: gradientOpacity }}
       >
+        {/* Add the Ripple component without animation */}
+        <Ripple 
+          className="z-20 opacity-80" 
+          mainCircleOpacity={0.15}
+          numCircles={6}
+          mainCircleSize={280}
+        />
         
         {/* Grid pattern for subtle texture */}
         <div className="absolute inset-0 z-0">
@@ -220,14 +273,6 @@ const CareerHeroSection = () => {
           </div>
         </div>
       </motion.section>
-      
-      {/* Simple gradient fade-out for smooth transition */}
-      <div 
-        className="h-48 relative z-5"
-        style={{
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%)'
-        }}
-      ></div>
     </div>
   );
 };
