@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect, useCallback, lazy, Suspense } from 
 import { ArrowRight, Shield, Rocket, Brain, Target, ChevronDown, Play, MapPin, ThumbsUp, ThumbsDown, Menu, X, ExternalLink, Check, ArrowUpRight, Star, Globe, Users, MessageCircle } from 'lucide-react';
 import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence, stagger } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { NewNavbar } from '@/components/Navbar';
 
 // Container component for consistent spacing and max width
 function Container({ children, className = "", maxWidth = "max-w-7xl" }) {
@@ -367,188 +368,7 @@ function TeamMemberCard({ name, role, bio, image, index = 0 }) {
   );
 }
 
-// Modern navbar with glass effect
-function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('home');
-  const [scrolled, setScrolled] = useState(false);
-  
-  const navItems = [
-    { name: 'Features', href: '#features' },
-    { name: 'About', href: '#about' },
-    { name: 'Roadmap', href: '#roadmap' },
-    { name: 'Team', href: '#team' }
-  ];
-  
-  // Handle scroll to determine active section and header appearance
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-      
-      // Update active section based on scroll position
-      const sections = ['home', 'features', 'about', 'roadmap', 'team'];
-      
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= 100 && rect.bottom >= 100) {
-            setActiveSection(section);
-            break;
-          }
-        }
-      }
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
-  // Close menu when escape key is pressed
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') {
-        setMobileMenuOpen(false);
-      }
-    };
-    
-    if (mobileMenuOpen) {
-      document.addEventListener('keydown', handleEscape);
-    }
-    
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [mobileMenuOpen]);
-
-  return (
-    <header 
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
-        scrolled ? 'backdrop-blur-xl bg-black/80 border-b border-white/5' : 'bg-transparent'
-      }`}
-      role="banner"
-    >
-      <Container>
-        <div className="flex items-center justify-between py-4">
-          <a 
-            href="#home" 
-            className="text-2xl font-bold tracking-tight focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 rounded-md flex items-center"
-            aria-label="Certcy - return to homepage"
-          >
-            <span className="text-blue-400 mr-1">cert</span>
-            <span className="text-white">cy</span>
-          </a>
-          
-          <nav 
-            className="hidden md:flex items-center space-x-1" 
-            aria-label="Main navigation"
-          >
-            {navItems.map((item) => (
-              <a 
-                key={item.name} 
-                href={item.href} 
-                className={`relative px-4 py-2 text-base transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 rounded-md ${
-                  activeSection === item.href.substring(1) ? 'text-white' : 'text-gray-400 hover:text-white'
-                }`}
-                aria-current={activeSection === item.href.substring(1) ? 'page' : undefined}
-              >
-                {item.name}
-                {activeSection === item.href.substring(1) && (
-                  <motion.span 
-                    layoutId="activeNav"
-                    className="absolute -bottom-1 left-0 w-full h-0.5 bg-blue-500"
-                    aria-hidden="true"
-                  />
-                )}
-              </a>
-            ))}
-          </nav>
-          
-          <div className="flex items-center gap-4">
-            <a 
-              href="/sign-in" 
-              aria-label="Log in to certcy"
-              className="hidden md:block text-base text-gray-400 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 rounded-md px-2 py-1"
-            >
-              Log in
-            </a>
-            
-            <Button 
-              href="#get-started" 
-              ariaLabel="Get started with certcy"
-              icon={<ArrowRight className="w-4 h-4" />}
-            >
-              Get Started
-            </Button>
-            
-            <button
-              className="md:hidden text-gray-300 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 rounded-md p-1"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-expanded={mobileMenuOpen}
-              aria-controls="mobile-menu"
-              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-            >
-              {mobileMenuOpen ? (
-                <X className="w-6 h-6" aria-hidden="true" />
-              ) : (
-                <Menu className="w-6 h-6" aria-hidden="true" />
-              )}
-            </button>
-          </div>
-        </div>
-      </Container>
-      
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div 
-            id="mobile-menu"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-black/95 backdrop-blur-xl"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Mobile navigation menu"
-          >
-            <div className="px-4 pt-2 pb-6 space-y-1">
-              {navItems.map((item, index) => (
-                <motion.a
-                  key={item.name}
-                  href={item.href}
-                  className={`block py-3 px-2 border-b border-white/[0.05] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 rounded-md ${
-                    activeSection === item.href.substring(1) 
-                      ? 'text-white font-medium border-blue-500/30' 
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                  onClick={() => setMobileMenuOpen(false)}
-                  aria-current={activeSection === item.href.substring(1) ? 'page' : undefined}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  {item.name}
-                </motion.a>
-              ))}
-              <motion.a
-                href="/sign-in"
-                aria-label="Log in to certcy"
-                className="block py-3 px-2 border-b border-white/[0.05] text-blue-400 hover:text-blue-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 rounded-md"
-                onClick={() => setMobileMenuOpen(false)}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: navItems.length * 0.1 }}
-              >
-                Log in
-              </motion.a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
-  );
-}
 
 // Scroll progress indicator with modern style
 function ScrollProgressIndicator() {
@@ -565,7 +385,6 @@ function ScrollProgressIndicator() {
     />
   );
 }
-
 // Main component
 function Home() {
   const { scrollYProgress } = useScroll();
@@ -816,7 +635,11 @@ function Home() {
       </div>
 
       {/* Enhanced Navigation */}
-      <Navbar />
+      <div className="fixed top-5 left-0 right-0 z-50">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+          <NewNavbar />
+        </div>
+      </div>
 
       <main id="main-content">
         {/* Hero Section */}
