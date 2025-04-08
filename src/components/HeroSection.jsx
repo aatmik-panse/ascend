@@ -6,51 +6,7 @@ import { cn } from "@/lib/utils";
 import { GridPattern } from "@/registry/magicui/grid-pattern";
 import { kaushan_script } from "@/app/fonts";
 
-// Add the Ripple component definition
-const Ripple = React.memo(function Ripple({
-  mainCircleSize = 210,
-  mainCircleOpacity = 0.24,
-  numCircles = 8,
-  className,
-  ...props
-}) {
-  return (
-    <div
-      className={cn(
-        "pointer-events-none absolute inset-0 select-none",
-        className,
-      )}
-      {...props}
-    >
-      {Array.from({ length: numCircles }, (_, i) => {
-        const size = mainCircleSize + i * 70;
-        const opacity = mainCircleOpacity - i * 0.03;
-        const borderStyle = i === numCircles - 1 ? "dashed" : "solid";
-        const borderOpacity = 5 + i * 5;
 
-        return (
-          <div
-            key={i}
-            className={`absolute rounded-full border bg-foreground/25 shadow-xl`}
-            style={{
-              width: `${size}px`,
-              height: `${size}px`,
-              opacity,
-              borderStyle,
-              borderWidth: "1px",
-              borderColor: `rgba(255, 255, 255, ${borderOpacity / 100})`,
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%) scale(1)",
-            }}
-          />
-        );
-      })}
-    </div>
-  );
-});
-
-Ripple.displayName = "Ripple";
 
 const CareerHeroSection = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -113,15 +69,13 @@ const CareerHeroSection = () => {
   
   return (
     <div className="relative overflow-hidden">
-      {/* Simplified gradient background */}
+      {/* Background layers */}
       <div 
-        className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
+        className="fixed inset-0 pointer-events-none overflow-hidden"
         style={{ opacity: gradientOpacity }}
       >
-
-        
-        {/* Grid pattern for subtle texture */}
-        <div className="absolute inset-0 z-0">
+        {/* Grid Pattern (base layer) */}
+        <div className="absolute inset-0">
           <GridPattern
             width={40}
             height={40}
@@ -133,8 +87,21 @@ const CareerHeroSection = () => {
             )}
           />
         </div>
-        
-        {/* Subtle grainy texture */}
+
+        {/* New Light Gradient Overlay (middle layer) - centered */}
+        <div 
+          className="absolute"
+          style={{ 
+            background: 'radial-gradient(circle, rgba(170, 200, 235, 0.3) 0%, rgba(170, 200, 235, 0) 70%)',
+            width: '100vw',
+            height: '100vh',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)'
+          }}
+        />
+
+        {/* Subtle Grain Texture (top background layer) */}
         <div
           className="absolute inset-0 opacity-15"
           style={{
@@ -164,7 +131,7 @@ const CareerHeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+            <span className="bg-clip-text bg-gradient-to-r ">
               Transform Career Uncertainty
             </span>
             <br />

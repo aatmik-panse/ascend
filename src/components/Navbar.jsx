@@ -19,12 +19,12 @@ export function NewNavbar() {
       link: "#features",
     },
     {
-      name: "Pricing",
-      link: "#pricing",
+      name: "Testimonials",
+      link: "#testimonials",
     },
     {
-      name: "Contact",
-      link: "#contact",
+      name: "Support",
+      link: "#support",
     },
   ];
 
