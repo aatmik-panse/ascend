@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import Navbar from "@/components/Navbar";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter, usePathname } from 'next/navigation';
+import Navbar from '@/components/OldNavbar';
 
 export default function DashboardLayout({ children }) {
   const [user, setUser] = useState(null);

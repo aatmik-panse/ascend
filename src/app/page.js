@@ -4,6 +4,7 @@ import { ArrowRight, Shield, Rocket, Brain, Target, ChevronDown, Play, MapPin, T
 import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence, stagger } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { NewNavbar } from '@/components/Navbar';
+import CareerHeroSection from '@/components/HeroSection';
 
 // Container component for consistent spacing and max width
 function Container({ children, className = "", maxWidth = "max-w-7xl" }) {
@@ -611,29 +612,8 @@ function Home() {
       <ScrollProgressIndicator />
       
       {/* Subtle Background Noise for Texture */}
-      <div className="fixed inset-0 opacity-[0.03] bg-[url('/noise.png')] pointer-events-none z-[1]" aria-hidden="true"></div>
-      
-      {/* Subtle Background Gradients */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
-        <GradientBlur 
-          className="w-[900px] h-[600px]" 
-          color="#4285F4" 
-          position={{ top: -100, left: -300 }} 
-        />
-        <GradientBlur 
-          className="w-[800px] h-[800px]" 
-          color="#4285F4" 
-          position={{ bottom: -400, right: -200 }} 
-          opacity={0.2} 
-        />
-        <GradientBlur 
-          className="w-[600px] h-[600px]" 
-          color="#0F59F2" 
-          position={{ top: '40%', left: '60%' }} 
-          opacity={0.2} 
-        />
-      </div>
-
+      <div className="fixed inset-0 opacity-[0.03]  pointer-events-none z-[1]" aria-hidden="true"></div>
+      {/* /noise.png */}
       {/* Enhanced Navigation */}
       <div className="fixed top-5 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -642,163 +622,85 @@ function Home() {
       </div>
 
       <main id="main-content">
-        {/* Hero Section */}
-        <section id="home" className="relative min-h-screen flex items-center justify-center pt-20">
-          <motion.div 
-            className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-transparent"
-            style={{ opacity }}
-            aria-hidden="true"
-          />
-          
-          <motion.div 
-            className="w-full py-12 relative z-10"
-            style={{ scale }}
-          >
+
+          <CareerHeroSection />
+
+          {/* Features Section */}
+          <section id="features" className="py-24 relative ">
             <Container>
-              <motion.div 
-                ref={logoRef}
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={logoInView ? { scale: 1, opacity: 1 } : { scale: 0.95, opacity: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="mt-16 mb-20 text-center"
-              >
-                <div className="mx-auto flex flex-col items-center justify-center relative">
-                  <div className="w-28 h-28 rounded-full bg-gradient-to-br from-blue-500/10 to-blue-700/10 flex items-center justify-center mb-8">
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 inline-block text-transparent bg-clip-text relative z-10">
-                      <span className="font-bold">cert</span>cy
-                    </h1>
-                  </div>
-                  
-                  <TextReveal delay={0.3}>
-                    <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                      For careers that <span className="text-blue-500">won't settle</span>
-                      <br /> for average outcomes
-                    </h2>
-                  </TextReveal>
-
-                  <TextReveal delay={0.5}>
-                    <p className="text-xl text-gray-400 mb-12 max-w-2xl leading-relaxed">
-                      Navigate your professional journey with AI-powered insights and strategic guidance that turns market volatility into opportunity.
+              <div className="flex flex-col lg:flex-row gap-16 lg:gap-20 items-center">
+                <motion.div 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  className="lg:w-1/2"
+                >
+                  <div className="lg:max-w-md">
+                    <span className="text-blue-500 text-sm uppercase tracking-wider mb-3 block font-medium">Data-Driven Career Navigation</span>
+                    <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white leading-tight">Tools that transform volatility into advantage</h2>
+                    <p className="text-gray-400 mb-10 leading-relaxed text-lg">
+                      Our platform's intelligent systems analyze market patterns, industry shifts, and your unique skillset to guide you toward optimal career moves.
                     </p>
-                  </TextReveal>
-
-                  <div className="flex flex-col sm:flex-row gap-4 items-center">
-                    <Button 
-                      href="/onboarding" 
-                      size="lg" 
-                      ariaLabel="Begin career assessment"
-                      icon={<ArrowRight className="w-5 h-5" />}
-                    >
-                      Begin Assessment
-                    </Button>
                     
-                    <a 
-                      href="#about" 
-                      className="text-gray-400 hover:text-white transition-colors flex items-center py-3 px-8 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 rounded-md"
-                    >
-                      Learn more <ChevronDown className="w-4 h-4 ml-1" aria-hidden="true" />
-                    </a>
+                    <div className="space-y-8">
+                      {features.map((feature, index) => (
+                        <FeatureCard 
+                          key={feature.title}
+                          icon={feature.icon}
+                          title={feature.title}
+                          description={feature.desc}
+                          index={index}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-              
-              {/* Company Logos */}
-              <div className="mt-20 border-t border-white/5 pt-12">
-                <p className="text-center text-sm text-gray-500 uppercase tracking-wider mb-8 font-medium">Trusted by professionals from</p>
-                <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8">
-                  {['Google', 'Microsoft', 'Amazon', 'IBM', 'Apple'].map((company, index) => (
-                    <motion.div 
-                      key={company} 
-                      className="text-gray-400 text-lg"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 0.6, y: 0 }}
-                      transition={{ delay: index * 0.1, duration: 0.5 }}
-                    >
-                      {company}
-                    </motion.div>
-                  ))}
-                </div>
+                </motion.div>
+                
+                <motion.div 
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  className="lg:w-1/2"
+                >
+                  <Card hoverEffect={false}>
+                    <div className="border-b border-white/5 flex px-4 py-3 gap-2">
+                      <div className="w-3 h-3 rounded-full bg-[#FF5F56]" aria-hidden="true"></div>
+                      <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" aria-hidden="true"></div>
+                      <div className="w-3 h-3 rounded-full bg-[#27C93F]" aria-hidden="true"></div>
+                    </div>
+                    <div className="p-6">
+                      <div className="flex gap-6 mb-6">
+                        <div className="w-1/2">
+                          <div className="h-4 w-32 bg-blue-500/20 rounded-full mb-2" aria-hidden="true"></div>
+                          <div className="h-32 bg-[#0f0f18] rounded-lg border border-white/5" aria-hidden="true"></div>
+                        </div>
+                        <div className="w-1/2">
+                          <div className="h-4 w-28 bg-blue-500/20 rounded-full mb-2" aria-hidden="true"></div>
+                          <div className="h-32 bg-[#0f0f18] rounded-lg border border-white/5" aria-hidden="true"></div>
+                        </div>
+                      </div>
+                      <div className="mb-6">
+                        <div className="h-4 w-40 bg-blue-500/20 rounded-full mb-2" aria-hidden="true"></div>
+                        <div className="grid grid-cols-4 gap-2">
+                          {[...Array(4)].map((_, i) => (
+                            <div key={i} className="h-16 bg-[#0f0f18] rounded-lg border border-white/5" aria-hidden="true"></div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="h-4 w-36 bg-blue-500/20 rounded-full mb-2" aria-hidden="true"></div>
+                        <div className="h-28 bg-[#0f0f18] rounded-lg border border-white/5" aria-hidden="true"></div>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
               </div>
             </Container>
-          </motion.div>
-        </section>
+          </section>
 
-        {/* Features Section */}
-        <section id="features" className="py-24 relative">
-          <Container>
-            <div className="flex flex-col lg:flex-row gap-16 lg:gap-20 items-center">
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true, margin: "-50px" }}
-                className="lg:w-1/2"
-              >
-                <div className="lg:max-w-md">
-                  <span className="text-blue-500 text-sm uppercase tracking-wider mb-3 block font-medium">Data-Driven Career Navigation</span>
-                  <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white leading-tight">Tools that transform volatility into advantage</h2>
-                  <p className="text-gray-400 mb-10 leading-relaxed text-lg">
-                    Our platform's intelligent systems analyze market patterns, industry shifts, and your unique skillset to guide you toward optimal career moves.
-                  </p>
-                  
-                  <div className="space-y-8">
-                    {features.map((feature, index) => (
-                      <FeatureCard 
-                        key={feature.title}
-                        icon={feature.icon}
-                        title={feature.title}
-                        description={feature.desc}
-                        index={index}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-              
-              <motion.div 
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true, margin: "-50px" }}
-                className="lg:w-1/2"
-              >
-                <Card hoverEffect={false}>
-                  <div className="border-b border-white/5 flex px-4 py-3 gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#FF5F56]" aria-hidden="true"></div>
-                    <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" aria-hidden="true"></div>
-                    <div className="w-3 h-3 rounded-full bg-[#27C93F]" aria-hidden="true"></div>
-                  </div>
-                  <div className="p-6">
-                    <div className="flex gap-6 mb-6">
-                      <div className="w-1/2">
-                        <div className="h-4 w-32 bg-blue-500/20 rounded-full mb-2" aria-hidden="true"></div>
-                        <div className="h-32 bg-[#0f0f18] rounded-lg border border-white/5" aria-hidden="true"></div>
-                      </div>
-                      <div className="w-1/2">
-                        <div className="h-4 w-28 bg-blue-500/20 rounded-full mb-2" aria-hidden="true"></div>
-                        <div className="h-32 bg-[#0f0f18] rounded-lg border border-white/5" aria-hidden="true"></div>
-                      </div>
-                    </div>
-                    <div className="mb-6">
-                      <div className="h-4 w-40 bg-blue-500/20 rounded-full mb-2" aria-hidden="true"></div>
-                      <div className="grid grid-cols-4 gap-2">
-                        {[...Array(4)].map((_, i) => (
-                          <div key={i} className="h-16 bg-[#0f0f18] rounded-lg border border-white/5" aria-hidden="true"></div>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="h-4 w-36 bg-blue-500/20 rounded-full mb-2" aria-hidden="true"></div>
-                      <div className="h-28 bg-[#0f0f18] rounded-lg border border-white/5" aria-hidden="true"></div>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-            </div>
-          </Container>
-        </section>
-
-        {/* Methodology Section */}
+        {/* Methodology Section - outside the wrapper */}
         <section className="py-24 relative">
           <GradientBlur 
             className="w-[600px] h-[600px]" 
@@ -1019,7 +921,7 @@ function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="py-20 bg-[#050505] border-t border-white/5" role="contentinfo">
+      <footer className="py-20 bg-[#050505] border-t border-white/5 relative z-10" role="contentinfo">
         <Container>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mb-16">
             <div className="md:col-span-2">
@@ -1067,6 +969,7 @@ function Home() {
               </div>
             </div>
             
+            
             {[
               {
                 title: "Product",
@@ -1099,7 +1002,7 @@ function Home() {
             ))}
           </div>
           
-          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center">
+          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center"></div>
             <p className="text-gray-600 text-sm mb-4 md:mb-0">
               © {new Date().getFullYear()} certcy. All rights reserved.
             </p>
@@ -1107,9 +1010,8 @@ function Home() {
               <a 
                 href="#" 
                 className="text-gray-600 hover:text-blue-400 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 rounded-md"
-              >
+              ></a>
                 Terms
-              </a>
               <a 
                 href="#" 
                 className="text-gray-600 hover:text-blue-400 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 rounded-md"
@@ -1123,7 +1025,6 @@ function Home() {
                 Security
               </a>
             </div>
-          </div>
         </Container>
       </footer>
     </div>

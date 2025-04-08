@@ -60,8 +60,9 @@ export const NavBody = ({
       }}
       transition={{
         type: "spring",
-        stiffness: 200,
-        damping: 50,
+        stiffness: 100, // Reduced from 200 for slower animation
+        damping: 30, // Reduced from 50 for slower animation
+        duration: 1.2, // Added longer duration for slower animation
       }}
       style={{
         minWidth: "800px",
@@ -87,7 +88,7 @@ export const NavItems = ({
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
+        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-1000 hover:text-zinc-800 lg:flex lg:space-x-2", // Changed from duration-800 to duration-1000
         className
       )}>
       {items.map((item, idx) => (
@@ -129,8 +130,9 @@ export const MobileNav = ({
       }}
       transition={{
         type: "spring",
-        stiffness: 200,
-        damping: 50,
+        stiffness: 100, // Reduced from 200 for slower animation
+        damping: 30, // Reduced from 50 for slower animation
+        duration: 1.2, // Added longer duration for slower animation
       }}
       className={cn(
         "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden",
@@ -167,6 +169,7 @@ export const MobileNavMenu = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }} // Added longer duration for slower animation
           className={cn(
             "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-lg bg-white px-4 py-8 shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] dark:bg-neutral-950",
             className
@@ -198,7 +201,9 @@ export const NavbarLogo = () => {
         src="https://i.ibb.co/j9v4yTh4/minilogo.png"
         alt="logo"
         width={30}
-        height={30} />
+        height={30}
+        className=" rounded-sm object-cover"
+         />
       <span className="font-medium text-black dark:text-white">certcy</span>
     </Link>
   );
@@ -213,7 +218,7 @@ export const NavbarButton = ({
   ...props
 }) => {
   const baseStyles =
-    "px-4 py-2 rounded-md bg-white button bg-white text-black text-sm font-bold relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center";
+    "px-4 py-2 rounded-md bg-white button bg-white text-black text-sm font-bold relative cursor-pointer hover:-translate-y-0.5 transition duration-1200 inline-block text-center";
 
   const variantStyles = {
     primary:
