@@ -8,29 +8,41 @@ import { GridPattern } from "@/registry/magicui/grid-pattern";
 const CareerHeroSection = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [viewportHeight, setViewportHeight] = useState(800); // Default viewport height
   const firstSectionRef = useRef(null);
   const secondSectionRef = useRef(null);
   
-  // Handle mouse movement for interactive elements
+  // Initialize window-dependent values after mount
   useEffect(() => {
+    // Set initial viewport dimensions
+    setViewportHeight(window.innerHeight);
+    
+    // Handle resize
+    const handleResize = () => {
+      setViewportHeight(window.innerHeight);
+    };
+    
+    // Handle mouse movement for interactive elements
     const handleMouseMove = (e) => {
       const x = (e.clientX / window.innerWidth) - 0.5;
       const y = (e.clientY / window.innerHeight) - 0.5;
       setMousePosition({ x, y });
     };
     
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-  
-  // Handle scroll for parallax and transitions
-  useEffect(() => {
+    // Handle scroll for parallax and transitions
     const handleScroll = () => {
       setScrollPosition(window.scrollY);
     };
     
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
   
   // Calculate scroll progress for animations
@@ -40,17 +52,17 @@ const CareerHeroSection = () => {
     return (scrollPosition - startPosition) / (endPosition - startPosition);
   };
   
-  // Section transition calculations
-  const firstSectionProgress = calculateProgress(0, window.innerHeight);
+  // Section transition calculations - safely using viewportHeight
+  const firstSectionProgress = calculateProgress(0, viewportHeight);
   const parallaxY = firstSectionProgress * 150; // Reduced parallax effect for better focus
   
-  const secondSectionStartPosition = window.innerHeight * 0.5;
-  const secondSectionEndPosition = window.innerHeight * 1;
+  const secondSectionStartPosition = viewportHeight * 0.5;
+  const secondSectionEndPosition = viewportHeight * 1;
   const secondSectionProgress = calculateProgress(secondSectionStartPosition, secondSectionEndPosition);
   const secondSectionOpacity = secondSectionProgress;
   
   // Background gradient opacity
-  const gradientOpacity = 1 - calculateProgress(window.innerHeight * 1.3, window.innerHeight * 2);
+  const gradientOpacity = 1 - calculateProgress(viewportHeight * 1.3, viewportHeight * 2);
   
   return (
     <div className="relative overflow-hidden">
@@ -73,8 +85,6 @@ const CareerHeroSection = () => {
             )}
           />
         </div>
-        
-        {/* Background gradient */}
         
         {/* Subtle grainy texture */}
         <div
