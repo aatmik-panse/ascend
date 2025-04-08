@@ -10,6 +10,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import React, { useRef, useState } from "react";
+import { kaushan_script } from "@/app/fonts";
 
 export const Navbar = ({
   children,
@@ -204,7 +205,7 @@ export const NavbarLogo = () => {
         height={30}
         className=" rounded-sm object-cover"
          />
-      <span className="font-medium text-black dark:text-white">certcy</span>
+      <span className={`font-medium text-black dark:text-white ${kaushan_script.className}`}>Certcy</span>
     </Link>
   );
 };

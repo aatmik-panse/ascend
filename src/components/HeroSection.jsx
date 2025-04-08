@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from "@/lib/utils";
 import { GridPattern } from "@/registry/magicui/grid-pattern";
+import { kaushan_script } from "@/app/fonts";
 
 // Add the Ripple component definition
 const Ripple = React.memo(function Ripple({
@@ -117,13 +118,7 @@ const CareerHeroSection = () => {
         className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
         style={{ opacity: gradientOpacity }}
       >
-        {/* Add the Ripple component without animation */}
-        <Ripple 
-          className="z-20 opacity-80" 
-          mainCircleOpacity={0.15}
-          numCircles={6}
-          mainCircleSize={280}
-        />
+
         
         {/* Grid pattern for subtle texture */}
         <div className="absolute inset-0 z-0">
@@ -217,10 +212,10 @@ const CareerHeroSection = () => {
           opacity: Math.max(0, secondSectionOpacity),
         }}
       >
-        <div className="max-w-5xl mx-auto px-4 md:px-8">
+        <div className="max-w-5xl mx-auto px-4 md:px-8 relative z-10">
           <div className="mb-12 text-center">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
-              <span className="text-blue-500">certcy</span> is your career catalyst
+              <span className={`text-blue-500 ${kaushan_script.className}`}>Certcy&nbsp;</span> is your career catalyst
             </h2>
             <p className="text-lg text-gray-300 max-w-3xl mx-auto">
               Guiding professionals through career transitions with data-driven insights
