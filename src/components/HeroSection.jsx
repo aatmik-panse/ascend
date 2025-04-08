@@ -1,12 +1,11 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Brain, RouteOff, BarChart2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from "@/lib/utils";
 import { GridPattern } from "@/registry/magicui/grid-pattern";
 import { kaushan_script } from "@/app/fonts";
-
-
+import { MagicCard } from './magicui/magic-card';
 
 const CareerHeroSection = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -92,7 +91,7 @@ const CareerHeroSection = () => {
         <div 
           className="absolute"
           style={{ 
-            background: 'radial-gradient(circle, rgba(170, 200, 235, 0.3) 0%, rgba(170, 200, 235, 0) 70%)',
+            background: 'radial-gradient(circle, rgba(170, 200, 235, 0.3) 0%, rgba(170, 200, 235, 0) 60%)',
             width: '100vw',
             height: '100vh',
             top: '50%',
@@ -180,7 +179,7 @@ const CareerHeroSection = () => {
         }}
       >
         <div className="max-w-5xl mx-auto px-4 md:px-8 relative z-10">
-          <div className="mb-12 text-center">
+          <div className="mb-16 text-center">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
               <span className={`text-blue-500 ${kaushan_script.className}`}>Certcy&nbsp;</span> is your career catalyst
             </h2>
@@ -191,40 +190,58 @@ const CareerHeroSection = () => {
           
           <div className="grid md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="bg-slate-900/60 backdrop-blur-sm p-6 rounded-xl border border-slate-800">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 16V21M12 16L18 21M12 16L6 21M18 9V10M18 13V14M6 13V14M6 9V10M12 3V10M15.2 10H8.8C8.35817 10 8 10.3582 8 10.8V15.2C8 15.6418 8.35817 16 8.8 16H15.2C15.6418 16 16 15.6418 16 15.2V10.8C16 10.3582 15.6418 10 15.2 10Z" stroke="#38BDF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+            <MagicCard
+              className="rounded-xl" 
+              gradientFrom="#3B82F6" 
+              gradientTo="#38BDF8"
+            >
+              <div className="p-8">
+                <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-5">
+                  <Brain className="text-blue-400 h-6 w-6" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-white">AI-Powered Analysis</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Get personalized insights about your skills and market positioning based on real-time industry data.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">AI-Powered Analysis</h3>
-              <p className="text-gray-400">Get personalized insights about your skills and market positioning based on real-time industry data.</p>
-            </div>
+            </MagicCard>
             
             {/* Feature 2 */}
-            <div className="bg-slate-900/60 backdrop-blur-sm p-6 rounded-xl border border-slate-800">
-              <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9 6L20 6M20 6L16 2M20 6L16 10M15 18H4M4 18L8 14M4 18L8 22" stroke="#A855F7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+            <MagicCard 
+              className="rounded-xl" 
+              gradientFrom="#A855F7" 
+              gradientTo="#8B5CF6"
+            >
+              <div className="p-8">
+                <div className="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mb-5">
+                  <RouteOff className="text-purple-400 h-6 w-6" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-white">Strategic Roadmaps</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Develop clear action plans for upskilling, career pivots, and advancement opportunities tailored to your goals.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Strategic Roadmaps</h3>
-              <p className="text-gray-400">Develop clear action plans for upskilling, career pivots, and advancement opportunities tailored to your goals.</p>
-            </div>
+            </MagicCard>
             
             {/* Feature 3 */}
-            <div className="bg-slate-900/60 backdrop-blur-sm p-6 rounded-xl border border-slate-800">
-              <div className="w-12 h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center mb-4">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M16 8V16M12 11V16M8 14V16M4 18H20C20.5523 18 21 17.5523 21 17V7C21 6.44772 20.5523 6 20 6H4C3.44772 6 3 6.44772 3 7V17C3 17.5523 3.44772 18 4 18Z" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+            <MagicCard 
+              className="rounded-xl" 
+              gradientFrom="#084531" 
+              gradientTo="#01734f"
+            >
+              <div className="p-8">
+                <div className="w-12 h-12 bg-emerald-500/10 rounded-lg flex items-center justify-center mb-5">
+                  <BarChart2 className="text-emerald-400 h-6 w-6" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-white">Continuous Growth</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Track your progress and receive adaptive recommendations as industry demands and your skills evolve.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Continuous Growth</h3>
-              <p className="text-gray-400">Track your progress and receive adaptive recommendations as industry demands and your skills evolve.</p>
-            </div>
+            </MagicCard>
           </div>
           
-          <div className="mt-12 text-center">
+          {/* <div className="mt-12 text-center">
             <a 
               href="/learn-more"  
               className="inline-flex items-center text-blue-400 hover:text-blue-300 font-medium"
@@ -232,7 +249,7 @@ const CareerHeroSection = () => {
               Learn how certcy works
               <ArrowRight className="ml-2 h-4 w-4" />
             </a>
-          </div>
+          </div> */}
         </div>
       </motion.section>
     </div>
