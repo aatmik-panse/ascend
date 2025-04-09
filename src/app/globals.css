@@ -93,9 +93,11 @@
 }
 
 :root {
-  --font-sans: 'Playfair Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Playfair Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, serif;
-  --font-playfair: 'Playfair Display', serif;
+  --font-sans: "Playfair Display", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  --font-display: "Playfair Display", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, serif;
+  --font-playfair: "Playfair Display", serif;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -134,7 +136,12 @@ body {
   font-family: var(--font-display);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display);
 }
 
@@ -148,8 +155,8 @@ h1, h2, h3, h4, h5, h6 {
 } */
 
 @theme {
-  --color-periwinkle: #8A85FF;
-  --color-lilac: #C8A2FF;
+  --color-periwinkle: #8a85ff;
+  --color-lilac: #c8a2ff;
 }
 
 @theme inline {
@@ -231,7 +238,7 @@ body {
 }
 
 .recharts-legend-wrapper {
-  color: #9CA3AF !important;
+  color: #9ca3af !important;
 }
 
 .btn-primary {

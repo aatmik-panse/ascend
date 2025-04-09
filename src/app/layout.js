@@ -1,41 +1,50 @@
 // "use client";
-import React from 'react';
+import React from "react";
 import "./globals.css";
-import { Inter } from 'next/font/google';
-import { playfair_display } from './fonts';
+import { Inter } from "next/font/google";
+import { playfair_display } from "./fonts";
 
 export const metadata = {
   title: {
-    default: 'Certcy - Career Evolution Platform',
-    template: '%s | Certcy'
+    default: "Certcy - Career Evolution Platform",
+    template: "%s | Certcy",
   },
-  description: 'Guiding professionals through career transitions with data-driven insights',
-  keywords: ['career development', 'professional growth', 'career guidance', 'job transition', 'career pivot'],
-  authors: [{ name: 'Certcy Team' }],
-  creator: 'Certcy',
-  publisher: 'Certcy',
+  description:
+    "Guiding professionals through career transitions with data-driven insights",
+  keywords: [
+    "career development",
+    "professional growth",
+    "career guidance",
+    "job transition",
+    "career pivot",
+  ],
+  authors: [{ name: "Certcy Team" }],
+  creator: "Certcy",
+  publisher: "Certcy",
   openGraph: {
-    title: 'Certcy - Career Evolution Platform',
-    description: 'Guiding professionals through career transitions with data-driven insights',
-    url: 'https://certcy.space',
-    siteName: 'Certcy',
-    locale: 'en_US',
-    type: 'website',
+    title: "Certcy - Career Evolution Platform",
+    description:
+      "Guiding professionals through career transitions with data-driven insights",
+    url: "https://certcy.space",
+    siteName: "Certcy",
+    locale: "en_US",
+    type: "website",
     images: [
       {
-        url: 'https://www.certcy.space/backfull.JPG', // Replace with your actual OG image
+        url: "https://www.certcy.space/backfull.JPG", // Replace with your actual OG image
         width: 1200,
         height: 630,
-        alt: 'Certcy - Career Evolution Platform'
-      }
-    ]
+        alt: "Certcy - Career Evolution Platform",
+      },
+    ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Certcy - Career Evolution Platform',
-    description: 'Guiding professionals through career transitions with data-driven insights',
-    images: ['https://www.certcy.space/backfull.JPG'], // Replace with your actual Twitter image
-    creator: '@certcy'
+    card: "summary_large_image",
+    title: "Certcy - Career Evolution Platform",
+    description:
+      "Guiding professionals through career transitions with data-driven insights",
+    images: ["https://www.certcy.space/backfull.JPG"], // Replace with your actual Twitter image
+    creator: "@certcy",
   },
   robots: {
     index: true,
@@ -43,21 +52,21 @@ export const metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    }
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
-    apple: '/apple-touch-icon.png',
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
   },
-}
+};
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${playfair_display.variable}`}>
       <body className={playfair_display.className}>{children}</body>
     </html>
-  )
+  );
 }
