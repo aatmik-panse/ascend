@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { GridPattern } from "@/registry/magicui/grid-pattern";
 import { kaushan_script } from "@/app/fonts";
 import { MagicCard } from './magicui/magic-card';
+import { SiSwiggy, SiRailway, SiPlanetscale, SiStripe, SiSupabase, SiHashnode ,SiSaucelabs, SiSencha, SiBukalapak } from 'react-icons/si';
 
 const CareerHeroSection = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -66,6 +67,16 @@ const CareerHeroSection = () => {
   // Background gradient opacity
   const gradientOpacity = 1 - calculateProgress(viewportHeight * 1.3, viewportHeight * 2);
   
+  const companyIcons = [
+    { icon: SiBukalapak, name: 'Bukalapak' },
+    { icon: SiRailway, name: 'Railway' },
+    { icon: SiPlanetscale, name: 'PlanetScale' },
+    { icon: SiSencha, name: 'Sencha' },
+    { icon: SiSwiggy, name: 'Swiggy' },
+    { icon: SiHashnode, name: 'Hashnode' },
+    { icon: SiSaucelabs, name: 'Sauce Labs' },
+  ];
+
   return (
     <div className="relative overflow-hidden">
       {/* Background layers */}
@@ -99,22 +110,14 @@ const CareerHeroSection = () => {
             transform: 'translate(-50%, -50%)'
           }}
         />
+        
 
-        {/* Subtle Grain Texture (top background layer) */}
-        <div
-          className="absolute inset-0 opacity-15"
-          style={{
-            backgroundImage: 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39ra2uRkZGZmZlpaWmXl5dvb29xcXGTk5NnZ2c8TV1mAAAAG3RSTlNAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAvEOwtAAAFVklEQVR4XpWWB67c2BUFb3g557T/hRo9/WUMZHlgr4Bg8Z4qQgQJlHI4A8SzFVrapvmTF9O7dmYRFZ60YiBhJRCgh1FYhiLAmdvX0CzTOpNE77ME0Zty/nWWzchDtiqrmQDeuv3powQ5ta2eN0FY0InkqDD73lT9c9lEzwUNqgFHs9VQce3TVClFCQrSTfOiYkVJQBmpbq2L6iZavPnAPcoU0dSw0SUTqz/GtrGuXfbyyBniKykOWQWGqwwMA7QiYAxi+IlPdqo+hYHnUt5ZPfnsHJyNiDtnpJyayNBkF6cWoYGAMY92U2hXHF/C1M8uP/ZtYdiuj26UdAdQQSXQErwSOMzt/XWRWAz5GuSBIkwG1H3FabJ2OsUOUhGC6tK4EMtJO0ttC6IBD3kM0ve0tJwMdSfjZo+EEISaeTr9P3wYrGjXqyC1krcKdhMpxEnt5JetoulscpyzhXN5FRpuPHvbeQaKxFAEB6EN+cYN6xD7RYGpXpNndMmZgM5Dcs3YSNFDHUo2LGfZuukSWyUYirJAdYbF3MfqEKmjM+I2EfhA94iG3L7uKrR+GdWD73ydlIB+6hgref1QTlmgmbM3/LeX5GI1Ux1RWpgxpLuZ2+I+IjzZ8wqE4nilvQdkUdfhzI5QDWy+kw5Wgg2pGpeEVeCCA7b85BO3F9DzxB3cdqvBzWcmzbyMiqhzuYqtHRVG2y4x+KOlnyqla8AoWWpuBoYRxzXrfKuILl6SfiWCbjxoZJUaCBj1CjH7GIaDbc9kqBY3W/Rgjda1iqQcOJu2WW+76pZC9QG7M00dffe9hNnseupFL53r8F7YHSwJWUKP2q+k7RdsxyOB11n0xtOvnW4irMMFNV4H0uqwS5ExsmP9AxbDTc9JwgneAT5vTiUSm1E7BSflSt3bfa1tv8Di3R8n3Af7MNWzs49hmauE2wP+ttrq+AsWpFG2awvsuOqbipWHgtuvuaAE+A1Z/7gC9hesnr+7wqCwG8c5yAg3AL1fm8T9AZtp/bbJGwl1pNrE7RuOX7PeMRUERVaPpEs+yqeoSmuOlokqw49pgomjLeh7icHNlG19yjs6XXOMedYm5xH2YxpV2tc0Ro2jJfxC50ApuxGob7lMsxfTbeUv07TyYxpeLucEH1gNd4IKH2LAg5TdVhlCafZvpskfncCfx8pOhJzd76bJWeYFnFciwcYfubRc12Ip/ppIhA1/mSZ/RxjFDrJC5xifFjJpY2Xl5zXdguFqYyTR1zSp1Y9p+tktDYYSNflcxI0iyO4TPBdlRcpeqjK/piF5bklq77VSEaA+z8qmJTFzIWiitbnzR794USKBUaT0NTEsVjZqLaFVqJoPN9ODG70IPbfBHKK+/q/AWR0tJzYHRULOa4MP+W/HfGadZUbfw177G7j/OGbIs8TahLyynl4X4RinF793Oz+BU0saXtUHrVBFT/DnA3ctNPoGbs4hRIjTok8i+algT1lTHi4SxFvONKNrgQFAq2/gFnWMXgwffgYMJpiKYkmW3tTg3ZQ9Jq+f8XN+A5eeUKHWvJWJ2sgJ1Sop+wwhqFVijqWaJhwtD8MNlSBeWNNWTa5Z5kPZw5+LbVT99wqTdx29lMUH4OIG/D86ruKEauBjvH5xy6um/Sfj7ei6UUVk4AIl3MyD4MSSTOFgSwsH/QJWaQ5as7ZcmgBZkzjjU1UrQ74ci1gWBCSGHtuV1H2mhSnO3Wp/3fEV5a+4wz//6qy8JxjZsmxxy5+4w9CDNJY09T072iKG0EnOS0arEYgXqYnXcYHwjTtUNAcMelOd4xpkoqiTYICWFq0JSiPfPDQdnt+4/wuqcXY47QILbgAAAABJRU5ErkJggg==")',
-            backgroundRepeat: 'repeat',
-            mixBlendMode: 'overlay'
-          }}
-        />
       </div>
       
       {/* First Section - Hero Content */}
       <motion.section 
         ref={firstSectionRef}
-        className="h-screen flex items-center justify-center relative z-10"
+        className="h-screen flex items-center justify-center relative z-10 mt-24"
         style={{
           y: parallaxY,
           opacity: 1 - firstSectionProgress * 0.7, 
@@ -167,13 +170,43 @@ const CareerHeroSection = () => {
               <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-blue-400/0 via-blue-400/90 to-blue-400/0 transition-opacity duration-500 group-hover:opacity-40" />
             </a>
           </motion.div>
+
+          <div className='gap-4 flex mt-36 justify-center items-center'/>
+
+          {/* Trusted By - Simple Version */}
+          <motion.div 
+            className="mt-auto w-full max-w-4xl mx-auto px-4"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.5 }}
+          >
+            <div className="text-center">
+              <p className="text-gray-400 text-sm font-medium uppercase tracking-wider mb-6">Trusted By</p>
+              <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+                {companyIcons.map((company, index) => (
+                  <motion.div
+                    key={company.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.9 + index * 0.1 }}
+                    className="group"
+                  >
+                    <company.icon 
+                      className="h-8 w-8 text-gray-400 transition-colors duration-200 group-hover:text-gray-200" 
+                      aria-label={company.name}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         </div>
       </motion.section>
       
       {/* Second Section - Value Proposition */}
       <motion.section 
         ref={secondSectionRef}
-        className="min-h-screen flex items-center relative z-10 py-20"
+        className="min-h-screen flex items-center relative z-10 "
         style={{
           opacity: Math.max(0, secondSectionOpacity),
         }}
