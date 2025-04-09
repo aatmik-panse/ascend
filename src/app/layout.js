@@ -35,7 +35,7 @@ export const metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://startup-template-sage.vercel.app/hero-dark.png', // Replace with your actual OG image
+        url: 'https://www.certcy.space/backfull.JPG', // Replace with your actual OG image
         width: 1200,
         height: 630,
         alt: 'Certcy - Career Evolution Platform'
@@ -46,7 +46,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Certcy - Career Evolution Platform',
     description: 'Guiding professionals through career transitions with data-driven insights',
-    images: ['https://startup-template-sage.vercel.app/hero-dark.png'], // Replace with your actual Twitter image
+    images: ['https://www.certcy.space/backfull.JPG'], // Replace with your actual Twitter image
     creator: '@certcy'
   },
   robots: {
