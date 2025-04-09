@@ -10,6 +10,8 @@ import { GridPattern } from "@/registry/magicui/grid-pattern";
 import { cn } from '@/lib/utils';
 import { kaushan_script } from './fonts';
 import { DotPattern } from '@/components/magicui/dot-pattern';
+import { TextReveal } from '@/components/magicui/text-reveal';
+import { TypewriterEffect } from '@/components/ui/typewriter-effect';
 
 // Container component for consistent spacing and max width
 function Container({ children, className = "", maxWidth = "max-w-7xl" }) {
@@ -19,32 +21,6 @@ function Container({ children, className = "", maxWidth = "max-w-7xl" }) {
     </div>
   );
 }
-
-
-
-// Scroll progress indicator with modern style
-function ScrollProgressIndicator() {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
-  
-  return (
-    <motion.div
-      className="fixed top-0 left-0 right-0 h-0.5 bg-blue-500 origin-left z-50"
-      style={{ scaleX, opacity: 0.8 }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 0.8 }}
-      transition={{ delay: 0.5 }}
-    />
-  );
-}
-// Main component
-function Home() {
-  const { scrollYProgress } = useScroll();
-  const scaleProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
   // Video section data
   const videos = [
     { 
@@ -72,35 +48,11 @@ function Home() {
       description: "Discover Jessica's framework for maintaining career momentum in volatile markets",
     }
   ];
-
-  return (
-    <div className="min-h-screen bg-neutral-950 text-white relative">
-      {/* Accessibility skip link */}
-      <a 
-        href="#main-content" 
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-blue-500 text-white px-4 py-2 z-50 focus:outline-none rounded-md"
-      >
-        Skip to main content
-      </a>
-      
-      {/* Performance-optimized scroll indicator */}
-      <ScrollProgressIndicator />
-      
-      {/* Subtle Background Noise for Texture */}
-      <div className="fixed inset-0 opacity-[0.03]  pointer-events-none z-[1]" aria-hidden="true"></div>
-      {/* /noise.png */}
-      {/* Enhanced Navigation */}
-      <div className="fixed top-5 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-          <NewNavbar />
-        </div>
-      </div>
-
-      <main id="main-content">
-        <CareerHeroSection />
-
-        {/* Video Section - Updated */}
-        <section className="py-24 relative overflow-hidden bg-neutral-100">
+function VideoSection() {
+return (
+  <>
+          {/* Video Section - Updated */}
+          <section className="py-24 relative overflow-hidden bg-neutral-100">
           <div className="absolute inset-0 pointer-events-none">
             <DotPattern
               glow={true}
@@ -166,8 +118,74 @@ function Home() {
             </div>
           </Container>
         </section>
+        </>
+);
+}
 
 
+
+// Scroll progress indicator with modern style
+function ScrollProgressIndicator() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+  
+  return (
+    <motion.div
+      className="fixed top-0 left-0 right-0 h-0.5 bg-blue-500 origin-left z-50"
+      style={{ scaleX, opacity: 0.8 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 0.8 }}
+      transition={{ delay: 0.5 }}
+    />
+  );
+}
+// Main component
+function Home() {
+  const { scrollYProgress } = useScroll();
+  const scaleProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
+
+  return (
+    <div className="min-h-screen bg-neutral-950 text-white relative">
+      {/* Accessibility skip link */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-blue-500 text-white px-4 py-2 z-50 focus:outline-none rounded-md"
+      >
+        Skip to main content
+      </a>
+      
+      {/* Performance-optimized scroll indicator */}
+      <ScrollProgressIndicator />
+      
+      {/* Subtle Background Noise for Texture */}
+      <div className="fixed inset-0 opacity-[0.03]  pointer-events-none z-[1]" aria-hidden="true"></div>
+      {/* /noise.png */}
+      {/* Enhanced Navigation */}
+      <div className="fixed top-5 left-0 right-0 z-50">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+          <NewNavbar />
+        </div>
+      </div>
+
+      <main id="main-content">
+        <CareerHeroSection />
+
+        <VideoSection />
+
+        <TextReveal>
+          Every career is a boat, sailing into the future with hopes and aspirations. 
+          The ride is smooth at first. Then the storms hit-recession, downturns, layoffs. 
+          Most boats sink. But not this one. This one adjusts, changes direction, and rebuilds 
+          with new abilities and toughness. When the clouds part, it speeds ahead, stronger 
+          and quicker, to once-distant horizons.
+        </TextReveal>
+
+        <div className=' h-[100vh]'></div>
       </main>
     </div>
   );

@@ -175,11 +175,11 @@ const CareerHeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
-            <span className="bg-clip-text bg-gradient-to-r ">
-              Transform Career Uncertainty
+            <span className="bg-clip-text bg-gradient-to-r from-white to-white/80">
+              Some careers sink in silence.
             </span>
             <br />
-            <span className="text-white">Into Strategic Advantage</span>
+            <span className="text-white">Yours won&apos;t.</span>
           </motion.h1>
           
           <motion.p 
@@ -188,8 +188,8 @@ const CareerHeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            Navigate your professional journey with AI-powered insights that help you
-            stay ahead of industry changes and position yourself for success.
+            certcy is your compass through chaos — layoffs, pivots, upskilling, and more.
+            We don&apos;t save careers. We steer them.
           </motion.p>
           
           <motion.div
