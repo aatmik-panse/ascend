@@ -1,17 +1,13 @@
 "use client"
-import React, { useRef, useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import { ArrowRight, Shield, Rocket, Brain, Target, ChevronDown, Play, MapPin, ThumbsUp, ThumbsDown, Menu, X, ExternalLink, Check, ArrowUpRight, Star, Globe, Users, MessageCircle } from 'lucide-react';
-import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence, stagger } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import React from 'react';
+import { motion, useScroll, useSpring,  } from 'framer-motion';
 import { NewNavbar } from '@/components/Navbar';
 import CareerHeroSection from '@/components/HeroSection';
 import HeroVideoDialog from '@/components/magicui/hero-video-dialog';
-import { GridPattern } from "@/registry/magicui/grid-pattern";
 import { cn } from '@/lib/utils';
 import { kaushan_script } from './fonts';
 import { DotPattern } from '@/components/magicui/dot-pattern';
 import { TextReveal } from '@/components/magicui/text-reveal';
-import { TypewriterEffect } from '@/components/ui/typewriter-effect';
 
 // Container component for consistent spacing and max width
 function Container({ children, className = "", maxWidth = "max-w-7xl" }) {
@@ -75,7 +71,7 @@ return (
                 <span className={`text-blue-500 ${kaushan_script.className}`}>Learn&nbsp;</span> from the experienced
               </h2>
               <p className="text-lg text-gray-950 max-w-3xl mx-auto">
-                Discover how professionals like you navigated career challenges with certcy&apos;s strategic guidance.
+                Discover how professionals like you navigated career challenges with Certcy&apos;s strategic guidance.
               </p>
             </motion.div>
 

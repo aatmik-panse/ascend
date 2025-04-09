@@ -213,7 +213,7 @@ const Navbar = ({ isLoggedIn }) => {
         <div className="fixed top-0 left-0 right-0 h-16 bg-[#0f0f0f] border-b border-[var(--color-periwinkle)]/20 flex items-center justify-between px-4 z-40">
           <Link href="/" className="flex items-center">
             <span className="text-2xl font-bold bg-gradient-to-r from-[var(--color-periwinkle)] to-[var(--color-lilac)] bg-clip-text text-transparent">
-              certcy
+              Certcy
             </span>
           </Link>
           <button 
@@ -259,7 +259,7 @@ const Navbar = ({ isLoggedIn }) => {
           <span className={`text-2xl font-bold bg-gradient-to-r from-[var(--color-periwinkle)] to-[var(--color-lilac)] bg-clip-text text-transparent transition-all duration-300 ${
             isExpanded ? 'opacity-100' : 'w-0 opacity-0'
           }`}>
-            certcy
+            Certcy
           </span>
           <span className={`text-2xl font-bold bg-gradient-to-r from-[var(--color-periwinkle)] to-[var(--color-lilac)] bg-clip-text text-transparent transition-all duration-300 ${
             isExpanded ? 'w-0 opacity-0' : 'opacity-100'

@@ -82,7 +82,7 @@ const shimmerKeyframes = `
                 style={{ 
                   backgroundImage: `linear-gradient(135deg, ${theme.periwinkle} 0%, ${theme.lilac} 100%)` 
                 }}>
-                certcy
+                Certcy
               </h2>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-8">
@@ -178,7 +178,7 @@ const shimmerKeyframes = `
         <div className="border-t border-gray-800/50 pt-8 mt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-gray-500">
-              © {currentYear} certcy. All rights reserved.
+              © {currentYear} Certcy. All rights reserved.
             </p>
             <div className="flex items-center text-sm text-gray-500 group">
               <span>Made with</span>

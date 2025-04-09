@@ -188,7 +188,7 @@ const CareerHeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            certcy is your compass through chaos — layoffs, pivots, upskilling, and more.
+            Certcy is your compass through chaos — layoffs, pivots, upskilling, and more.
             We don&apos;t save careers. We steer them.
           </motion.p>
           
@@ -292,15 +292,6 @@ const CareerHeroSection = () => {
             ))}
           </div>
           
-          {/* <div className="mt-12 text-center">
-            <a 
-              href="/learn-more"  
-              className="inline-flex items-center text-blue-400 hover:text-blue-300 font-medium"
-            >
-              Learn how certcy works
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </a>
-          </div> */}
         </div>
       </motion.section>
     </div>
