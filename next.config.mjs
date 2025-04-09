@@ -16,6 +16,20 @@ const nextConfig = {
             pathname: '/**',
             search: '',
           },
+          {
+            protocol: 'https',
+            hostname: 'startup-template-sage.vercel.app',
+            port: '',
+            pathname: '/**',
+            search: '',
+          },
+          {
+            protocol: 'https',
+            hostname: 'images.unsplash.com',
+            port: '',
+            pathname: '/**',
+            search: '',
+          },
         ],
       },
 };

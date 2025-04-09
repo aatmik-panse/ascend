@@ -5,6 +5,11 @@ import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePres
 import { useInView } from 'react-intersection-observer';
 import { NewNavbar } from '@/components/Navbar';
 import CareerHeroSection from '@/components/HeroSection';
+import HeroVideoDialog from '@/components/magicui/hero-video-dialog';
+import { GridPattern } from "@/registry/magicui/grid-pattern";
+import { cn } from '@/lib/utils';
+import { kaushan_script } from './fonts';
+import { DotPattern } from '@/components/magicui/dot-pattern';
 
 // Container component for consistent spacing and max width
 function Container({ children, className = "", maxWidth = "max-w-7xl" }) {
@@ -457,149 +462,33 @@ function Home() {
   // Video section data
   const videos = [
     { 
-      title: "From Layoff to Leadership", 
+      title: "From Layoff to Leadership",
       duration: "12:45",
       industry: "Technology",
-      thumbnail: "/video1.jpg"
+      thumbnail: "https://startup-template-sage.vercel.app/hero-dark.png",
+      videoSrc: "https://www.youtube.com/embed/your-video-id",
+      description: "See how Sarah transformed an unexpected layoff into a strategic career pivot",
     },
     { 
-      title: "Career Pivot After Recession", 
-      duration: "18:22",
+      title: "Career Pivot After Recession",
+      duration: "18:22", 
       industry: "Finance",
-      thumbnail: "/video2.jpg" 
+      thumbnail: "https://startup-template-sage.vercel.app/hero-dark.png",
+      videoSrc: "https://www.youtube.com/embed/your-video-id-2",
+      description: "Learn how Michael repositioned his skills for a high-growth sector",
     },
     { 
-      title: "Building Resilience in Uncertainty", 
+      title: "Building Resilience in Uncertainty",
       duration: "15:36",
       industry: "Healthcare",
-      thumbnail: "/video3.jpg"
-    }
-  ];
-  
-  // Roadmap section data
-  const roadmapSteps = [
-    { 
-      title: "Assessment", 
-      desc: "A comprehensive evaluation of your current position, skills, and career trajectory against market realities.",
-      keyPoints: ["Skills inventory analysis", "Market position assessment", "Career vulnerability detection"]
-    },
-    { 
-      title: "Strategy Development", 
-      desc: "Creating your personalized roadmap to career resilience with actionable steps and clear milestones.",
-      keyPoints: ["Opportunity identification", "Risk mitigation planning", "Skill development prioritization"]
-    },
-    { 
-      title: "Implementation Support", 
-      desc: "Executing your strategy with guidance, tools, and expert mentorship to ensure successful outcomes.",
-      keyPoints: ["Learning resource curation", "Network expansion", "Position optimization"]
-    },
-    { 
-      title: "Continuous Adaptation", 
-      desc: "Ongoing refinement of your strategy as market conditions evolve to maintain your competitive edge.",
-      keyPoints: ["Regular reassessment", "Strategy adjustment", "Preemptive risk management"]
-    }
-  ];
-  
-  // Team section data
-  const teamMembers = [
-    { 
-      name: "Alexandra Chen", 
-      role: "CEO & Co-founder",
-      bio: "Former VP of Talent at Google with 15+ years guiding career development for thousands of professionals.",
-      image: "/team1.jpg"
-    },
-    { 
-      name: "Michael Ramirez", 
-      role: "CTO & Co-founder",
-      bio: "AI and data science expert who led engineering teams at Microsoft and built machine learning systems predicting industry trends.",
-      image: "/team2.jpg"
-    },
-    { 
-      name: "Sarah Johnson", 
-      role: "COO & Co-founder",
-      bio: "Career strategist who's guided 1000+ professionals through major transitions with a background in organizational psychology.",
-      image: "/team3.jpg"
-    }
-  ];
-  
-  // Testimonials section data
-  const testimonials = [
-    { 
-      name: "James Wilson", 
-      role: "Senior Developer",
-      quote: "certcy identified a potential layoff at my company 3 months before it happened, giving me time to pivot to a more secure position with a 15% salary increase.",
-      company: "Former Amazon engineer"
-    },
-    { 
-      name: "Emily Rodriguez", 
-      role: "Marketing Director",
-      quote: "The skill gap analysis showed me exactly what I needed to learn to transition from traditional to digital marketing, saving me months of trial and error.",
-      company: "Global CPG brand"
-    },
-    { 
-      name: "David Chen", 
-      role: "Financial Analyst",
-      quote: "Having a strategic career plan allowed me to navigate the financial sector during the downturn and emerge with more responsibility and a clearer path forward.",
-      company: "Investment management firm"
-    }
-  ];
-  
-  // Pricing section data
-  const pricingPlans = [
-    {
-      name: "Essentials",
-      price: "$29",
-      period: "per month",
-      description: "Core tools for career monitoring and basic risk assessment",
-      features: [
-        "Industry risk monitoring",
-        "Basic skills assessment",
-        "Career path visualization",
-        "Monthly strategy updates",
-        "Email support"
-      ],
-      cta: "Get Started",
-      popular: false
-    },
-    {
-      name: "Professional",
-      price: "$79",
-      period: "per month",
-      description: "Comprehensive career management with advanced insights and personalized guidance",
-      features: [
-        "Advanced risk prediction",
-        "Detailed skill gap analysis",
-        "Personalized opportunity mapping",
-        "Weekly strategy updates",
-        "Priority support",
-        "2 mentor sessions per month",
-        "Resume and outreach optimization"
-      ],
-      cta: "Start Free Trial",
-      popular: true
-    },
-    {
-      name: "Executive",
-      price: "$199",
-      period: "per month",
-      description: "Elite career strategy with dedicated mentorship and comprehensive support",
-      features: [
-        "All Professional features",
-        "Executive risk assessment",
-        "Leadership skill development",
-        "Strategic career positioning",
-        "Unlimited mentor access",
-        "Network expansion strategy",
-        "Executive presence coaching",
-        "Board position preparation"
-      ],
-      cta: "Contact Sales",
-      popular: false
+      thumbnail: "https://startup-template-sage.vercel.app/hero-dark.png",
+      videoSrc: "https://www.youtube.com/embed/your-video-id-3",
+      description: "Discover Jessica's framework for maintaining career momentum in volatile markets",
     }
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white relative">
+    <div className="min-h-screen bg-neutral-950 text-white relative">
       {/* Accessibility skip link */}
       <a 
         href="#main-content" 
@@ -626,7 +515,7 @@ function Home() {
           <CareerHeroSection />
 
           {/* Features Section */}
-          <section id="features" className="py-24 relative ">
+          {/* <section id="features" className="py-24 relative ">
             <Container>
               <div className="flex flex-col lg:flex-row gap-16 lg:gap-20 items-center">
                 <motion.div 
@@ -698,10 +587,10 @@ function Home() {
                 </motion.div>
               </div>
             </Container>
-          </section>
+          </section> */}
 
         {/* Methodology Section - outside the wrapper */}
-        <section className="py-24 relative">
+        {/* <section className="py-24 relative">
           <GradientBlur 
             className="w-[600px] h-[600px]" 
             color="#4285F4" 
@@ -740,45 +629,78 @@ function Home() {
               ))}
             </div>
           </Container>
-        </section>
+        </section> */}
 
-        {/* Video Section */}
-        <section className="py-24 relative">
-          <Container>
-            <SectionHeading
-              subtitle="Success Stories"
-              title="Learn from the experienced"
-              description="Discover how professionals like you navigated career challenges with certcy's strategic guidance."
+        {/* Video Section - Updated */}
+        <section className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none">
+            <DotPattern
+              glow={true}
+              className={cn(
+                "[mask-image:radial-gradient(800px_circle_at_center,white,transparent)]",
+                "opacity-40"
+              )}
             />
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          </div>
+
+          <Container className="relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
+                <span className={`text-blue-500 ${kaushan_script.className}`}>Learn&nbsp;</span> from the experienced
+              </h2>
+              <p className="text-lg text-gray-300 max-w-3xl mx-auto">
+                Discover how professionals like you navigated career challenges with certcy&apos;s strategic guidance.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {videos.map((video, index) => (
-                <VideoCard 
+                <motion.div
                   key={index}
-                  title={video.title}
-                  duration={video.duration}
-                  industry={video.industry}
-                  thumbnail={video.thumbnail}
-                  index={index}
-                />
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.2 }}
+                >
+                  <div className="group relative">
+                    <HeroVideoDialog
+                      thumbnailSrc={video.thumbnail}
+                      videoSrc={video.videoSrc}
+                      thumbnailAlt={video.title}
+                      animationStyle="from-bottom"
+                      className="w-full aspect-video mb-6"
+                    />
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <span className="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-sm font-medium">
+                          {video.duration}
+                        </span>
+                        <span className="px-3 py-1 bg-white/5 text-gray-300 rounded-full text-sm">
+                          {video.industry}
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">
+                        {video.title}
+                      </h3>
+                      <p className="text-gray-400 leading-relaxed">
+                        {video.description}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
               ))}
-            </div>
-            
-            <div className="text-center mt-12">
-              <motion.a 
-                href="#" 
-                className="inline-flex items-center text-base text-blue-400 hover:text-blue-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 rounded-md px-2 py-1 font-medium"
-                whileHover={{ x: 5 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                View all case studies <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
-              </motion.a>
             </div>
           </Container>
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-24 relative">
+        {/* <section className="py-24 relative">
           <GradientBlur 
             className="w-[700px] h-[700px]" 
             color="#4285F4" 
@@ -817,10 +739,10 @@ function Home() {
               </motion.a>
             </div>
           </Container>
-        </section>
+        </section> */}
 
         {/* Pricing Section */}
-        <section className="py-24 relative">
+        {/* <section className="py-24 relative">
           <Container>
             <SectionHeading
               subtitle="Investment"
@@ -860,7 +782,7 @@ function Home() {
               </div>
             </div>
           </Container>
-        </section>
+        </section> */}
 
         {/* Call to Action Section */}
         <section className="py-24 relative" aria-labelledby="cta-heading">

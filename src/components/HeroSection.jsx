@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowRight, Brain, RouteOff, BarChart2 } from 'lucide-react';
+import { ArrowRight, Brain, Shield, Rocket, Target, RouteOff, BarChart2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from "@/lib/utils";
 import { GridPattern } from "@/registry/magicui/grid-pattern";
@@ -75,6 +75,48 @@ const CareerHeroSection = () => {
     { icon: SiSwiggy, name: 'Swiggy' },
     { icon: SiHashnode, name: 'Hashnode' },
     { icon: SiSaucelabs, name: 'Sauce Labs' },
+  ];
+
+  const features = [
+    {
+      title: "Risk Shield ",
+      description: "Stay two steps ahead with AI-powered career risk detection that spots layoff patterns",
+      icon: Shield,
+      gradientFrom: "#3B82F6",
+      gradientTo: "#38BDF8",
+      benefits: [
+        "Warning for company changes",
+        "Industry volatility predictions",
+        "Personalized risk scores",
+        "Market stability insights"
+      ]
+    },
+    {
+      title: "Career Catalyst ",
+      description: "Transform your career trajectory with data-driven insights and strategic positioning",
+      icon: Rocket,
+      gradientFrom: "#A855F7",
+      gradientTo: "#8B5CF6",
+      benefits: [
+        "Premium job matching algorithm",
+        "Advanced outreach templates",
+        "Interview preparation tools",
+        "Salary negotiation insights"
+      ]
+    },
+    {
+      title: "Future Edge ",
+      description: "Navigate the future of work with AI-guided skill development and career evolution paths",
+      icon: Target,
+      gradientFrom: "#084531",
+      gradientTo: "#01734f",
+      benefits: [
+        "Emerging skill trend analysis",
+        "Personalized learning roadmaps",
+        "Industry transition guides",
+        "Expert mentorship network"
+      ]
+    }
   ];
 
   return (
@@ -222,56 +264,32 @@ const CareerHeroSection = () => {
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <MagicCard
-              className="rounded-xl" 
-              gradientFrom="#3B82F6" 
-              gradientTo="#38BDF8"
-            >
-              <div className="p-8">
-                <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-5">
-                  <Brain className="text-blue-400 h-6 w-6" />
+            {features.map((feature, index) => (
+              <MagicCard
+                key={index}
+                className="rounded-xl group hover:scale-[1.02] transition-transform duration-300" 
+                gradientFrom={feature.gradientFrom} 
+                gradientTo={feature.gradientTo}
+              >
+                <div className="p-8">
+                  <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+                    <feature.icon className={`h-6 w-6 transition-colors duration-300`} />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4 text-white">{feature.title}</h3>
+                  <p className="text-gray-300 leading-relaxed mb-6">
+                    {feature.description}
+                  </p>
+                  <ul className="space-y-3">
+                    {feature.benefits.map((benefit, i) => (
+                      <li key={i} className="flex items-center text-sm text-gray-300">
+                        <div className="w-1.5 h-1.5 rounded-full bg-current mr-2" />
+                        {benefit}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-white">AI-Powered Analysis</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  Get personalized insights about your skills and market positioning based on real-time industry data.
-                </p>
-              </div>
-            </MagicCard>
-            
-            {/* Feature 2 */}
-            <MagicCard 
-              className="rounded-xl" 
-              gradientFrom="#A855F7" 
-              gradientTo="#8B5CF6"
-            >
-              <div className="p-8">
-                <div className="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mb-5">
-                  <RouteOff className="text-purple-400 h-6 w-6" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-white">Strategic Roadmaps</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  Develop clear action plans for upskilling, career pivots, and advancement opportunities tailored to your goals.
-                </p>
-              </div>
-            </MagicCard>
-            
-            {/* Feature 3 */}
-            <MagicCard 
-              className="rounded-xl" 
-              gradientFrom="#084531" 
-              gradientTo="#01734f"
-            >
-              <div className="p-8">
-                <div className="w-12 h-12 bg-emerald-500/10 rounded-lg flex items-center justify-center mb-5">
-                  <BarChart2 className="text-emerald-400 h-6 w-6" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-white">Continuous Growth</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  Track your progress and receive adaptive recommendations as industry demands and your skills evolve.
-                </p>
-              </div>
-            </MagicCard>
+              </MagicCard>
+            ))}
           </div>
           
           {/* <div className="mt-12 text-center">
