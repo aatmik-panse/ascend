@@ -224,9 +224,6 @@ body {
 }
 
 /* Main Content Padding for Fixed Navbar */
-main {
-  @apply pl-20 transition-all duration-800;
-}
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
