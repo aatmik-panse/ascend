@@ -94,14 +94,14 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
 }
 
-@layer base {
+/* @layer base {
   * {
     @apply border-[hsl(var(--border))];
   }
   body {
     @apply bg-background text-foreground;
   }
-}
+} */
 
 @theme {
   --color-periwinkle: #8A85FF;
@@ -277,11 +277,11 @@ main {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-@layer base {
+/* @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
   }
-}
+} */
