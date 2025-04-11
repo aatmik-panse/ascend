@@ -1,10 +1,15 @@
-"use client";;
+"use client";
 import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 
 import { cn } from "@/lib/utils";
 
-export const TextReveal = ({ children, className }) => {
+export const TextReveal = ({
+  children,
+  className,
+  fontClassName = "",
+  fontWeight = "400",
+}) => {
   const targetRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -16,17 +21,31 @@ export const TextReveal = ({ children, className }) => {
 
   const words = children.split(" ");
 
+  // Determine font classes
+  const useSerifDisplay = fontClassName.includes("dm-serif");
+  const useSpaceGrotesk = fontClassName.includes("space-grotesk");
+
+  const fontClass = useSerifDisplay
+    ? "dm-serif-display-regular"
+    : useSpaceGrotesk
+    ? `space-grotesk-${fontWeight}`
+    : "";
+
   return (
     <div ref={targetRef} className={cn("relative z-0 h-[200vh]", className)}>
       <div
         className={
           "sticky top-0 mx-auto flex h-[50%] max-w-5xl items-center bg-transparent px-[1rem] py-[5rem]"
-        }>
+        }
+      >
         <span
           ref={targetRef}
-          className={
-            "flex flex-wrap p-5 text-xl font-bold font-stretch-normal text-gray-200/20 dark:text-white/20 md:p-8 md:text-3xl lg:p-10 lg:text-4xl xl:text-5xl"
-          }>
+          className={cn(
+            "flex flex-wrap p-5 text-xl font-bold font-stretch-normal text-gray-200/20 dark:text-white/20 md:p-8 md:text-3xl lg:p-10 lg:text-4xl xl:text-5xl",
+            fontClassName,
+            fontClass
+          )}
+        >
           {words.map((word, i) => {
             const start = i / words.length;
             const end = start + 1 / words.length;
@@ -47,7 +66,10 @@ const Word = ({ children, progress, range }) => {
   return (
     <span className="xl:lg-3 relative mx-1 lg:mx-1.5">
       <span className="absolute opacity-30">{children}</span>
-      <motion.span style={{ opacity: opacity }} className={"text-white dark:text-white"}>
+      <motion.span
+        style={{ opacity: opacity }}
+        className={"text-white dark:text-white"}
+      >
         {children}
       </motion.span>
     </span>

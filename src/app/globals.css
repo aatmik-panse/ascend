@@ -48,56 +48,62 @@
     --ring: 212.7 26.8% 83.9%;
   }
 
-  /* Playfair Display font classes */
-  .playfair-display-400 {
-    font-family: "Playfair Display", serif;
+  /* DM Serif Display font classes */
+  .dm-serif-display-regular {
+    font-family: "DM Serif Display", serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .dm-serif-display-regular-italic {
+    font-family: "DM Serif Display", serif;
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  /* Space Grotesk font classes */
+  .space-grotesk-300 {
+    font-family: "Space Grotesk", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+  }
+
+  .space-grotesk-400 {
+    font-family: "Space Grotesk", sans-serif;
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
   }
 
-  .playfair-display-500 {
-    font-family: "Playfair Display", serif;
+  .space-grotesk-500 {
+    font-family: "Space Grotesk", sans-serif;
     font-optical-sizing: auto;
     font-weight: 500;
     font-style: normal;
   }
 
-  .playfair-display-600 {
-    font-family: "Playfair Display", serif;
+  .space-grotesk-600 {
+    font-family: "Space Grotesk", sans-serif;
     font-optical-sizing: auto;
     font-weight: 600;
     font-style: normal;
   }
 
-  .playfair-display-700 {
-    font-family: "Playfair Display", serif;
+  .space-grotesk-700 {
+    font-family: "Space Grotesk", sans-serif;
     font-optical-sizing: auto;
     font-weight: 700;
-    font-style: normal;
-  }
-
-  .playfair-display-800 {
-    font-family: "Playfair Display", serif;
-    font-optical-sizing: auto;
-    font-weight: 800;
-    font-style: normal;
-  }
-
-  .playfair-display-900 {
-    font-family: "Playfair Display", serif;
-    font-optical-sizing: auto;
-    font-weight: 900;
     font-style: normal;
   }
 }
 
 :root {
-  --font-sans: "Playfair Display", -apple-system, BlinkMacSystemFont, "Segoe UI",
+  --font-sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
-  --font-display: "Playfair Display", -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, serif;
-  --font-playfair: "Playfair Display", serif;
+  --font-display: "DM Serif Display", Georgia, serif;
+  --font-dm-serif: "DM Serif Display", serif;
+  --font-space-grotesk: "Space Grotesk", sans-serif;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -133,7 +139,7 @@
 }
 
 body {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
 }
 
 h1,

@@ -1,8 +1,18 @@
 // "use client";
 import React from "react";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Inter } from "next/font/google";
-import { playfair_display } from "./fonts";
+import { dm_serif_display, space_grotesk } from "./fonts";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata = {
   title: {
@@ -65,8 +75,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${playfair_display.variable}`}>
-      <body className={playfair_display.className}>{children}</body>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} ${dm_serif_display.variable} ${space_grotesk.variable}`}
+    >
+      <body>{children}</body>
     </html>
   );
 }
