@@ -169,7 +169,7 @@ function Home() {
       </a>
 
       {/* Performance-optimized scroll indicator */}
-      <ScrollProgressIndicator />
+      {/* <ScrollProgressIndicator /> */}
 
       {/* Subtle Background Noise for Texture */}
       <div
@@ -189,16 +189,16 @@ function Home() {
 
         <VideoSection />
 
-        <TextReveal>
+        {/* <TextReveal>
           Every career is a boat, sailing into the future with hopes and
           aspirations. The ride is smooth at first. Then the storms
           hit-recession, downturns, layoffs. Most boats sink. But not this one.
           This one adjusts, changes direction, and rebuilds with new abilities
           and toughness. When the clouds part, it speeds ahead, stronger and
           quicker, to once-distant horizons.
-        </TextReveal>
+        </TextReveal> */}
 
-        <div className=" h-[100vh]"></div>
+        {/* <div className=" h-[100vh]"></div> */}
       </main>
     </div>
   );

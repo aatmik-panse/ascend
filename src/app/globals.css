@@ -263,20 +263,6 @@ body {
   @apply text-[#8B7FD7];
 }
 
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 0px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-gray-900;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-periwinkle/30 rounded-full hover:bg-periwinkle/50 transition-colors;
-}
-
 /* Main Content Padding for Fixed Navbar */
 
 /* Responsive Adjustments */
