@@ -44,39 +44,46 @@ export const TextReveal = ({
           sectionRef.current.classList.remove("active");
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     );
 
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
     }
 
-    // Create the animation
-    gsap.fromTo(
-      text.chars,
-      {
+    // Create the scroll-based animation
+    const chars = text.chars;
+    chars.forEach((char, i) => {
+      // Set initial state
+      gsap.set(char, {
         color: bgColor,
-        opacity: 0,
-        scale: 0.9,
-        y: 20,
-      },
-      {
+        opacity: 0.3,
+        scale: 0.95,
+        y: 10,
+      });
+
+      // Create per-character scroll animation
+      const delay = i * staggerAmount;
+      const triggerStart = `top+=${100 + i * 5}px bottom`;
+      const triggerEnd = `top+=${200 + i * 10}px 70%`;
+
+      gsap.to(char, {
         color: fgColor,
         opacity: 1,
         scale: 1,
         y: 0,
-        duration: duration,
-        stagger: staggerAmount,
-        ease: "power3.out",
+        duration: 0.4,
+        ease: "power2.out",
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: startTrigger,
-          end: endTrigger,
-          scrub: false, // Changed to false for smoother animations
+          start: triggerStart,
+          end: triggerEnd,
+          scrub: true,
           toggleActions: "play none none reverse",
+          // markers: i % 10 === 0, // Uncomment for debugging
         },
-      }
-    );
+      });
+    });
 
     // Cleanup
     return () => {
