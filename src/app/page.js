@@ -189,16 +189,43 @@ function Home() {
 
         <VideoSection />
 
-        {/* <TextReveal>
-          Every career is a boat, sailing into the future with hopes and
-          aspirations. The ride is smooth at first. Then the storms
-          hit-recession, downturns, layoffs. Most boats sink. But not this one.
-          This one adjusts, changes direction, and rebuilds with new abilities
-          and toughness. When the clouds part, it speeds ahead, stronger and
-          quicker, to once-distant horizons.
-        </TextReveal> */}
+        {/* Modern Text Reveal Section with Dotted Background */}
+        <section className="relative overflow-hidden bg-neutral-950">
+          <div className="absolute inset-0 pointer-events-none">
+            <DotPattern
+              width={24}
+              height={24}
+              glow={true}
+              className={cn(
+                "opacity-25 text-blue-500/50",
+                "[mask-image:radial-gradient(900px_circle_at_center,white,transparent)]"
+              )}
+            />
+          </div>
 
-        {/* <div className=" h-[100vh]"></div> */}
+          <div className="relative z-10 py-32 md:py-40">
+            <div className="container  mx-auto px-6">
+              <div className="h-32"></div>
+
+              <TextReveal
+                bgColor="#232323"
+                fgColor="#f8fafc"
+                sectionBgColor="transparent"
+                sectionHeight="auto"
+                staggerAmount={0.03}
+                duration={0.5}
+                className="reveal-container"
+              >
+                Every career is a boat, sailing into the future with hopes and
+                aspirations. The ride is smooth at first. Then the storms
+                hit-recession, downturns, layoffs. Most boats sink. But not this
+                one. This one adjusts, changes direction, and rebuilds.
+              </TextReveal>
+
+              <div className="h-32"></div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );
