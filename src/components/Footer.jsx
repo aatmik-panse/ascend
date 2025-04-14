@@ -201,11 +201,6 @@ function Footer() {
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-800/60"></div>
           </div>
-          <div className="relative flex justify-center">
-            <div className=" px-4 text-sm text-blue-500">
-              <Compass size={16} />
-            </div>
-          </div>
         </div>
 
         {/* Copyright section with improved layout */}
