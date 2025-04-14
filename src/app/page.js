@@ -12,6 +12,7 @@ import { ThreeDMarquee } from "@/components/ui/3d-marquee";
 import Footer from "@/components/Footer";
 import { ArrowRight } from "lucide-react";
 import ComparisonTable from "@/components/ComparisionTable";
+import TracingBeamFeature from "@/components/TracingBeamFeature";
 
 // Container component for consistent spacing and max width
 function Container({ children, className = "", maxWidth = "max-w-7xl" }) {
@@ -306,7 +307,7 @@ function Home() {
       <main id="main-content">
         <CareerHeroSection />
 
-        <txtr className="relative z-10 py-32 md:py-40">
+        <div className="relative z-10 py-32 md:py-40">
           <div className="container  mx-auto px-6">
             <div className="h-32 w-5xl"></div>
 
@@ -327,9 +328,12 @@ function Home() {
 
             <div className="h-36"></div>
           </div>
-        </txtr>
+        </div>
 
         <VideoSection />
+
+        {/* Add the TracingBeamFeature component here */}
+        <TracingBeamFeature />
 
         <ComparisonTable />
 
