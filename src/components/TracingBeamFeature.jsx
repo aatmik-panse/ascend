@@ -44,7 +44,7 @@ export default function TracingBeamFeature() {
     >
       <div className="absolute inset-0 pointer-events-none">
         <DotPattern
-          glow={true}
+          // glow={true}
           className={cn(
             "[mask-image:radial-gradient(800px_circle_at_center,white,transparent)]",
             "opacity-20"

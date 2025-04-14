@@ -273,64 +273,57 @@ const CareerHeroSection = () => {
       </motion.section>
 
       {/* Second Section - Value Proposition - improved responsiveness */}
-      <motion.section
-        ref={secondSectionRef}
-        className="min-h-[90vh] sm:min-h-screen flex items-center relative z-10 py-16 sm:py-0"
-        style={{
-          opacity: Math.max(0, secondSectionOpacity),
-        }}
-      >
-        <div className="max-w-xl sm:max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 md:px-8 relative z-10">
-          <div className="mb-8 sm:mb-12 md:mb-16 text-center">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 tracking-tight">
-              <span className={`text-blue-500 ${kaushan_script.className}`}>
-                Certcy&nbsp;
-              </span>{" "}
-              is your career catalyst
-            </h2>
-            <p className="text-base sm:text-lg text-gray-300 max-w-3xl mx-auto">
-              Guiding professionals through career transitions with data-driven
-              insights
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-            {features.map((feature, index) => (
-              <MagicCard
-                key={index}
-                className="rounded-xl group hover:scale-[1.02] transition-transform duration-300"
-                gradientFrom={feature.gradientFrom}
-                gradientTo={feature.gradientTo}
-              >
-                <div className="p-6 sm:p-8">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-lg flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-300">
-                    <feature.icon
-                      className={`h-5 w-5 sm:h-6 sm:w-6 transition-colors duration-300`}
-                    />
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-white">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm sm:text-base text-gray-300 leading-relaxed mb-4 sm:mb-6">
-                    {feature.description}
-                  </p>
-                  <ul className="space-y-2 sm:space-y-3">
-                    {feature.benefits.map((benefit, i) => (
-                      <li
-                        key={i}
-                        className="flex items-center text-xs sm:text-sm text-gray-300"
-                      >
-                        <div className="w-1.5 h-1.5 rounded-full bg-current mr-2" />
-                        {benefit}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </MagicCard>
-            ))}
-          </div>
+      <div className="max-w-xl sm:max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 md:px-8 relative z-10">
+        <div className="mb-8 sm:mb-12 md:mb-16 text-center">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 tracking-tight">
+            <span className={`text-blue-500 ${kaushan_script.className}`}>
+              Certcy&nbsp;
+            </span>{" "}
+            is your career catalyst
+          </h2>
+          <p className="text-base sm:text-lg text-gray-300 max-w-3xl mx-auto">
+            Guiding professionals through career transitions with data-driven
+            insights
+          </p>
         </div>
-      </motion.section>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+          {features.map((feature, index) => (
+            <MagicCard
+              key={index}
+              className="rounded-xl group hover:scale-[1.02] transition-transform duration-300"
+              gradientFrom={feature.gradientFrom}
+              gradientTo={feature.gradientTo}
+            >
+              <div className="p-6 sm:p-8">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-lg flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-300">
+                  <feature.icon
+                    className={`h-5 w-5 sm:h-6 sm:w-6 transition-colors duration-300`}
+                  />
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-white">
+                  {feature.title}
+                </h3>
+                <p className="text-sm sm:text-base text-gray-300 leading-relaxed mb-4 sm:mb-6">
+                  {feature.description}
+                </p>
+                <ul className="space-y-2 sm:space-y-3">
+                  {feature.benefits.map((benefit, i) => (
+                    <li
+                      key={i}
+                      className="flex items-center text-xs sm:text-sm text-gray-300"
+                    >
+                      <div className="w-1.5 h-1.5 rounded-full bg-current mr-2" />
+                      {benefit}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </MagicCard>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
