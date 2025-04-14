@@ -175,7 +175,7 @@ function FinalCta() {
             transition={{ duration: 0.7 }}
             className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-gray-800"
           >
-            Careers don't collapse overnight.
+            Careers don&apos;t collapse overnight.
             <br />
             <span className="text-blue-600">
               But they rise faster when you steer them right.
@@ -199,7 +199,7 @@ function FinalCta() {
             transition={{ duration: 0.7, delay: 0.4 }}
             className="relative inline-block"
           >
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg blur-md opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+            {/* <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg blur-md opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div> */}
             <button className="relative px-8 py-4 bg-white rounded-lg font-medium text-lg text-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center space-x-2">
               <span className={`text-blue-500 ${kaushan_script.className}`}>
                 Certcy Your Career
@@ -209,30 +209,6 @@ function FinalCta() {
           </motion.div>
         </div>
       </Container>
-
-      {/* Decorative element - floating compass icon */}
-      <motion.div
-        className="absolute right-[15%] bottom-[20%] opacity-10 hidden md:block"
-        initial={{ rotate: 0 }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-      >
-        <svg width="120" height="120" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="11" stroke="#3B82F6" strokeWidth="1.5" />
-          <path
-            d="M12 2V4M12 20V22M2 12H4M20 12H22M4.93 4.93L6.34 6.34M17.66 17.66L19.07 19.07M4.93 19.07L6.34 17.66M17.66 6.34L19.07 4.93"
-            stroke="#3B82F6"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-          <path
-            d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
-            fill="#3B82F6"
-          />
-          <path d="M12 7L13 12L12 13L11 12L12 7Z" fill="#3B82F6" />
-          <path d="M12 17L11 12L12 11L13 12L12 17Z" fill="#3B82F6" />
-        </svg>
-      </motion.div>
     </section>
   );
 }
@@ -354,56 +330,35 @@ function Home() {
 
         <VideoSection />
 
-        {/* 3D Marquee with Career Transformation */}
-        <section className="relative py-24 md:py-32 overflow-hidden">
-          <div className="container mx-auto px-6 relative z-20">
-            <div className="text-center mb-16 md:mb-20">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
+        {/* 3D Marquee with Career Transformation - Simplified but larger */}
+        <section className="relative flex items-center justify-center h-screen overflow-hidden">
+          {/* Simple centered content with clean styling */}
+          <div className="max-w-3xl mx-auto text-center px-6 relative z-20">
+            <div className="bg-black/50 backdrop-blur-sm p-8 md:p-12 rounded-xl border border-white/10 shadow-xl">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
                 Your career is your ship.
-                <span className={`text-blue-500 ${kaushan_script.className}`}>
-                  Don't let it sink.
+                <span
+                  className={`block mt-2 text-blue-400 ${kaushan_script.className}`}
+                >
+                  Don&apos;t let it sink.
                 </span>
               </h2>
-              <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+              <p className="text-lg text-blue-100/80 mx-auto  max-w-xl">
                 Navigate economic uncertainty with data-driven insights and
                 strategic career planning.
               </p>
             </div>
-
-            <div className="flex justify-center">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-medium flex items-center transition-colors duration-300"
-              >
-                Start Your Journey
-                <svg
-                  className="ml-2 w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M14 5l7 7m0 0l-7 7m7-7H3"
-                  />
-                </svg>
-              </motion.button>
-            </div>
           </div>
 
-          {/* The 3D marquee as background */}
-          <div className="absolute inset-0 z-0">
-            {/* Dark gradient overlay to improve text readability */}
-            <div className="h-full w-full">
-              <ThreeDMarquee
-                className="pointer-events-none h-full w-full opacity-40"
-                images={newsImages}
-              />
-            </div>
+          {/* The 3D marquee as background - scaled up to fill the section better */}
+          <div className="absolute inset-0 z-0 scale-125">
+            {/* Simple dark gradient overlay for better contrast */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 z-10"></div>
+
+            <ThreeDMarquee
+              className="pointer-events-none h-full w-full opacity-60"
+              images={newsImages}
+            />
           </div>
         </section>
 
