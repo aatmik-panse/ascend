@@ -11,6 +11,7 @@ import { TextReveal } from "@/components/magicui/text-reveal";
 import { ThreeDMarquee } from "@/components/ui/3d-marquee";
 import Footer from "@/components/Footer";
 import { ArrowRight } from "lucide-react";
+import ComparisonTable from "@/components/ComparisionTable";
 
 // Container component for consistent spacing and max width
 function Container({ children, className = "", maxWidth = "max-w-7xl" }) {
@@ -330,6 +331,8 @@ function Home() {
 
         <VideoSection />
 
+        <ComparisonTable />
+
         {/* 3D Marquee with Career Transformation - Simplified but larger */}
         <section className="relative flex items-center justify-center h-screen overflow-hidden">
           {/* Simple centered content with clean styling */}
@@ -353,7 +356,7 @@ function Home() {
           {/* The 3D marquee as background - scaled up to fill the section better */}
           <div className="absolute inset-0 z-0 scale-125">
             {/* Simple dark gradient overlay for better contrast */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 z-10"></div>
+            <div className="absolute inset-0 z-10"></div>
 
             <ThreeDMarquee
               className="pointer-events-none h-full w-full opacity-60"
