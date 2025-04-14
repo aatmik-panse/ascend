@@ -315,7 +315,7 @@ function Home() {
               sectionBgColor="transparent"
               sectionHeight="auto"
               staggerAmount={0.03}
-              duration={0.5}
+              duration={0.3}
               className="reveal-container"
             >
               Every career is a boat, sailing into the future with hopes and
