@@ -165,7 +165,7 @@ const CareerHeroSection = () => {
           />
         </div>
 
-        {/* New Light Gradient Overlay (middle layer) - centered */}
+        {/* Responsive Light Gradient Overlay (middle layer) */}
         <div
           className="absolute"
           style={{
@@ -180,10 +180,10 @@ const CareerHeroSection = () => {
         />
       </div>
 
-      {/* First Section - Hero Content */}
+      {/* First Section - Hero Content - improved responsive layout */}
       <motion.section
         ref={firstSectionRef}
-        className="h-screen flex items-center justify-center relative z-10 mt-24"
+        className="min-h-[90vh] sm:h-screen flex items-center justify-center relative z-10 pt-20 sm:pt-24 pb-8 sm:pb-0"
         style={{
           y: parallaxY,
           opacity: 1 - firstSectionProgress * 0.7,
@@ -192,9 +192,9 @@ const CareerHeroSection = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <div className="max-w-4xl mx-auto px-4 md:px-8 text-center relative">
+        <div className="max-w-xl sm:max-w-2xl md:max-w-4xl mx-auto px-4 md:px-8 text-center relative">
           <motion.h1
-            className="text-5xl md:text-6xl font-bold mb-6 leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
@@ -207,7 +207,7 @@ const CareerHeroSection = () => {
           </motion.h1>
 
           <motion.p
-            className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed mb-8"
+            className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
@@ -224,33 +224,34 @@ const CareerHeroSection = () => {
           >
             <a
               href="/onboarding"
-              className="bg-slate-800 no-underline group cursor-pointer relative shadow-lg shadow-zinc-900 rounded-full p-px text-lg font-semibold leading-6 text-white inline-flex items-center"
+              className="bg-slate-800 no-underline group cursor-pointer relative shadow-lg shadow-zinc-900 rounded-full p-px text-sm sm:text-base md:text-lg font-semibold leading-6 text-white inline-flex items-center"
             >
               <span className="absolute inset-0 overflow-hidden rounded-full">
                 <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               </span>
-              <div className="relative flex items-center z-10 rounded-full bg-zinc-950 py-3 px-6 ring-1 ring-white/10">
-                <span className="mr-3">Start Career Assessment</span>
-                <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+              <div className="relative flex items-center z-10 rounded-full bg-zinc-950 py-2 sm:py-3 px-4 sm:px-6 ring-1 ring-white/10">
+                <span className="mr-2 sm:mr-3">Start Career Assessment</span>
+                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-300 group-hover:translate-x-1" />
               </div>
               <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-blue-400/0 via-blue-400/90 to-blue-400/0 transition-opacity duration-500 group-hover:opacity-40" />
             </a>
           </motion.div>
 
-          <div className="gap-4 flex mt-36 justify-center items-center" />
+          {/* Responsive spacing */}
+          <div className="gap-4 flex mt-16 sm:mt-24 md:mt-36 justify-center items-center" />
 
-          {/* Trusted By - Simple Version */}
+          {/* Trusted By - Responsive Version */}
           <motion.div
-            className="mt-auto w-full max-w-4xl mx-auto px-4"
+            className="mt-auto w-full max-w-xl sm:max-w-2xl md:max-w-4xl mx-auto px-4"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9, duration: 0.5 }}
           >
             <div className="text-center">
-              <p className="text-gray-400 text-sm font-medium uppercase tracking-wider mb-6">
+              <p className="text-gray-400 text-xs sm:text-sm font-medium uppercase tracking-wider mb-4 sm:mb-6">
                 Trusted By
               </p>
-              <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+              <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-8 md:gap-12">
                 {companyIcons.map((company, index) => (
                   <motion.div
                     key={company.name}
@@ -260,7 +261,7 @@ const CareerHeroSection = () => {
                     className="group"
                   >
                     <company.icon
-                      className="h-8 w-8 text-gray-400 transition-colors duration-200 group-hover:text-gray-200"
+                      className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-gray-400 transition-colors duration-200 group-hover:text-gray-200"
                       aria-label={company.name}
                     />
                   </motion.div>
@@ -271,29 +272,29 @@ const CareerHeroSection = () => {
         </div>
       </motion.section>
 
-      {/* Second Section - Value Proposition */}
+      {/* Second Section - Value Proposition - improved responsiveness */}
       <motion.section
         ref={secondSectionRef}
-        className="min-h-screen flex items-center relative z-10 "
+        className="min-h-[90vh] sm:min-h-screen flex items-center relative z-10 py-16 sm:py-0"
         style={{
           opacity: Math.max(0, secondSectionOpacity),
         }}
       >
-        <div className="max-w-5xl mx-auto px-4 md:px-8 relative z-10">
-          <div className="mb-16 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+        <div className="max-w-xl sm:max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 md:px-8 relative z-10">
+          <div className="mb-8 sm:mb-12 md:mb-16 text-center">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 tracking-tight">
               <span className={`text-blue-500 ${kaushan_script.className}`}>
                 Certcy&nbsp;
               </span>{" "}
               is your career catalyst
             </h2>
-            <p className="text-lg text-gray-300 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-gray-300 max-w-3xl mx-auto">
               Guiding professionals through career transitions with data-driven
               insights
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
             {features.map((feature, index) => (
               <MagicCard
                 key={index}
@@ -301,23 +302,23 @@ const CareerHeroSection = () => {
                 gradientFrom={feature.gradientFrom}
                 gradientTo={feature.gradientTo}
               >
-                <div className="p-8">
-                  <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+                <div className="p-6 sm:p-8">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-lg flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-300">
                     <feature.icon
-                      className={`h-6 w-6 transition-colors duration-300`}
+                      className={`h-5 w-5 sm:h-6 sm:w-6 transition-colors duration-300`}
                     />
                   </div>
-                  <h3 className="text-2xl font-bold mb-4 text-white">
+                  <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-white">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-300 leading-relaxed mb-6">
+                  <p className="text-sm sm:text-base text-gray-300 leading-relaxed mb-4 sm:mb-6">
                     {feature.description}
                   </p>
-                  <ul className="space-y-3">
+                  <ul className="space-y-2 sm:space-y-3">
                     {feature.benefits.map((benefit, i) => (
                       <li
                         key={i}
-                        className="flex items-center text-sm text-gray-300"
+                        className="flex items-center text-xs sm:text-sm text-gray-300"
                       >
                         <div className="w-1.5 h-1.5 rounded-full bg-current mr-2" />
                         {benefit}

@@ -298,18 +298,18 @@ function Home() {
       ></div>
       {/* /noise.png */}
       {/* Enhanced Navigation */}
-      <div className="fixed top-5 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+      <div className="fixed top-0 sm:top-5 left-0 right-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <NewNavbar />
         </div>
       </div>
 
-      <main id="main-content">
+      <main id="main-content" className="overflow-hidden">
         <CareerHeroSection />
 
-        <div className="relative z-10 py-32 md:py-40">
-          <div className="container  mx-auto px-6">
-            <div className="h-32 w-5xl"></div>
+        <div className="relative z-10 py-16 sm:py-24 md:py-32">
+          <div className="container  mx-auto px-4 sm:px-6">
+            <div className="h-16 sm:h-24 md:h-32 w-full"></div>
 
             <TextReveal
               bgColor="#232323"
@@ -326,7 +326,7 @@ function Home() {
               one. This one adjusts, changes direction, and rebuilds.
             </TextReveal>
 
-            <div className="h-36"></div>
+            <div className="h-16 sm:h-24 md:h-36"></div>
           </div>
         </div>
 
@@ -337,12 +337,12 @@ function Home() {
 
         <ComparisonTable />
 
-        {/* 3D Marquee with Career Transformation - Simplified but larger */}
-        <section className="relative flex items-center justify-center h-screen overflow-hidden">
+        {/* 3D Marquee with Career Transformation - improved responsive layout */}
+        <section className="relative flex items-center justify-center min-h-[80vh] md:h-screen overflow-hidden py-16 md:py-0">
           {/* Simple centered content with clean styling */}
-          <div className="max-w-3xl mx-auto text-center px-6 relative z-20">
-            <div className="bg-black/50 backdrop-blur-sm p-8 md:p-12 rounded-xl border border-white/10 shadow-xl">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+          <div className="max-w-sm sm:max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto text-center px-4 sm:px-6 relative z-20">
+            <div className="bg-black/50 backdrop-blur-sm p-6 sm:p-8 md:p-12 rounded-xl border border-white/10 shadow-xl">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 text-white">
                 Your career is your ship.
                 <span
                   className={`block mt-2 text-blue-400 ${kaushan_script.className}`}
@@ -350,7 +350,7 @@ function Home() {
                   Don&apos;t let it sink.
                 </span>
               </h2>
-              <p className="text-lg text-blue-100/80 mx-auto  max-w-xl">
+              <p className="text-base sm:text-lg text-blue-100/80 mx-auto max-w-xl">
                 Navigate economic uncertainty with data-driven insights and
                 strategic career planning.
               </p>
@@ -358,7 +358,7 @@ function Home() {
           </div>
 
           {/* The 3D marquee as background - scaled up to fill the section better */}
-          <div className="absolute inset-0 z-0 scale-125">
+          <div className="absolute inset-0 z-0 scale-110 sm:scale-125">
             {/* Simple dark gradient overlay for better contrast */}
             <div className="absolute inset-0 z-10"></div>
 
