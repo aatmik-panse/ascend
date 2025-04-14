@@ -9,10 +9,8 @@ import { kaushan_script } from "./fonts";
 import { DotPattern } from "@/components/magicui/dot-pattern";
 import { TextReveal } from "@/components/magicui/text-reveal";
 import { ThreeDMarquee } from "@/components/ui/3d-marquee";
-import {
-  TypewriterEffect,
-  TypewriterEffectSmooth,
-} from "@/components/ui/typewriter-effect";
+import Footer from "@/components/Footer";
+import { ArrowRight } from "lucide-react";
 
 // Container component for consistent spacing and max width
 function Container({ children, className = "", maxWidth = "max-w-7xl" }) {
@@ -135,6 +133,110 @@ function VideoSection() {
   );
 }
 
+// Final CTA Component with animated background
+function FinalCta() {
+  return (
+    <section className="py-24 md:py-32 bg-gradient-to-b from-blue-50 to-white overflow-hidden relative">
+      {/* Background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute w-full h-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08)_0%,transparent_70%)]" />
+        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white to-transparent" />
+
+        {/* Subtle animated waves */}
+        <motion.div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%233B82F6' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E\")",
+            animationName: "wave",
+            animationDuration: "25s",
+            animationTimingFunction: "linear",
+            animationIterationCount: "infinite",
+          }}
+        />
+        <style jsx global>{`
+          @keyframes wave {
+            0% {
+              background-position: 0% 0;
+            }
+            100% {
+              background-position: 100% 0;
+            }
+          }
+        `}</style>
+      </div>
+
+      <Container>
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-gray-800"
+          >
+            Careers don't collapse overnight.
+            <br />
+            <span className="text-blue-600">
+              But they rise faster when you steer them right.
+            </span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="text-xl md:text-2xl text-gray-600 mb-12 font-light"
+          >
+            Start with certcy. Navigate your storm.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.4 }}
+            className="relative inline-block"
+          >
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg blur-md opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+            <button className="relative px-8 py-4 bg-white rounded-lg font-medium text-lg text-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center space-x-2">
+              <span className={`text-blue-500 ${kaushan_script.className}`}>
+                Certcy Your Career
+              </span>
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </button>
+          </motion.div>
+        </div>
+      </Container>
+
+      {/* Decorative element - floating compass icon */}
+      <motion.div
+        className="absolute right-[15%] bottom-[20%] opacity-10 hidden md:block"
+        initial={{ rotate: 0 }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+      >
+        <svg width="120" height="120" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" stroke="#3B82F6" strokeWidth="1.5" />
+          <path
+            d="M12 2V4M12 20V22M2 12H4M20 12H22M4.93 4.93L6.34 6.34M17.66 17.66L19.07 19.07M4.93 19.07L6.34 17.66M17.66 6.34L19.07 4.93"
+            stroke="#3B82F6"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+          <path
+            d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
+            fill="#3B82F6"
+          />
+          <path d="M12 7L13 12L12 13L11 12L12 7Z" fill="#3B82F6" />
+          <path d="M12 17L11 12L12 11L13 12L12 17Z" fill="#3B82F6" />
+        </svg>
+      </motion.div>
+    </section>
+  );
+}
+
 // Scroll progress indicator with modern style
 function ScrollProgressIndicator() {
   const { scrollYProgress } = useScroll();
@@ -246,9 +348,11 @@ function Home() {
               one. This one adjusts, changes direction, and rebuilds.
             </TextReveal>
 
-            <div className="h-32"></div>
+            <div className="h-36"></div>
           </div>
         </txtr>
+
+        <VideoSection />
 
         {/* 3D Marquee with Career Transformation */}
         <section className="relative py-24 md:py-32 overflow-hidden">
@@ -303,12 +407,11 @@ function Home() {
           </div>
         </section>
 
-        <div className="h-32"></div>
+        {/* Final CTA Section */}
 
-        <VideoSection />
-
-        <div className="h-32"></div>
+        <FinalCta />
       </main>
+      <Footer />
     </div>
   );
 }
