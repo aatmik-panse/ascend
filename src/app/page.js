@@ -8,6 +8,11 @@ import { cn } from "@/lib/utils";
 import { kaushan_script } from "./fonts";
 import { DotPattern } from "@/components/magicui/dot-pattern";
 import { TextReveal } from "@/components/magicui/text-reveal";
+import { ThreeDMarquee } from "@/components/ui/3d-marquee";
+import {
+  TypewriterEffect,
+  TypewriterEffectSmooth,
+} from "@/components/ui/typewriter-effect";
 
 // Container component for consistent spacing and max width
 function Container({ children, className = "", maxWidth = "max-w-7xl" }) {
@@ -149,6 +154,41 @@ function ScrollProgressIndicator() {
     />
   );
 }
+// News cutout images for 3D Marquee
+const newsImages = [
+  "https://assets.aceternity.com/cloudinary_bkp/3d-card.png",
+  "https://assets.aceternity.com/animated-modal.png",
+  "https://assets.aceternity.com/animated-testimonials.webp",
+  "https://assets.aceternity.com/cloudinary_bkp/Tooltip_luwy44.png",
+  "https://assets.aceternity.com/github-globe.png",
+  "https://assets.aceternity.com/glare-card.png",
+  "https://assets.aceternity.com/layout-grid.png",
+  "https://assets.aceternity.com/flip-text.png",
+  "https://assets.aceternity.com/hero-highlight.png",
+  "https://assets.aceternity.com/carousel.webp",
+  "https://assets.aceternity.com/placeholders-and-vanish-input.png",
+  "https://assets.aceternity.com/shooting-stars-and-stars-background.png",
+  "https://assets.aceternity.com/signup-form.png",
+  "https://assets.aceternity.com/cloudinary_bkp/stars_sxle3d.png",
+  "https://assets.aceternity.com/spotlight-new.webp",
+  "https://assets.aceternity.com/cloudinary_bkp/Spotlight_ar5jpr.png",
+  "https://assets.aceternity.com/cloudinary_bkp/Parallax_Scroll_pzlatw_anfkh7.png",
+  "https://assets.aceternity.com/tabs.png",
+  "https://assets.aceternity.com/cloudinary_bkp/Tracing_Beam_npujte.png",
+  "https://assets.aceternity.com/cloudinary_bkp/typewriter-effect.png",
+  "https://assets.aceternity.com/glowing-effect.webp",
+  "https://assets.aceternity.com/hover-border-gradient.png",
+  "https://assets.aceternity.com/cloudinary_bkp/Infinite_Moving_Cards_evhzur.png",
+  "https://assets.aceternity.com/cloudinary_bkp/Lamp_hlq3ln.png",
+  "https://assets.aceternity.com/macbook-scroll.png",
+  "https://assets.aceternity.com/cloudinary_bkp/Meteors_fye3ys.png",
+  "https://assets.aceternity.com/cloudinary_bkp/Moving_Border_yn78lv.png",
+  "https://assets.aceternity.com/multi-step-loader.png",
+  "https://assets.aceternity.com/vortex.png",
+  "https://assets.aceternity.com/wobble-card.png",
+  "https://assets.aceternity.com/world-map.webp",
+];
+
 // Main component
 function Home() {
   const { scrollYProgress } = useScroll();
@@ -210,7 +250,64 @@ function Home() {
           </div>
         </txtr>
 
+        {/* 3D Marquee with Career Transformation */}
+        <section className="relative py-24 md:py-32 overflow-hidden">
+          <div className="container mx-auto px-6 relative z-20">
+            <div className="text-center mb-16 md:mb-20">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
+                Your career is your ship.
+                <span className={`text-blue-500 ${kaushan_script.className}`}>
+                  Don't let it sink.
+                </span>
+              </h2>
+              <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+                Navigate economic uncertainty with data-driven insights and
+                strategic career planning.
+              </p>
+            </div>
+
+            <div className="flex justify-center">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-medium flex items-center transition-colors duration-300"
+              >
+                Start Your Journey
+                <svg
+                  className="ml-2 w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
+                </svg>
+              </motion.button>
+            </div>
+          </div>
+
+          {/* The 3D marquee as background */}
+          <div className="absolute inset-0 z-0">
+            {/* Dark gradient overlay to improve text readability */}
+            <div className="h-full w-full">
+              <ThreeDMarquee
+                className="pointer-events-none h-full w-full opacity-40"
+                images={newsImages}
+              />
+            </div>
+          </div>
+        </section>
+
+        <div className="h-32"></div>
+
         <VideoSection />
+
+        <div className="h-32"></div>
       </main>
     </div>
   );
