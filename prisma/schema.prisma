@@ -48,3 +48,9 @@ model OnboardingData {
 
   @@index([userId])
 }
+
+model Waitlist {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  created_at DateTime @default(now())
+}
