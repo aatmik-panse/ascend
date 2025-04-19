@@ -39,7 +39,9 @@ export function NewNavbar() {
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
             {/* <NavbarButton variant="secondary">Login</NavbarButton> */}
-            <NavbarButton variant="primary">Get Started</NavbarButton>
+            <NavbarButton variant="primary" href="/waitlist">
+              Get Started
+            </NavbarButton>
           </div>
         </NavBody>
 

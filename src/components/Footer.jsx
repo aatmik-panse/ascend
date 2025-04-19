@@ -36,12 +36,12 @@ function Footer() {
           <div className="space-y-4">
             <h3 className="text-lg font-medium mb-2">Quick Links</h3>
             <div className="grid grid-cols-2 gap-2">
-              <FooterLink text="About Us" />
-              <FooterLink text="Features" />
-              <FooterLink text="Blog" />
-              <FooterLink text="Support" />
+              <FooterLink text="About Us" href="/about-us" />
+              {/* <FooterLink text="Features" /> */}
+              <FooterLink text="Blog" href="/blog" />
+              <FooterLink text="Support" href="/support" />
               <FooterLink text="Privacy Policy" href="/privacy-policy" />
-              <FooterLink text="Terms of Service" />
+              <FooterLink text="Terms of Service" href="terms-of-service" />
             </div>
           </div>
 

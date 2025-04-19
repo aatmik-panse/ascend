@@ -26,9 +26,7 @@ const PrivacyPolicy = () => {
           >
             Privacy Policy
           </h1>
-          <p className="text-gray-400">
-            Last updated: {new Date().toLocaleDateString()}
-          </p>
+          <p className="text-gray-400">Last updated: Jan 10, 2025</p>
         </div>
 
         <div className="space-y-8 text-gray-300">

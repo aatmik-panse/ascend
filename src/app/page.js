@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { NewNavbar } from "@/components/Navbar";
 import CareerHeroSection from "@/components/HeroSection";
 import HeroVideoDialog from "@/components/magicui/hero-video-dialog";
@@ -55,6 +56,12 @@ const videos = [
   },
 ];
 function VideoSection() {
+  const router = useRouter();
+
+  const redirectToWaitlist = () => {
+    router.push("/waitlist");
+  };
+
   return (
     <>
       {/* Video Section - Updated */}
@@ -124,6 +131,13 @@ function VideoSection() {
                     <p className="text-gray-400 leading-relaxed">
                       {video.description}
                     </p>
+                    <button
+                      onClick={redirectToWaitlist}
+                      className="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-300 text-sm flex items-center"
+                    >
+                      Learn more
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -137,6 +151,12 @@ function VideoSection() {
 
 // Final CTA Component with animated background
 function FinalCta() {
+  const router = useRouter();
+
+  const redirectToWaitlist = () => {
+    router.push("/waitlist");
+  };
+
   return (
     <section className="py-24 md:py-32 bg-gradient-to-b from-blue-50 to-white overflow-hidden relative">
       {/* Background elements */}
@@ -179,7 +199,10 @@ function FinalCta() {
             className="relative inline-block"
           >
             {/* <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg blur-md opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div> */}
-            <button className="relative px-8 py-4 bg-white rounded-lg font-medium text-lg text-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center space-x-2">
+            <button
+              onClick={redirectToWaitlist}
+              className="relative px-8 py-4 bg-white rounded-lg font-medium text-lg text-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center space-x-2"
+            >
               <span className={`text-blue-500 ${kaushan_script.className}`}>
                 Certcy Your Career
               </span>
@@ -248,12 +271,17 @@ const newsImages = [
 
 // Main component
 function Home() {
+  const router = useRouter();
   const { scrollYProgress } = useScroll();
   const scaleProgress = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
     restDelta: 0.001,
   });
+
+  const redirectToWaitlist = () => {
+    router.push("/waitlist");
+  };
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white relative">
@@ -282,7 +310,7 @@ function Home() {
       </div>
 
       <main id="main-content" className="overflow-hidden">
-        <CareerHeroSection />
+        <CareerHeroSection redirectToWaitlist={redirectToWaitlist} />
 
         <div className="relative z-10 py-16 sm:py-24 md:py-32">
           <div className="container  mx-auto px-4 sm:px-6">
@@ -310,9 +338,9 @@ function Home() {
         <VideoSection />
 
         {/* Add the TracingBeamFeature component here */}
-        <TracingBeamFeature />
+        <TracingBeamFeature redirectToWaitlist={redirectToWaitlist} />
 
-        <ComparisonTable />
+        <ComparisonTable redirectToWaitlist={redirectToWaitlist} />
 
         {/* 3D Marquee with Career Transformation - improved responsive layout */}
         <section className="relative flex items-center justify-center min-h-[80vh] md:h-screen overflow-hidden py-16 md:py-0">
@@ -327,10 +355,16 @@ function Home() {
                   Don&apos;t let it sink.
                 </span>
               </h2>
-              <p className="text-base sm:text-lg text-blue-100/80 mx-auto max-w-xl">
+              <p className="text-base sm:text-lg text-blue-100/80 mx-auto max-w-xl mb-8">
                 Navigate economic uncertainty with data-driven insights and
                 strategic career planning.
               </p>
+              <button
+                onClick={redirectToWaitlist}
+                className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-300"
+              >
+                Join Waitlist
+              </button>
             </div>
           </div>
 
@@ -347,7 +381,6 @@ function Home() {
         </section>
 
         {/* Final CTA Section */}
-
         <FinalCta />
       </main>
       <Footer />

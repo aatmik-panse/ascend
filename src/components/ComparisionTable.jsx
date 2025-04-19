@@ -74,7 +74,7 @@ const ComparisonTable = () => {
         </p>
       </div>
 
-      <div className="bg-[#0f0f1a] rounded-xl shadow-lg overflow-hidden border border-gray-800/30">
+      <div className="bg-[#0f0f1a] rounded-xl shadow-lg overflow-hidden border border-gray-800/30 max-w-max">
         {/* Table headers */}
         <div className="grid grid-cols-2">
           <div className="bg-gray-800 p-4">
