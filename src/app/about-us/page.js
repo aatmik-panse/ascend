@@ -130,7 +130,7 @@ export default function AboutPage() {
                 transition={{ duration: 0.7, delay: 0.2 }}
                 className="text-lg md:text-xl text-gray-300 mb-10 max-w-3xl mx-auto"
               >
-                We're on a mission to transform how professionals navigate
+                We&apos;re on a mission to transform how professionals navigate
                 career transitions with data-driven insights and expert
                 guidance.
               </motion.p>
@@ -206,9 +206,9 @@ export default function AboutPage() {
                       transition={{ duration: 0.6, delay: 0.3 }}
                     >
                       By bringing together experts in AI, data science, career
-                      development, and user experience, we've built a platform
-                      that helps thousands of professionals understand their
-                      risk factors, identify new opportunities, and
+                      development, and user experience, we&apos;ve built a
+                      platform that helps thousands of professionals understand
+                      their risk factors, identify new opportunities, and
                       strategically position themselves for success—even in
                       uncertain times.
                     </motion.p>
@@ -240,14 +240,14 @@ export default function AboutPage() {
                 className="text-lg md:text-xl leading-relaxed"
                 style={{ fontSize: "1.5rem" }}
               >
-                At Certcy, we're building a future where career transitions are
-                no longer guided by fear and uncertainty, but by clarity and
+                At Certcy, we&apos;re building a future where career transitions
+                are no longer guided by fear and uncertainty, but by clarity and
                 confidence. We believe that with the right data, insights, and
                 guidance, everyone can navigate the evolving career landscape
-                successfully. We're committed to democratizing access to career
-                intelligence and empowering professionals everywhere to take
-                control of their career trajectories—no matter what economic
-                challenges arise.
+                successfully. We&apos;re committed to democratizing access to
+                career intelligence and empowering professionals everywhere to
+                take control of their career trajectories—no matter what
+                economic challenges arise.
               </TextReveal>
             </div>
           </div>
@@ -299,8 +299,8 @@ export default function AboutPage() {
                   Meet Our Team
                 </h2>
                 <p className="text-lg text-gray-400 max-w-3xl mx-auto">
-                  We're a diverse group of experts passionate about transforming
-                  career development.
+                  We&apos;re a diverse group of experts passionate about
+                  transforming career development.
                 </p>
               </div>
 

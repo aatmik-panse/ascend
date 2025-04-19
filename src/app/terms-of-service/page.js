@@ -51,9 +51,24 @@ export default function TermsOfServicePage() {
                 Last updated: {lastUpdated}
               </p>
               <p className="text-gray-300 mb-8">
-                Please read these Terms of Service ("Terms", "Terms of Service")
-                carefully before using the Certcy website and platform (the
-                "Service") operated by Certcy, Inc. ("us", "we", or "our").
+                Please read these Terms of Service (&quot;Terms&quot;,
+                &quot;Terms of Service&quot;) carefully before using the Certcy
+                website and platform (the &quot;Service&quot;) operated by
+                Certcy, Inc. (&quot;us&quot;, &quot;we&quot;, or
+                &quot;our&quot;).
+              </p>
+
+              <p className="mb-4">
+                By accessing and using the Certcy platform
+                (&quot;Service&quot;), you agree to these Terms of Service
+                (&quot;Terms&quot;). If you don&apos;t agree with these Terms,
+                please don&apos;t use our Service.
+              </p>
+
+              <p className="mb-4">
+                These &quot;Terms&quot; constitute a legally binding agreement
+                between you and Certcy, Inc. (&quot;we,&quot; &quot;us,&quot; or
+                &quot;our&quot;) regarding your use of the Service.
               </p>
 
               <div className="prose prose-invert prose-lg max-w-none">
@@ -207,11 +222,12 @@ export default function TermsOfServicePage() {
                   </h2>
                   <p className="text-gray-300">
                     Your use of the Service is at your sole risk. The Service is
-                    provided on an "AS IS" and "AS AVAILABLE" basis. The Service
-                    is provided without warranties of any kind, whether express
-                    or implied, including, but not limited to, implied
-                    warranties of merchantability, fitness for a particular
-                    purpose, non-infringement or course of performance.
+                    provided on an &quot;AS IS&quot; and &quot;AS
+                    AVAILABLE&quot; basis. The Service is provided without
+                    warranties of any kind, whether express or implied,
+                    including, but not limited to, implied warranties of
+                    merchantability, fitness for a particular purpose,
+                    non-infringement or course of performance.
                   </p>
                 </section>
 
@@ -226,11 +242,13 @@ export default function TermsOfServicePage() {
                     provisions.
                   </p>
                   <p className="mt-3 text-gray-300">
-                    Our failure to enforce any right or provision of these Terms
-                    will not be considered a waiver of those rights. If any
-                    provision of these Terms is held to be invalid or
-                    unenforceable by a court, the remaining provisions of these
-                    Terms will remain in effect.
+                    If we don&apos;t exercise a right or provision in these
+                    Terms, that doesn&apos;t mean we&apos;ve waived it.
+                  </p>
+                  <p className="mt-3 text-gray-300">
+                    If any provision of these Terms is found unenforceable, that
+                    doesn&apos;t affect the validity of the remaining
+                    provisions.
                   </p>
                 </section>
 
@@ -241,9 +259,9 @@ export default function TermsOfServicePage() {
                   <p className="text-gray-300">
                     We reserve the right, at our sole discretion, to modify or
                     replace these Terms at any time. If a revision is material,
-                    we will try to provide at least 30 days' notice prior to any
-                    new terms taking effect. What constitutes a material change
-                    will be determined at our sole discretion.
+                    we will try to provide at least 30 days&apos; notice prior
+                    to any new terms taking effect. What constitutes a material
+                    change will be determined at our sole discretion.
                   </p>
                   <p className="mt-3 text-gray-300">
                     By continuing to access or use our Service after those
@@ -276,9 +294,9 @@ export default function TermsOfServicePage() {
 
               <div className="mt-12 pt-6 border-t border-gray-800">
                 <p className="text-gray-400">
-                  By using Certcy's services, you acknowledge that you have read
-                  and understand these Terms of Service and agree to be bound by
-                  them.
+                  By using Certcy&apos;s services, you acknowledge that you have
+                  read and understand these Terms of Service and agree to be
+                  bound by them.
                 </p>
                 <div className="mt-6 flex space-x-6">
                   <Link

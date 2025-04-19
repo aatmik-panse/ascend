@@ -119,7 +119,7 @@ export default function SupportPage() {
                 </div>
               </div>
               <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-violet-400 text-transparent bg-clip-text">
-                We're Here To Help
+                We&apos;re Here To Help
               </h1>
               <p className="text-lg md:text-xl text-gray-300 mb-8">
                 Get the support you need to navigate your career journey with
@@ -159,7 +159,7 @@ export default function SupportPage() {
                     Email Support
                   </h3>
                   <p className="text-gray-400 text-sm mb-4">
-                    Send us an email and we'll respond within 24 hours.
+                    Send us an email and we&apos;ll respond within 24 hours.
                   </p>
                   <Button
                     variant="outline"
@@ -238,7 +238,8 @@ export default function SupportPage() {
                 Get In Touch
               </h2>
               <p className="text-center text-gray-400 mb-10">
-                Send us a message and we'll get back to you as soon as possible.
+                Send us a message and we&apos;ll get back to you as soon as
+                possible.
               </p>
 
               <Card className="bg-neutral-800 border border-blue-900/20 p-6 md:p-8 rounded-xl shadow-xl">
