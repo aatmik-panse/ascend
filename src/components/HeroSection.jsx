@@ -223,7 +223,7 @@ const CareerHeroSection = () => {
             className="flex justify-center"
           >
             <a
-              href="/onboarding"
+              href="/waitlist"
               className="bg-slate-800 no-underline group cursor-pointer relative shadow-lg shadow-zinc-900 rounded-full p-px text-sm sm:text-base md:text-lg font-semibold leading-6 text-white inline-flex items-center"
             >
               <span className="absolute inset-0 overflow-hidden rounded-full">
