@@ -236,37 +236,40 @@ function ScrollProgressIndicator() {
 }
 // News cutout images for 3D Marquee
 const newsImages = [
-  "https://assets.aceternity.com/cloudinary_bkp/3d-card.png",
-  "https://assets.aceternity.com/animated-modal.png",
-  "https://assets.aceternity.com/animated-testimonials.webp",
-  "https://assets.aceternity.com/cloudinary_bkp/Tooltip_luwy44.png",
-  "https://assets.aceternity.com/github-globe.png",
-  "https://assets.aceternity.com/glare-card.png",
-  "https://assets.aceternity.com/layout-grid.png",
-  "https://assets.aceternity.com/flip-text.png",
-  "https://assets.aceternity.com/hero-highlight.png",
-  "https://assets.aceternity.com/carousel.webp",
-  "https://assets.aceternity.com/placeholders-and-vanish-input.png",
-  "https://assets.aceternity.com/shooting-stars-and-stars-background.png",
-  "https://assets.aceternity.com/signup-form.png",
-  "https://assets.aceternity.com/cloudinary_bkp/stars_sxle3d.png",
-  "https://assets.aceternity.com/spotlight-new.webp",
-  "https://assets.aceternity.com/cloudinary_bkp/Spotlight_ar5jpr.png",
-  "https://assets.aceternity.com/cloudinary_bkp/Parallax_Scroll_pzlatw_anfkh7.png",
-  "https://assets.aceternity.com/tabs.png",
-  "https://assets.aceternity.com/cloudinary_bkp/Tracing_Beam_npujte.png",
-  "https://assets.aceternity.com/cloudinary_bkp/typewriter-effect.png",
-  "https://assets.aceternity.com/glowing-effect.webp",
-  "https://assets.aceternity.com/hover-border-gradient.png",
-  "https://assets.aceternity.com/cloudinary_bkp/Infinite_Moving_Cards_evhzur.png",
-  "https://assets.aceternity.com/cloudinary_bkp/Lamp_hlq3ln.png",
-  "https://assets.aceternity.com/macbook-scroll.png",
-  "https://assets.aceternity.com/cloudinary_bkp/Meteors_fye3ys.png",
-  "https://assets.aceternity.com/cloudinary_bkp/Moving_Border_yn78lv.png",
-  "https://assets.aceternity.com/multi-step-loader.png",
-  "https://assets.aceternity.com/vortex.png",
-  "https://assets.aceternity.com/wobble-card.png",
-  "https://assets.aceternity.com/world-map.webp",
+  "https://i.ibb.co/wk75XD0/Screenshot-2025-04-20-120857.png",
+  "https://i.ibb.co/Gv6Sfk8p/Screenshot-2025-04-20-121043.png",
+  "https://i.ibb.co/FbKm4d0k/Screenshot-2025-04-20-121219.png",
+  "https://i.ibb.co/Xx7n0VZc/Screenshot-2025-04-20-121258.png",
+  "https://i.ibb.co/wFDgSVdL/Screenshot-2025-04-20-121425.png",
+  "https://i.ibb.co/LhZ0Kc6f/Screenshot-2025-04-20-121457.png",
+  "https://i.ibb.co/pvxCGdTN/Screenshot-2025-04-20-121540.png",
+  "https://i.ibb.co/fGS2tvjD/Screenshot-2025-04-20-121629.png",
+  "https://i.ibb.co/7T17MCc/Screenshot-2025-04-20-121700.png",
+  "https://i.ibb.co/gL81XfRz/Screenshot-2025-04-20-121729.png",
+  "https://i.ibb.co/C48nBf2/Screenshot-2025-04-20-121757.png",
+  "https://i.ibb.co/M578gQXw/Screenshot-2025-04-20-121825.png",
+  "https://i.ibb.co/PzPzJWtb/Screenshot-2025-04-20-121850.png",
+  "https://i.ibb.co/4g8yztk4/Screenshot-2025-04-20-121943.png",
+  "https://i.ibb.co/FZ0m42P/Screenshot-2025-04-20-122022.png",
+  "https://i.ibb.co/SXb4VpCw/Screenshot-2025-04-20-122150.png",
+  "https://i.ibb.co/LhsHN50f/Screenshot-2025-04-20-122315.png",
+  "https://i.ibb.co/nNJt38gY/Screenshot-2025-04-20-122334.png",
+  "https://i.ibb.co/3qN76jh/Screenshot-2025-04-20-122353.png",
+  "https://i.ibb.co/ds2Nf7z6/Screenshot-2025-04-20-122421.png",
+  "https://i.ibb.co/39ZtxxXC/Screenshot-2025-04-20-122447.png",
+  "https://i.ibb.co/9HSv91QH/Screenshot-2025-04-20-122522.png",
+  "https://i.ibb.co/0y3jc39c/Screenshot-2025-04-20-122548.png",
+  "https://i.ibb.co/s9Fz6LZB/Screenshot-2025-04-20-122615.png",
+  "https://i.ibb.co/DHLnJ50L/Screenshot-2025-04-20-122640.png",
+  "https://i.ibb.co/zhy8L8vZ/Screenshot-2025-04-20-122733.png",
+  "https://i.ibb.co/Rk0J8DJk/Screenshot-2025-04-20-122754.png",
+  "https://i.ibb.co/qYmkGVD5/Screenshot-2025-04-20-122810.png",
+  "https://i.ibb.co/3mH3tC8z/Screenshot-2025-04-20-122819.png",
+  "https://i.ibb.co/fGScc613/Screenshot-2025-04-20-122833.png",
+  "https://i.ibb.co/mC7rnm6b/Screenshot-2025-04-20-122844.png",
+  "https://i.ibb.co/gLgL64z2/Screenshot-2025-04-20-122905.png",
+  "https://i.ibb.co/zV6bytCs/Screenshot-2025-04-20-122932.png",
+  "https://i.ibb.co/gZRWWxqT/Screenshot-2025-04-20-122958.png",
 ];
 
 // Main component
@@ -335,7 +338,7 @@ function Home() {
           </div>
         </div>
 
-        <VideoSection />
+        {/* <VideoSection /> */}
 
         {/* Add the TracingBeamFeature component here */}
         <TracingBeamFeature redirectToWaitlist={redirectToWaitlist} />
