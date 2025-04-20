@@ -101,9 +101,9 @@ const CareerHeroSection = () => {
 
   const features = [
     {
-      title: "Risk Shield ",
+      title: "Career Radar",
       description:
-        "Stay two steps ahead with AI-powered career risk detection that spots layoff patterns",
+        "Spot early layoff signals from company data and industry trends—stay prepared, never surprised.",
       icon: Shield,
       gradientFrom: "#3B82F6",
       gradientTo: "#38BDF8",
@@ -115,9 +115,9 @@ const CareerHeroSection = () => {
       ],
     },
     {
-      title: "Career Catalyst ",
+      title: "Pivot Engine",
       description:
-        "Transform your career trajectory with data-driven insights and strategic positioning",
+        "Get smart career paths, resume boosts, and job options tailored to your strengths and goals.",
       icon: Rocket,
       gradientFrom: "#A855F7",
       gradientTo: "#8B5CF6",
@@ -129,9 +129,9 @@ const CareerHeroSection = () => {
       ],
     },
     {
-      title: "Future Edge ",
+      title: "CompassBot",
       description:
-        "Navigate the future of work with AI-guided skill development and career evolution paths",
+        "Your smart, personal career guide available 24/7. Ask questions, get clarity, and receive contextual advice through an emotionally-aware chatbot.",
       icon: Target,
       gradientFrom: "#084531",
       gradientTo: "#01734f",
@@ -230,7 +230,7 @@ const CareerHeroSection = () => {
                 <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               </span>
               <div className="relative flex items-center z-10 rounded-full bg-zinc-950 py-2 sm:py-3 px-4 sm:px-6 ring-1 ring-white/10">
-                <span className="mr-2 sm:mr-3">Join The WaitingList</span>
+                <span className="mr-2 sm:mr-3">Join The WaitList</span>
                 <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-300 group-hover:translate-x-1" />
               </div>
               <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-blue-400/0 via-blue-400/90 to-blue-400/0 transition-opacity duration-500 group-hover:opacity-40" />
@@ -251,7 +251,10 @@ const CareerHeroSection = () => {
               <p className="text-gray-400 text-xs sm:text-sm font-medium uppercase tracking-wider mb-4 sm:mb-6">
                 Trusted By
               </p>
-              <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-8 md:gap-12">
+              <div
+                className="flex flex-wrap justify-center items-center gap-6 sm:gap-8 md:gap-12"
+                id="features"
+              >
                 {companyIcons.map((company, index) => (
                   <motion.div
                     key={company.name}
@@ -272,6 +275,7 @@ const CareerHeroSection = () => {
         </div>
       </motion.section>
 
+      <div className="gap-4 flex mt-16 sm:mt-24 md:mt-36 justify-center items-center" />
       {/* Second Section - Value Proposition - improved responsiveness */}
 
       <div className="max-w-xl sm:max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 md:px-8 relative z-10">

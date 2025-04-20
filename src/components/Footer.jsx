@@ -48,11 +48,12 @@ function Footer() {
           {/* Contact */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium mb-2">Contact</h3>
-            <p className="text-gray-600 text-sm flex items-center">
-              <Mail size={16} className="mr-2" />
-              hello@certcy.com
-            </p>
-
+            <Link href={"https://www.linkedin.com/company/certcy/"}>
+              <p className="text-gray-600 text-sm flex items-center">
+                <Mail size={16} className="mr-2" />
+                Messsage us on LinkedIn
+              </p>
+            </Link>
             {/* Social Links */}
             <div className="pt-4">
               <h4 className="text-sm font-medium text-gray-600 mb-2">

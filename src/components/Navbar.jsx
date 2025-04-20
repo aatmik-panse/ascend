@@ -16,15 +16,15 @@ export function NewNavbar() {
   const navItems = [
     {
       name: "Features",
-      link: "#features",
+      link: "/#features",
     },
     {
-      name: "Testimonials",
-      link: "#testimonials",
+      name: "Working",
+      link: "/#working",
     },
     {
-      name: "Support",
-      link: "#support",
+      name: "About",
+      link: "/#about",
     },
   ];
 

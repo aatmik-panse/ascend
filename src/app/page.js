@@ -158,7 +158,10 @@ function FinalCta() {
   };
 
   return (
-    <section className="py-24 md:py-32 bg-gradient-to-b from-blue-50 to-white overflow-hidden relative">
+    <section
+      className="py-24 md:py-32 bg-gradient-to-b from-blue-50 to-white overflow-hidden relative"
+      id="about"
+    >
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute w-full h-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08)_0%,transparent_70%)]" />
@@ -201,10 +204,10 @@ function FinalCta() {
             {/* <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg blur-md opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div> */}
             <button
               onClick={redirectToWaitlist}
-              className="relative px-8 py-4 bg-white rounded-lg font-medium text-lg text-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center space-x-2"
+              className="relative px-8 py-4 bg-white rounded-lg font-medium text-lg text-blue-500 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center space-x-2"
             >
               <span className={`text-blue-500 ${kaushan_script.className}`}>
-                Certcy Your Career
+                Get Early Access
               </span>
               <ArrowRight className="ml-2 w-5 h-5" />
             </button>
@@ -362,12 +365,12 @@ function Home() {
                 Navigate economic uncertainty with data-driven insights and
                 strategic career planning.
               </p>
-              <button
+              {/* <button
                 onClick={redirectToWaitlist}
                 className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-300"
               >
                 Join Waitlist
-              </button>
+              </button> */}
             </div>
           </div>
 

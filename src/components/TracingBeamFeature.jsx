@@ -40,6 +40,7 @@ export default function TracingBeamFeature() {
   return (
     <div
       ref={containerRef}
+      id="working"
       className="relative mx-auto max-w-4xl px-4 py-16 md:py-24 bg-neutral-950 overflow-hidden" // Reduced vertical padding
     >
       <div className="absolute inset-0 pointer-events-none">
