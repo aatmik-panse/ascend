@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
-import Navbar from "@/components/OldNavbar";
+import SimpleSidebar from "@/components/Sidebar";
 
 export default function DashboardLayout({ children }) {
   const [user, setUser] = useState(null);
@@ -30,8 +30,8 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="flex min-h-screen bg-zinc-900">
-      <Navbar isLoggedIn={!!user} />
-      <main className="flex-1 ml-24 relative">{children}</main>
+      <SimpleSidebar isLoggedIn={!!user} />
+      <main className="flex-1 ml-12 md:ml-16 p-4 relative">{children}</main>
     </div>
   );
 }

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { Shield } from "lucide-react";
 
 export default function TermsOfServicePage() {
-  const lastUpdated = "February 15, 2023";
+  const lastUpdated = "February 15, 2025";
 
   return (
     <>
