@@ -20,6 +20,7 @@ export function Login({ mode = "signin" }) {
 
   const handleGoogleSignIn = () => {
     const redirectTo = `${config.domainName}/api/auth/callback`;
+    console.log("Google sign-in redirect URL:", redirectTo);
     setLoading(true);
     const supabase = createClient();
     supabase.auth.signInWithOAuth({
@@ -45,25 +46,29 @@ export function Login({ mode = "signin" }) {
     { error: "" }
   );
 
-  const [signUpState, signUpAction, signUpPending] = useActionState(
-    signUp,
-    { error: "", success: "", requiresConfirmation: false }
-  );
+  const [signUpState, signUpAction, signUpPending] = useActionState(signUp, {
+    error: "",
+    success: "",
+    requiresConfirmation: false,
+  });
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-br from-blue-950 via-gray-900 to-indigo-950 flex items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
       <div className="w-full max-w-md relative">
         {/* Abstract background patterns */}
-        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none"
+        >
           <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-blue-500/10 rounded-full blur-3xl opacity-20 transform -translate-x-1/2 -translate-y-1/2"></div>
           <div className="absolute bottom-0 right-0 w-2/3 h-2/3 bg-indigo-500/10 rounded-full blur-3xl opacity-20 transform translate-x-1/3 translate-y-1/3"></div>
         </div>
-        
+
         {/* Glass card effect */}
         <div className="relative bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-800/50 p-8 overflow-hidden">
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl"></div>
-          
+
           <div className="flex justify-center">
             <div className="w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
               <span className="text-white text-xl font-bold">A</span>
@@ -80,12 +85,22 @@ export function Login({ mode = "signin" }) {
           </p>
 
           <div className="mt-8">
-            {(magicLinkState?.success || signUpState?.success) ? (
+            {magicLinkState?.success || signUpState?.success ? (
               <div className="p-6 text-center bg-emerald-900/30 border border-emerald-700/50 rounded-xl backdrop-blur-sm">
                 <div className="flex justify-center mb-4">
                   <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    <svg
+                      className="w-6 h-6 text-emerald-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      ></path>
                     </svg>
                   </div>
                 </div>
@@ -105,7 +120,11 @@ export function Login({ mode = "signin" }) {
                       type="button"
                       variant={authMethod === "password" ? "default" : "ghost"}
                       onClick={() => setAuthMethod("password")}
-                      className={`rounded-lg ${authMethod === "password" ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/20" : "text-gray-300 hover:text-white hover:bg-gray-700/50"}`}
+                      className={`rounded-lg ${
+                        authMethod === "password"
+                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/20"
+                          : "text-gray-300 hover:text-white hover:bg-gray-700/50"
+                      }`}
                     >
                       Password
                     </Button>
@@ -113,7 +132,11 @@ export function Login({ mode = "signin" }) {
                       type="button"
                       variant={authMethod === "magic" ? "default" : "ghost"}
                       onClick={() => setAuthMethod("magic")}
-                      className={`rounded-lg ${authMethod === "magic" ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/20" : "text-gray-300 hover:text-white hover:bg-gray-700/50"}`}
+                      className={`rounded-lg ${
+                        authMethod === "magic"
+                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/20"
+                          : "text-gray-300 hover:text-white hover:bg-gray-700/50"
+                      }`}
                     >
                       Magic Link
                     </Button>
@@ -122,9 +145,17 @@ export function Login({ mode = "signin" }) {
 
                 {/* Password Form */}
                 {authMethod === "password" && (
-                  <form action={mode === "signin" ? passwordAction : signUpAction} className="space-y-4">
+                  <form
+                    action={mode === "signin" ? passwordAction : signUpAction}
+                    className="space-y-4"
+                  >
                     <div className="space-y-2">
-                      <label htmlFor="email" className="text-sm font-medium text-gray-300">Email</label>
+                      <label
+                        htmlFor="email"
+                        className="text-sm font-medium text-gray-300"
+                      >
+                        Email
+                      </label>
                       <div className="relative">
                         <Input
                           id="email"
@@ -152,9 +183,17 @@ export function Login({ mode = "signin" }) {
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <label htmlFor="password" className="text-sm font-medium text-gray-300">Password</label>
+                        <label
+                          htmlFor="password"
+                          className="text-sm font-medium text-gray-300"
+                        >
+                          Password
+                        </label>
                         {mode === "signin" && (
-                          <Link href="/forgot-password" className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors">
+                          <Link
+                            href="/forgot-password"
+                            className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                          >
                             Forgot password?
                           </Link>
                         )}
@@ -194,12 +233,10 @@ export function Login({ mode = "signin" }) {
                         ) : (
                           "Sign in"
                         )
+                      ) : signUpPending ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
                       ) : (
-                        signUpPending ? (
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                          "Create Account"
-                        )
+                        "Create Account"
                       )}
                     </Button>
                   </form>
@@ -209,7 +246,12 @@ export function Login({ mode = "signin" }) {
                 {authMethod === "magic" && (
                   <form action={magicLinkAction} className="space-y-4">
                     <div className="space-y-2">
-                      <label htmlFor="magic-email" className="text-sm font-medium text-gray-300">Email</label>
+                      <label
+                        htmlFor="magic-email"
+                        className="text-sm font-medium text-gray-300"
+                      >
+                        Email
+                      </label>
                       <div className="relative">
                         <Input
                           id="magic-email"
@@ -261,7 +303,9 @@ export function Login({ mode = "signin" }) {
 
                 <div className="flex items-center my-6">
                   <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"></div>
-                  <div className="px-4 text-sm text-gray-400">or continue with</div>
+                  <div className="px-4 text-sm text-gray-400">
+                    or continue with
+                  </div>
                   <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"></div>
                 </div>
 
@@ -299,17 +343,29 @@ export function Login({ mode = "signin" }) {
             )}
 
             {/* Error Messages */}
-            {(magicLinkState?.error || passwordState?.error || signUpState?.error) && (
+            {(magicLinkState?.error ||
+              passwordState?.error ||
+              signUpState?.error) && (
               <div className="mt-6 p-4 rounded-xl bg-red-900/20 border border-red-700/40 backdrop-blur-sm">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    <svg
+                      className="h-5 w-5 text-red-400"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                   <div className="ml-3">
                     <p className="text-sm text-red-300">
-                      {magicLinkState?.error || passwordState?.error || signUpState?.error}
+                      {magicLinkState?.error ||
+                        passwordState?.error ||
+                        signUpState?.error}
                     </p>
                   </div>
                 </div>

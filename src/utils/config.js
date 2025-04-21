@@ -4,7 +4,7 @@ const config = {
   domainName:
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://certcy.space",
+      : "https://www.certcy.space",
 };
 
 export default config;

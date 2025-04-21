@@ -40,13 +40,11 @@ export const signIn = validatedAction(signInSchema, async (data) => {
 
     // If user doesn't exist in users table, create the profile
     if (userDataError && userDataError.code === "PGRST116") {
-      const { error: insertError } = await supabase
-        .from("users")
-        .insert({ 
-          user_id: signInData.user.id,
-          email: signInData.user.email,
-          created_at: new Date().toISOString()
-        });
+      const { error: insertError } = await supabase.from("users").insert({
+        user_id: signInData.user.id,
+        email: signInData.user.email,
+        created_at: new Date().toISOString(),
+      });
 
       if (insertError) {
         console.error("Error creating user profile:", insertError);
@@ -81,13 +79,15 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
     const { data: existingUser } = await supabase.auth.getUser();
 
     // First, create the user in Supabase Auth
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${config.domainName}/api/auth/callback`,
-      },
-    });
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
+      {
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${config.domainName}/api/auth/callback`,
+        },
+      }
+    );
 
     if (signUpError) {
       console.error("Sign up error:", signUpError);
@@ -101,18 +101,16 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
       .eq("email", email)
       .single();
 
-    const passwordHash = hashPassword(password)
+    const passwordHash = hashPassword(password);
 
     // Only create users entry if it doesn't exist
     if (signUpData?.user && !existingProfile) {
-      const { error: insertError } = await supabase
-        .from("users")
-        .insert({ 
-          user_id: signUpData.user.id,
-          email: signUpData.user.email,
-          created_at: new Date().toISOString(),
-          passwordHash: password
-        });
+      const { error: insertError } = await supabase.from("users").insert({
+        user_id: signUpData.user.id,
+        email: signUpData.user.email,
+        created_at: new Date().toISOString(),
+        passwordHash: password,
+      });
 
       if (insertError) {
         console.error("Error creating users entry:", insertError);
@@ -121,11 +119,11 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
     }
 
     // Always return success message for email verification
-    return { 
-      success: "Please check your email for the confirmation link. Click the link to verify your account.",
-      requiresConfirmation: true 
+    return {
+      success:
+        "Please check your email for the confirmation link. Click the link to verify your account.",
+      requiresConfirmation: true,
     };
-
   } catch (error) {
     console.error("Unexpected error during sign up:", error);
     return { error: "An unexpected error occurred. Please try again." };
@@ -143,8 +141,8 @@ export const signInWithMagicLink = validatedAction(
     const supabase = await createClient();
     const { email, priceId } = data;
     const redirectTo = `${config.domainName}/api/auth/callback`;
-    console.log("data",data);
-    console.log("supabase data",supabase);
+    console.log("redirect URL:", redirectTo);
+    console.log("email:", email);
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
