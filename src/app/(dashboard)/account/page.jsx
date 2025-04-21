@@ -27,9 +27,6 @@ export default function AccountPage() {
     fullName: "",
     email: "",
     avatarUrl: null,
-    jobTitle: "",
-    company: "",
-    bio: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [notification, setNotification] = useState(null);
@@ -44,7 +41,6 @@ export default function AccountPage() {
         // Get authenticated user
         const user = await getUser();
 
-        // if (authError) throw authError;
         if (!user) {
           router.push("/sign-in");
           return;
@@ -52,16 +48,6 @@ export default function AccountPage() {
 
         setUser(user);
 
-        // // Fetch user profile data from users table
-        // const { data: userData, error: profileError } = await supabase
-        //   .from("users")
-        //   .select("*")
-        //   .eq("id", user.id)
-        //   .single();
-
-        // if (profileError && profileError.code !== "PGRST116") {
-        //   console.error("Error fetching profile:", profileError);
-        // }
         console.log("User:", user);
         const userData = user?.user_metadata;
         console.log("User Data:", userData);
@@ -71,9 +57,6 @@ export default function AccountPage() {
             fullName: userData.full_name || "",
             email: user.email || "",
             avatarUrl: userData.avatar_url,
-            jobTitle: userData.job_title || "",
-            company: userData.company || "",
-            bio: userData.bio || "",
           });
 
           if (userData.avatar_url) {
@@ -159,17 +142,12 @@ export default function AccountPage() {
       setLoading(true);
       const supabase = createClient();
 
-      const { error } = await supabase
-        .from("users")
-        .update({
+      // Update user metadata with only the allowed fields
+      const { data, error } = await supabase.auth.updateUser({
+        data: {
           full_name: profileData.fullName,
-          job_title: profileData.jobTitle,
-          company: profileData.company,
-          bio: profileData.bio,
-          avatar_url: profileData.avatarUrl,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", user.id);
+        },
+      });
 
       if (error) throw error;
 
@@ -350,9 +328,9 @@ export default function AccountPage() {
                 </button>
               </div>
 
-              {/* Form Section */}
+              {/* Form Section - Simplified to only include name */}
               <div className="md:col-span-2 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                   <div>
                     <label
                       className="block text-sm font-medium text-zinc-400 mb-1"
@@ -392,65 +370,6 @@ export default function AccountPage() {
                       Email cannot be changed
                     </p>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label
-                      className="block text-sm font-medium text-zinc-400 mb-1"
-                      htmlFor="jobTitle"
-                    >
-                      Job Title
-                    </label>
-                    <input
-                      type="text"
-                      id="jobTitle"
-                      name="jobTitle"
-                      value={profileData.jobTitle}
-                      onChange={handleInputChange}
-                      className="w-full bg-zinc-800/80 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g. Product Manager"
-                      disabled={!isEditing}
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      className="block text-sm font-medium text-zinc-400 mb-1"
-                      htmlFor="company"
-                    >
-                      Company
-                    </label>
-                    <input
-                      type="text"
-                      id="company"
-                      name="company"
-                      value={profileData.company}
-                      onChange={handleInputChange}
-                      className="w-full bg-zinc-800/80 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g. Google"
-                      disabled={!isEditing}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    className="block text-sm font-medium text-zinc-400 mb-1"
-                    htmlFor="bio"
-                  >
-                    Bio
-                  </label>
-                  <textarea
-                    id="bio"
-                    name="bio"
-                    rows="3"
-                    value={profileData.bio}
-                    onChange={handleInputChange}
-                    className="w-full bg-zinc-800/80 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="A brief description about yourself"
-                    disabled={!isEditing}
-                  ></textarea>
                 </div>
 
                 {isEditing && (
