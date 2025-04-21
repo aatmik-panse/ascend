@@ -84,7 +84,7 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
         email,
         password,
         options: {
-          emailRedirectTo: `${config.domainName}/api/auth/callback`,
+          emailRedirectTo: `${config.authCallbackDomain}/api/auth/callback`,
         },
       }
     );
@@ -140,7 +140,7 @@ export const signInWithMagicLink = validatedAction(
   async (data) => {
     const supabase = await createClient();
     const { email, priceId } = data;
-    const redirectTo = `${config.domainName}/api/auth/callback`;
+    const redirectTo = `${config.authCallbackDomain}/api/auth/callback`;
     console.log("redirect URL:", redirectTo);
     console.log("email:", email);
 
@@ -167,7 +167,7 @@ export const signInWithGoogle = async (event) => {
   const supabase = await createClient();
   const priceId = formData.get("priceId");
   try {
-    const redirectTo = `${config.domainName}/api/auth/callback`;
+    const redirectTo = `${config.authCallbackDomain}/api/auth/callback`;
     const { error: signInError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

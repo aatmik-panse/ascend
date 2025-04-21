@@ -4,7 +4,7 @@ import { getUser } from "@/queries/user";
 export default async function SignInPage() {
   const user = await getUser();
   if (user) {
-    return redirect("/layoff_risk");
+    return redirect("/dashboard");
   }
 
   return <Login mode="signin" />;
