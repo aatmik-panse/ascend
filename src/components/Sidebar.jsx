@@ -71,7 +71,7 @@ export default function SimpleSidebar({ isLoggedIn, userName, user }) {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  const avatarUrl = isLoggedIn ? user?.avatar_url : null;
+  const avatarUrl = isLoggedIn ? user?.user_metadata?.avatar_url : null;
 
   return (
     <>

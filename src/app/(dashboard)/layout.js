@@ -40,12 +40,7 @@ export default function DashboardLayout({ children }) {
 
         // Get the user's name if they are logged in
         if (user) {
-          const { data: userData } = await supabase
-            .from("users")
-            .select("full_name, email")
-            .eq("id", user.id)
-            .single();
-
+          const userData = user?.user_metadata;
           // Use full_name if available, otherwise use email or default to "User"
           setUserName(userData?.full_name || user.email || "User");
         }
