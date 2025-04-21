@@ -15,6 +15,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { signOut } from "@/app/(login)/actions";
+import { kaushan_script } from "@/app/fonts";
 
 export default function SimpleSidebar({ isLoggedIn }) {
   const pathname = usePathname();
@@ -26,9 +27,9 @@ export default function SimpleSidebar({ isLoggedIn }) {
   const navItems = [
     { to: "/layoff_risk", icon: Shield, label: "Layoff Risk" },
     { to: "/career_pivot", icon: Brain, label: "Career Pivot" },
-    { to: "/networking", icon: Network, label: "Networking" },
+    // { to: "/networking", icon: Network, label: "Networking" },
     { to: "/counseling", icon: MessageSquare, label: "Counseling" },
-    { to: "/pricing", icon: CreditCard, label: "Pricing" },
+    // { to: "/pricing", icon: CreditCard, label: "Pricing" },
   ];
 
   const handleSignOut = async () => {
@@ -76,7 +77,9 @@ export default function SimpleSidebar({ isLoggedIn }) {
             href="/"
             className="p-4 flex items-center justify-center border-b border-[var(--color-periwinkle)]/20"
           >
-            <span className="text-xl font-bold bg-gradient-to-r from-[var(--color-periwinkle)] to-[var(--color-lilac)] bg-clip-text text-transparent">
+            <span
+              className={`text-xl font-bold bg-gradient-to-r text-blue-500 bg-clip-text ${kaushan_script.className}`}
+            >
               C
             </span>
           </Link>
@@ -92,8 +95,8 @@ export default function SimpleSidebar({ isLoggedIn }) {
                   href={to}
                   className={`relative group p-3 rounded-lg transition-all duration-200 ${
                     isActive
-                      ? "text-[var(--color-periwinkle)] bg-[var(--color-periwinkle)]/10"
-                      : "text-gray-400 hover:text-[var(--color-lilac)] hover:bg-gray-800/50"
+                      ? "text-blue-500"
+                      : "text-gray-400 hover:text-blue-500 hover:bg-gray-800/50"
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -142,14 +145,6 @@ export default function SimpleSidebar({ isLoggedIn }) {
                       <User className="h-4 w-4" />
                       <span>My Account</span>
                     </Link>
-                    <Link
-                      href="/account/settings"
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-[var(--color-lilac)] transition-colors"
-                      onClick={() => setShowProfileMenu(false)}
-                    >
-                      <Settings className="h-4 w-4" />
-                      <span>Settings</span>
-                    </Link>
                     <button
                       onClick={handleSignOut}
                       className="w-full flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-red-500 transition-colors"
@@ -181,33 +176,7 @@ export default function SimpleSidebar({ isLoggedIn }) {
                       onClick={() => setShowLoginOptions(false)}
                     >
                       <User className="h-4 w-4" />
-                      <span>Standard Login</span>
-                    </Link>
-                    <Link
-                      href="/sign-in/google"
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-[var(--color-lilac)] transition-colors"
-                      onClick={() => setShowLoginOptions(false)}
-                    >
-                      <svg className="h-4 w-4 text-white" viewBox="0 0 24 24">
-                        <path
-                          fill="currentColor"
-                          d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
-                        />
-                      </svg>
-                      <span>Google Login</span>
-                    </Link>
-                    <Link
-                      href="/sign-in/github"
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-[var(--color-lilac)] transition-colors"
-                      onClick={() => setShowLoginOptions(false)}
-                    >
-                      <svg className="h-4 w-4 text-white" viewBox="0 0 24 24">
-                        <path
-                          fill="currentColor"
-                          d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z"
-                        />
-                      </svg>
-                      <span>GitHub Login</span>
+                      <span>Login</span>
                     </Link>
                   </div>
                 )}
@@ -257,14 +226,6 @@ export default function SimpleSidebar({ isLoggedIn }) {
                     <User className="h-4 w-4" />
                     <span>My Account</span>
                   </Link>
-                  <Link
-                    href="/account/settings"
-                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-[var(--color-lilac)] transition-colors"
-                    onClick={() => setShowProfileMenu(false)}
-                  >
-                    <Settings className="h-4 w-4" />
-                    <span>Settings</span>
-                  </Link>
                   <button
                     onClick={handleSignOut}
                     className="w-full flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-red-500 transition-colors"
@@ -293,33 +254,7 @@ export default function SimpleSidebar({ isLoggedIn }) {
                     onClick={() => setShowLoginOptions(false)}
                   >
                     <User className="h-4 w-4" />
-                    <span>Standard Login</span>
-                  </Link>
-                  <Link
-                    href="/sign-in/google"
-                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-[var(--color-lilac)] transition-colors"
-                    onClick={() => setShowLoginOptions(false)}
-                  >
-                    <svg className="h-4 w-4 text-white" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
-                      />
-                    </svg>
-                    <span>Google Login</span>
-                  </Link>
-                  <Link
-                    href="/sign-in/github"
-                    className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-[var(--color-lilac)] transition-colors"
-                    onClick={() => setShowLoginOptions(false)}
-                  >
-                    <svg className="h-4 w-4 text-white" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z"
-                      />
-                    </svg>
-                    <span>GitHub Login</span>
+                    <span>Login</span>
                   </Link>
                 </div>
               )}
@@ -378,14 +313,6 @@ export default function SimpleSidebar({ isLoggedIn }) {
                       <User className="h-5 w-5 flex-shrink-0" />
                       <span>My Account</span>
                     </Link>
-                    <Link
-                      href="/account/settings"
-                      className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-gray-400 hover:text-[var(--color-lilac)] hover:bg-gray-800/50 mb-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <Settings className="h-5 w-5 flex-shrink-0" />
-                      <span>Settings</span>
-                    </Link>
                     <button
                       onClick={handleSignOut}
                       className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-gray-800/50"
@@ -402,39 +329,7 @@ export default function SimpleSidebar({ isLoggedIn }) {
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <User className="h-5 w-5 flex-shrink-0" />
-                      <span>Standard Login</span>
-                    </Link>
-                    <Link
-                      href="/sign-in/google"
-                      className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-gray-400 hover:text-[var(--color-lilac)] hover:bg-gray-800/50 mb-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <svg
-                        className="h-5 w-5 flex-shrink-0 text-white"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
-                        />
-                      </svg>
-                      <span>Google Login</span>
-                    </Link>
-                    <Link
-                      href="/sign-in/github"
-                      className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-gray-400 hover:text-[var(--color-lilac)] hover:bg-gray-800/50"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <svg
-                        className="h-5 w-5 flex-shrink-0 text-white"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z"
-                        />
-                      </svg>
-                      <span>GitHub Login</span>
+                      <span>Login</span>
                     </Link>
                   </>
                 )}
