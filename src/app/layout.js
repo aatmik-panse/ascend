@@ -80,7 +80,8 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} ${dm_serif_display.variable} ${space_grotesk.variable}`}
     >
       <body>
-        <Analytics>{children}</Analytics>
+        <Analytics />
+        {children}
       </body>
     </html>
   );
