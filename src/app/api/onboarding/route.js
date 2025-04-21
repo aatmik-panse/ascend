@@ -1,29 +1,43 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import supabase from '@/lib/supabase';
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { createClient } from "@/utils/supabase/server";
+import supabase from "@/lib/supabase";
 
 // This function handles the POST request for onboarding data
 export async function POST(request) {
   try {
     // Use Supabase auth only
     let session = null;
-    
+
     // Get user from Supabase auth
-    const authHeader = request.headers.get('Authorization');
+    const authHeader = request.headers.get("Authorization");
     let supabaseUser = null;
-    
-    if (authHeader && authHeader.startsWith('Bearer ')) {
+
+    if (authHeader && authHeader.startsWith("Bearer ")) {
       const token = authHeader.substring(7);
       const { data, error } = await supabase.auth.getUser(token);
-      
+
       if (!error && data?.user) {
         supabaseUser = data.user;
       }
     }
-    
+
     // Parse the request body
     const onboardingData = await request.json();
-    
+
+    // Add detailed logging for debugging each field
+    console.log(
+      "Received onboarding data:",
+      JSON.stringify(onboardingData, null, 2)
+    );
+    console.log("biggestConcern field:", onboardingData.biggestConcern);
+    console.log(
+      "Current user:",
+      supabaseUser
+        ? `ID: ${supabaseUser.id}, Email: ${supabaseUser.email}`
+        : "Not authenticated"
+    );
+
     // Validate required fields
     if (!onboardingData.jobTitle) {
       return NextResponse.json(
@@ -31,109 +45,158 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-    
+
     // Prepare data for database - handle topSkills array properly
     // Filter out empty skills
-    const topSkills = Array.isArray(onboardingData.topSkills) 
-      ? onboardingData.topSkills.filter(Boolean) 
+    const topSkills = Array.isArray(onboardingData.topSkills)
+      ? onboardingData.topSkills.filter(Boolean)
       : [];
-    
-    // Determine user ID from Supabase
-    const userId = supabaseUser?.id || null;
-    
-    // If using Supabase, check if user exists in our Prisma DB
-    // If not, create a user record from Supabase data
+
+    let userId = null;
+
+    // If we have a Supabase user, get or create corresponding Prisma user
     if (supabaseUser) {
+      // First check if there's already a user with this email
       const existingUser = await prisma.user.findUnique({
-        where: { 
-          email: supabaseUser.email 
-        }
+        where: { email: supabaseUser.email },
       });
-      
-      if (!existingUser) {
+
+      if (existingUser) {
+        userId = existingUser.id;
+        console.log(`Found existing user with ID: ${userId}`);
+      } else {
         // Create a new user record based on Supabase user data
-        await prisma.user.create({
+        const newUser = await prisma.user.create({
           data: {
-            id: supabaseUser.id,
+            id: supabaseUser.id, // Use the Supabase ID as the Prisma ID
+            user_id: supabaseUser.id, // Also store as user_id for compatibility
             email: supabaseUser.email,
-            full_name: supabaseUser.user_metadata?.full_name,
-            avatar_url: supabaseUser.user_metadata?.avatar_url,
-            auth_provider: supabaseUser.app_metadata?.provider || 'supabase',
+            full_name:
+              supabaseUser.user_metadata?.full_name ||
+              supabaseUser.user_metadata?.name,
+            avatar_url:
+              supabaseUser.user_metadata?.avatar_url ||
+              supabaseUser.user_metadata?.picture,
+            auth_provider: supabaseUser.app_metadata?.provider || "supabase",
             email_verified: supabaseUser.email_confirmed_at ? true : false,
             provider_id: supabaseUser.app_metadata?.provider,
             provider_sub: supabaseUser.app_metadata?.sub,
-            last_sign_in_at: new Date(supabaseUser.last_sign_in_at),
+            last_sign_in_at: new Date(
+              supabaseUser.last_sign_in_at || Date.now()
+            ),
+            updated_at: new Date(),
             is_anonymous: false,
-            role: 'user'
-          }
+            role: "user",
+          },
         });
+
+        userId = newUser.id;
+        console.log(`Created new user with ID: ${userId}`);
       }
     }
-    
-    // Create record in database
+
+    // Extract and log all fields to identify any missing ones
+    const {
+      jobTitle,
+      company,
+      experience,
+      jobStability,
+      salarRange,
+      timeForGrowth,
+      linkedinUrl,
+      biggestConcern,
+    } = onboardingData;
+
+    console.log("Individual fields extracted from request:");
+    console.log("- jobTitle:", jobTitle);
+    console.log("- biggestConcern:", biggestConcern);
+    console.log("- jobStability:", jobStability);
+    console.log("- salarRange:", salarRange);
+
+    // Create onboarding record in database
+    console.log(`Creating onboarding data with userId: ${userId}`);
+
+    // Create the data object with explicit assignment of each field
+    const createData = {
+      // Use the user ID field to connect to the User model
+      ...(userId ? { userId } : {}),
+
+      // Required field
+      jobTitle: jobTitle,
+
+      // Optional fields - explicitly handle the biggestConcern field
+      company: company || null,
+      experience: experience || null,
+      jobStability: jobStability || 3,
+      salaryRange: salarRange || null,
+      topSkills: topSkills,
+      timeForGrowth: timeForGrowth || null,
+      linkedinUrl: linkedinUrl || null,
+      biggestConcern: biggestConcern || null,
+    };
+
+    // Log the full data object being sent to Prisma
+    console.log(
+      "Data being sent to Prisma:",
+      JSON.stringify(createData, null, 2)
+    );
+
     const result = await prisma.onboardingData.create({
-      data: {
-        // Connect to user if we have a user ID
-        ...(userId ? { userId } : {}),
-        
-        jobTitle: onboardingData.jobTitle,
-        company: onboardingData.company || null,
-        experience: onboardingData.experience || null,
-        jobStability: onboardingData.jobStability || 3,
-        salaryRange: onboardingData.salarRange || null, // Note the field name matches frontend
-        topSkills: topSkills,
-        timeForGrowth: onboardingData.timeForGrowth || null,
-        linkedinUrl: onboardingData.linkedinUrl || null,
-        biggestConcern: onboardingData.biggestConcern || null,
-      }
+      data: createData,
     });
-    
+
+    console.log(`Successfully created onboarding record:`, result);
+
     // Optionally, also store in Supabase if needed
     if (supabaseUser) {
       // Insert the same data into Supabase
-      const { error } = await supabase
-        .from('onboarding_data')
-        .insert({
-          user_id: supabaseUser.id,
-          job_title: onboardingData.jobTitle,
-          company: onboardingData.company,
-          experience: onboardingData.experience,
-          job_stability: onboardingData.jobStability,
-          salary_range: onboardingData.salarRange,
-          top_skills: topSkills,
-          time_for_growth: onboardingData.timeForGrowth,
-          linkedin_url: onboardingData.linkedinUrl,
-          biggest_concern: onboardingData.biggestConcern
-        });
-        
+      const { error } = await supabase.from("onboarding_data").insert({
+        user_id: supabaseUser.id,
+        job_title: jobTitle,
+        company: company,
+        experience: experience,
+        job_stability: jobStability,
+        salary_range: salarRange,
+        top_skills: topSkills,
+        time_for_growth: timeForGrowth,
+        linkedin_url: linkedinUrl,
+        biggest_concern: biggestConcern, // Explicit assignment
+      });
+
       if (error) {
         console.error("Supabase insertion error:", error);
         // Continue anyway since Prisma insertion succeeded
+      } else {
+        console.log("Successfully stored in Supabase as well");
       }
     }
-    
+
     // Return success response with the created data
     return NextResponse.json(
-      { 
+      {
         message: "Onboarding data saved successfully",
-        data: result
+        data: result,
       },
       { status: 201 }
     );
-    
   } catch (error) {
     console.error("Error saving onboarding data:", error);
-    
-    // Provide more specific error messages for common database errors
-    if (error.code === 'P2002') {
+
+    // Provide more specific error messages based on the error
+    if (error.code === "P2002") {
       return NextResponse.json(
         { error: "A record for this user already exists" },
         { status: 409 }
       );
     }
-    
+
+    // Include the error message and stack trace for debugging
     return NextResponse.json(
-      { error: "Failed to save onboarding data" },
+      {
+        error: "Failed to save onboarding data",
+        message: error.message,
+        stack: process.env.NODE_ENV !== "production" ? error.stack : undefined,
+      },
       { status: 500 }
     );
   }
@@ -142,81 +205,88 @@ export async function POST(request) {
 // Add a GET endpoint to retrieve onboarding data
 export async function GET(request) {
   try {
-    // Only use Supabase auth
-    let session = null;
-    
-    // Check for Supabase token
-    const authHeader = request.headers.get('Authorization');
-    let supabaseUser = null;
-    
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
-      const { data, error } = await supabase.auth.getUser(token);
-      
-      if (!error && data?.user) {
-        supabaseUser = data.user;
-      }
+    const supabase = createClient();
+
+    // Check for Supabase user
+    const {
+      data: { user: supabaseUser },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+      console.error("Auth error:", authError);
     }
-    
+
     // Determine user ID from Supabase
     const userId = supabaseUser?.id;
-    
+
     if (userId) {
-      // Get data from Prisma
-      const data = await prisma.onboardingData.findFirst({
+      console.log(`Looking for onboarding data for user: ${userId}`);
+
+      // Get data from Prisma - first try user_id field
+      let data = await prisma.onboardingData.findFirst({
         where: {
-          userId
+          OR: [{ userId: userId }, { user: { user_id: userId } }],
         },
         orderBy: {
-          createdAt: 'desc'
-        }
+          createdAt: "desc",
+        },
+        include: {
+          user: true,
+        },
       });
-      
+
       if (data) {
+        console.log("Found onboarding data in Prisma");
         return NextResponse.json({ data });
       }
-      
+
       // If not found in Prisma but we have a Supabase user, try Supabase
       if (supabaseUser) {
         const { data: supabaseData, error } = await supabase
-          .from('onboarding_data')
-          .select('*')
-          .eq('user_id', supabaseUser.id)
-          .order('created_at', { ascending: false })
+          .from("onboarding_data")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false })
           .limit(1)
           .single();
-          
+
         if (!error && supabaseData) {
+          console.log("Found onboarding data in Supabase");
           return NextResponse.json({ data: supabaseData });
         }
       }
-      
+
       return NextResponse.json(
         { error: "No onboarding data found for this user" },
         { status: 404 }
       );
     }
-    
+
     // If no authenticated user, return most recent entry (for development)
+    console.log("No authenticated user, returning most recent entry");
     const data = await prisma.onboardingData.findFirst({
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
-    
+
     if (!data) {
       return NextResponse.json(
         { error: "No onboarding data found" },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json({ data });
-    
   } catch (error) {
     console.error("Error retrieving onboarding data:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve onboarding data" },
+      {
+        error: "Failed to retrieve onboarding data",
+        message: error.message,
+        stack: process.env.NODE_ENV !== "production" ? error.stack : undefined,
+      },
       { status: 500 }
     );
   }

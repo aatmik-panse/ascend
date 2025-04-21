@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/utils/supabase/client";
 
 export default function CareerOnboarding() {
   const router = useRouter();
@@ -103,18 +104,60 @@ export default function CareerOnboarding() {
     setSubmissionError(null);
 
     try {
+      // Get the Supabase client to access auth tokens
+      const supabase = createClient();
+
+      // Log the form data being submitted for debugging
+      console.log("Submitting form data:", JSON.stringify(formData, null, 2));
+
+      // Validate the biggestConcern field is included
+      if (formData.biggestConcern === undefined) {
+        console.error("biggestConcern field is undefined");
+      }
+
+      // Get the session which contains the access token
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      // Prepare the data payload, explicitly including all fields
+      const payload = {
+        jobTitle: formData.jobTitle,
+        company: formData.company,
+        experience: formData.experience,
+        jobStability: formData.jobStability,
+        salarRange: formData.salarRange,
+        topSkills: formData.topSkills.filter(Boolean),
+        timeForGrowth: formData.timeForGrowth,
+        linkedinUrl: formData.linkedinUrl,
+        biggestConcern: formData.biggestConcern,
+      };
+
+      console.log("Sending payload to API:", JSON.stringify(payload, null, 2));
+
+      // Make API request with authentication header
       const response = await fetch("/api/onboarding", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          // Include the access token in the Authorization header if available
+          ...(session?.access_token
+            ? {
+                Authorization: `Bearer ${session.access_token}`,
+              }
+            : {}),
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
+      const responseData = await response.json();
+      console.log("API response:", responseData);
+
       if (!response.ok) {
-        throw new Error("Failed to save onboarding data");
+        throw new Error(responseData.error || "Failed to save onboarding data");
       }
 
+      // Move to the completion step after successful submission
       setCurrentStep(currentStep + 1);
     } catch (error) {
       console.error("Error submitting form:", error);
