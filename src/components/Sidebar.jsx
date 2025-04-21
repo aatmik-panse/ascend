@@ -29,9 +29,10 @@ export default function SimpleSidebar({ isLoggedIn, userName, user }) {
   const [showLoginOptions, setShowLoginOptions] = useState(false);
 
   const navItems = [
-    // { to: "/dashboard", icon: Home, label: "Dashboard" },
-    { to: "/layoff_risk", icon: Shield, label: "Layoff Risk" },
+    { to: "/dashboard", icon: Home, label: "Dashboard" },
+    // { to: "/layoff_risk", icon: Shield, label: "Layoff Risk" },
     { to: "/career_pivot", icon: Brain, label: "Career Pivot" },
+    { to: "/tools", icon: Network, label: "Tools" },
     { to: "/counseling", icon: MessageSquare, label: "Counseling" },
   ];
 

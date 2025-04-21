@@ -3,7 +3,7 @@ import React from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { dm_serif_display, space_grotesk } from "./fonts";
-
+import { Analytics } from "@vercel/analytics/react";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -79,7 +79,9 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${dm_serif_display.variable} ${space_grotesk.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <Analytics>{children}</Analytics>
+      </body>
     </html>
   );
 }
