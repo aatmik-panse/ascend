@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
+import config from "@/utils/config";
 
 export async function GET(request) {
   try {
@@ -19,8 +20,9 @@ export async function GET(request) {
     const redirectTo = decodeURIComponent(encodedRedirectTo);
 
     if (!code) {
+      // Use config.domainName for proper environment-based redirection
       return NextResponse.redirect(
-        new URL("/sign-in?error=no_code", request.url)
+        new URL("/sign-in?error=no_code", config.domainName)
       );
     }
 
@@ -38,14 +40,14 @@ export async function GET(request) {
     if (exchangeError) {
       console.error("Error exchanging code for session:", exchangeError);
       return NextResponse.redirect(
-        new URL("/sign-in?error=auth_failed", request.url)
+        new URL("/sign-in?error=auth_failed", config.domainName)
       );
     }
 
     if (!session) {
       console.error("No session created after code exchange");
       return NextResponse.redirect(
-        new URL("/sign-in?error=session_failed", request.url)
+        new URL("/sign-in?error=session_failed", config.domainName)
       );
     }
 
@@ -57,7 +59,7 @@ export async function GET(request) {
     if (userError || !user) {
       console.error("Error getting user:", userError);
       return NextResponse.redirect(
-        new URL("/sign-in?error=user_not_found", request.url)
+        new URL("/sign-in?error=user_not_found", config.domainName)
       );
     }
 
@@ -162,7 +164,7 @@ export async function GET(request) {
   } catch (error) {
     console.error("Auth callback error:", error);
     return NextResponse.redirect(
-      new URL("/sign-in?error=auth_failed", request.url)
+      new URL("/sign-in?error=auth_failed", config.domainName)
     );
   }
 }

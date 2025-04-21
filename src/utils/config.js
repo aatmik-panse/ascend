@@ -1,5 +1,5 @@
 const config = {
-  appName: "Hippo",
+  appName: "Certcy",
   appDescription: "Hippo is a platform for .",
   domainName:
     process.env.NODE_ENV === "development"
