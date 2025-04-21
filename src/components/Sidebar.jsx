@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { signOut } from "@/app/(login)/actions";
 import { kaushan_script } from "@/app/fonts";
+import Image from "next/image";
 
 export default function SimpleSidebar({ isLoggedIn, userName, user }) {
   const pathname = usePathname();
@@ -84,11 +85,13 @@ export default function SimpleSidebar({ isLoggedIn, userName, user }) {
             className="p-4 flex items-center justify-center h-20 border-b border-blue-500/10 relative overflow-hidden group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-indigo-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <span
-              className={`text-xl font-bold bg-gradient-to-r text-blue-500 bg-clip-text ${kaushan_script.className}`}
-            >
-              C
-            </span>
+            <Image
+              src="/logo.png"
+              alt="Certcy Logo"
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-sm object-cover transition-transform duration-300 group-hover:scale-110"
+            />
           </Link>
 
           {/* Nav Items */}
