@@ -13,11 +13,12 @@ import {
   Menu,
   Settings,
   LogOut,
+  User2Icon,
 } from "lucide-react";
 import { signOut } from "@/app/(login)/actions";
 import { kaushan_script } from "@/app/fonts";
 
-export default function SimpleSidebar({ isLoggedIn }) {
+export default function SimpleSidebar({ isLoggedIn, userName, user }) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -65,7 +66,7 @@ export default function SimpleSidebar({ isLoggedIn }) {
     setShowProfileMenu(false);
   };
 
-  const avatarUrl = isLoggedIn ? "/default-avatar.png" : null;
+  const avatarUrl = isLoggedIn ? user?.avatar_url : <User2Icon />;
 
   return (
     <>
@@ -137,6 +138,11 @@ export default function SimpleSidebar({ isLoggedIn }) {
                 {/* Profile popup menu */}
                 {showProfileMenu && (
                   <div className="absolute bottom-full left-0 mb-2 w-48 bg-gray-800 rounded-lg border border-[var(--color-periwinkle)]/20 overflow-hidden shadow-lg z-20">
+                    <div className="px-4 py-2 border-b border-[var(--color-periwinkle)]/20">
+                      <p className="text-sm font-medium text-white truncate">
+                        {userName || "Account"}
+                      </p>
+                    </div>
                     <Link
                       href="/account"
                       className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-[var(--color-lilac)] transition-colors"
@@ -218,6 +224,11 @@ export default function SimpleSidebar({ isLoggedIn }) {
               {/* Mobile profile popup menu */}
               {showProfileMenu && (
                 <div className="absolute top-full right-0 mt-2 w-48 bg-gray-800 rounded-lg border border-[var(--color-periwinkle)]/20 overflow-hidden shadow-lg z-50">
+                  <div className="px-4 py-2 border-b border-[var(--color-periwinkle)]/20">
+                    <p className="text-sm font-medium text-white truncate">
+                      {userName || "Account"}
+                    </p>
+                  </div>
                   <Link
                     href="/account"
                     className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-[var(--color-lilac)] transition-colors"
