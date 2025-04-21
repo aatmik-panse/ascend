@@ -1,9 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   ChevronRight,
-  ChevronLeft,
-  CheckCircle,
+  ArrowRight,
   Briefcase,
   Building,
   Clock,
@@ -14,11 +15,15 @@ import {
   Linkedin,
   AlertCircle,
   Loader2,
+  CheckCircle,
 } from "lucide-react";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 export default function CareerOnboarding() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState(null);
@@ -34,10 +39,41 @@ export default function CareerOnboarding() {
     biggestConcern: "",
   });
 
-  const totalSteps = 6;
+  const inputRefs = useRef({});
+  const totalQuestions = 9;
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        nextStep();
+      }
+      if (e.key === "ArrowUp") {
+        prevStep();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentStep]);
+
+  useEffect(() => {
+    const currentQuestion = questions[currentStep];
+    if (currentQuestion?.field && inputRefs.current[currentQuestion.field]) {
+      setTimeout(() => {
+        inputRefs.current[currentQuestion.field].focus();
+      }, 400);
+    }
+  }, [currentStep]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleSelectChange = (name, value) => {
     setFormData({
       ...formData,
       [name]: value,
@@ -58,6 +94,8 @@ export default function CareerOnboarding() {
       ...formData,
       jobStability: value,
     });
+
+    setTimeout(() => nextStep(), 500);
   };
 
   const submitFormData = async () => {
@@ -77,7 +115,6 @@ export default function CareerOnboarding() {
         throw new Error("Failed to save onboarding data");
       }
 
-      // Move to the completion step after successful submission
       setCurrentStep(currentStep + 1);
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -90,10 +127,8 @@ export default function CareerOnboarding() {
   };
 
   const nextStep = () => {
-    console.log("Next button clicked, current step:", currentStep);
-    if (currentStep < totalSteps) {
-      // If it's the final step (confirmation), submit data to backend
-      if (currentStep === 5) {
+    if (currentStep < totalQuestions + 1) {
+      if (currentStep === totalQuestions) {
         submitFormData();
       } else {
         setCurrentStep(currentStep + 1);
@@ -102,570 +137,454 @@ export default function CareerOnboarding() {
   };
 
   const prevStep = () => {
-    console.log("Back button clicked, current step:", currentStep);
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
 
-  const getStepContent = () => {
-    switch (currentStep) {
-      case 0:
+  const getProgressPercentage = () => {
+    if (currentStep === 0) return 0;
+    if (currentStep === totalQuestions + 1) return 100;
+    return (currentStep / (totalQuestions + 1)) * 100;
+  };
+
+  const questions = [
+    {
+      id: "welcome",
+      title: "Welcome to CareerCompass",
+      subtitle: "Let's personalize your career growth journey",
+      description: "This will take less than 2 minutes to complete",
+    },
+    {
+      id: "jobTitle",
+      title: "What is your current job title?",
+      field: "jobTitle",
+      placeholder: "e.g. Product Manager",
+      type: "text",
+    },
+    {
+      id: "company",
+      title: "Which company do you work for?",
+      field: "company",
+      placeholder: "e.g. Acme Inc.",
+      type: "text",
+    },
+    {
+      id: "experience",
+      title: "How many years of experience do you have?",
+      field: "experience",
+      type: "select",
+      options: [
+        { value: "0-1", label: "Less than 1 year" },
+        { value: "1-3", label: "1-3 years" },
+        { value: "3-5", label: "3-5 years" },
+        { value: "5-10", label: "5-10 years" },
+        { value: "10+", label: "10+ years" },
+      ],
+    },
+    {
+      id: "jobStability",
+      title: "How stable do you feel in your current job?",
+      subtitle: "1 being very unstable, 5 being very stable",
+      field: "jobStability",
+      type: "rating",
+    },
+    {
+      id: "salarRange",
+      title: "What's your approximate salary range?",
+      subtitle: "This helps us provide relevant career advice",
+      field: "salarRange",
+      type: "select",
+      optional: true,
+      options: [
+        { value: "", label: "Prefer not to say" },
+        { value: "0-50k", label: "Under $50,000" },
+        { value: "50k-75k", label: "$50,000 - $75,000" },
+        { value: "75k-100k", label: "$75,000 - $100,000" },
+        { value: "100k-150k", label: "$100,000 - $150,000" },
+        { value: "150k+", label: "$150,000+" },
+      ],
+    },
+    {
+      id: "topSkills",
+      title: "What are your top 3 skills?",
+      field: "topSkills",
+      type: "skills",
+    },
+    {
+      id: "timeForGrowth",
+      title: "How much time can you dedicate to growth each week?",
+      field: "timeForGrowth",
+      type: "select",
+      options: [
+        { value: "1-3", label: "1-3 hours/week" },
+        { value: "4-7", label: "4-7 hours/week" },
+        { value: "8-15", label: "8-15 hours/week" },
+        { value: "15+", label: "15+ hours/week" },
+      ],
+    },
+    {
+      id: "linkedinUrl",
+      title: "What's your LinkedIn URL?",
+      subtitle: "Optional",
+      field: "linkedinUrl",
+      placeholder: "https://linkedin.com/in/yourprofile",
+      type: "text",
+      optional: true,
+    },
+    {
+      id: "biggestConcern",
+      title: "What's your biggest career concern right now?",
+      field: "biggestConcern",
+      placeholder: "e.g. Job security, skill gaps, career progression...",
+      type: "textarea",
+    },
+    {
+      id: "confirm",
+      title: "Almost done!",
+      subtitle: "Please review your information",
+      type: "confirm",
+    },
+    {
+      id: "complete",
+      title: "Thanks for completing your profile",
+      subtitle: "We've customized your experience based on your responses",
+      type: "complete",
+    },
+  ];
+
+  const currentQuestion = questions[currentStep];
+
+  const handleKeyDown = (e, index) => {
+    if (
+      e.key === "Tab" &&
+      !e.shiftKey &&
+      index < 2 &&
+      inputRefs.current[`skill-${index + 1}`]
+    ) {
+      setTimeout(() => {
+        inputRefs.current[`skill-${index + 1}`].focus();
+      }, 10);
+    }
+  };
+
+  const getFormField = () => {
+    if (
+      !currentQuestion ||
+      currentQuestion.id === "welcome" ||
+      currentQuestion.id === "complete"
+    ) {
+      return null;
+    }
+
+    switch (currentQuestion.type) {
+      case "text":
         return (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col items-center text-center"
-          >
-            <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-indigo-500 text-transparent bg-clip-text">
-              Welcome to CareerCompass
-            </h1>
-            <p className="text-gray-300 mb-10 max-w-md leading-relaxed">
-              Let's get to know you better to personalize your career growth
-              journey. This will take less than 2 minutes.
-            </p>
-            <div className="w-full max-w-sm">
+          <div className="w-full max-w-md mt-8">
+            <Input
+              ref={(el) => (inputRefs.current[currentQuestion.field] = el)}
+              type={currentQuestion.inputType || "text"}
+              name={currentQuestion.field}
+              value={formData[currentQuestion.field]}
+              onChange={handleInputChange}
+              placeholder={
+                currentQuestion.placeholder || "Type your answer here..."
+              }
+              className="w-full text-xl h-14 bg-transparent border-t-0 border-x-0 border-b-2 border-gray-300 rounded-none px-0 focus-visible:ring-0 focus-visible:border-b-black"
+              required={!currentQuestion.optional}
+              onKeyDown={(e) => e.key === "Enter" && nextStep()}
+            />
+          </div>
+        );
+      case "textarea":
+        return (
+          <div className="w-full max-w-md mt-8">
+            <Textarea
+              ref={(el) => (inputRefs.current[currentQuestion.field] = el)}
+              name={currentQuestion.field}
+              value={formData[currentQuestion.field]}
+              onChange={handleInputChange}
+              placeholder={
+                currentQuestion.placeholder || "Type your answer here..."
+              }
+              className="w-full text-xl h-32 bg-transparent border-2 border-gray-300 rounded-md px-4 py-3 focus-visible:ring-0 focus-visible:border-black"
+              required={!currentQuestion.optional}
+            />
+          </div>
+        );
+      case "select":
+        return (
+          <div className="w-full max-w-md mt-8 space-y-3">
+            {currentQuestion.options.map((option) => (
               <button
-                onClick={nextStep}
-                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-4 rounded-xl flex items-center justify-center font-medium transition-all duration-300 shadow-lg shadow-purple-900/20"
-              >
-                Get Started <ChevronRight className="ml-2 w-5 h-5" />
-              </button>
-            </div>
-          </motion.div>
-        );
-      case 1:
-        return (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            className="space-y-8"
-          >
-            <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-indigo-500 text-transparent bg-clip-text">
-              Tell us about your work
-            </h2>
-
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <label className="block text-gray-300 text-sm font-medium flex items-center">
-                  <Briefcase className="w-4 h-4 mr-2 text-purple-400" />
-                  What is your job title?
-                </label>
-                <input
-                  type="text"
-                  name="jobTitle"
-                  value={formData.jobTitle}
-                  onChange={handleInputChange}
-                  placeholder="e.g. Product Manager"
-                  className="w-full bg-[#1a1a2e]/50 backdrop-blur-sm text-white border border-gray-800/50 rounded-xl p-3.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <label className="block text-gray-300 text-sm font-medium flex items-center">
-                  <Building className="w-4 h-4 mr-2 text-purple-400" />
-                  Which company do you currently work at?
-                </label>
-                <input
-                  type="text"
-                  name="company"
-                  value={formData.company}
-                  onChange={handleInputChange}
-                  placeholder="e.g. Acme Inc."
-                  className="w-full bg-[#1a1a2e]/50 backdrop-blur-sm text-white border border-gray-800/50 rounded-xl p-3.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                />
-              </div>
-            </div>
-          </motion.div>
-        );
-      case 2:
-        return (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            className="space-y-8"
-          >
-            <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-indigo-500 text-transparent bg-clip-text">
-              Your experience
-            </h2>
-
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <label className="block text-gray-300 text-sm font-medium flex items-center">
-                  <Clock className="w-4 h-4 mr-2 text-purple-400" />
-                  What's your estimated years of experience in this field?
-                </label>
-                <select
-                  name="experience"
-                  value={formData.experience}
-                  onChange={handleInputChange}
-                  className="w-full bg-[#1a1a2e]/50 backdrop-blur-sm text-white border border-gray-800/50 rounded-xl p-3.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                >
-                  <option value="">Select experience</option>
-                  <option value="0-1">Less than 1 year</option>
-                  <option value="1-3">1-3 years</option>
-                  <option value="3-5">3-5 years</option>
-                  <option value="5-10">5-10 years</option>
-                  <option value="10+">10+ years</option>
-                </select>
-              </div>
-
-              <div className="space-y-4">
-                <label className="block text-gray-300 text-sm font-medium mb-2 flex items-center">
-                  <TrendingUp className="w-4 h-4 mr-2 text-purple-400" />
-                  How stable do you feel in your current job?
-                </label>
-                <div className="p-4 bg-[#1a1a2e]/30 backdrop-blur-sm rounded-xl border border-gray-800/50">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs text-gray-400">Very unstable</span>
-                    <span className="text-xs text-gray-400">Very stable</span>
-                  </div>
-                  <div className="flex justify-between items-center space-x-3">
-                    {[1, 2, 3, 4, 5].map((value) => (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => handleStabilityChange(value)}
-                        className={`w-full h-2 rounded-full ${
-                          formData.jobStability >= value
-                            ? "bg-gradient-to-r from-purple-500 to-indigo-500"
-                            : "bg-gray-700"
-                        } transition-all duration-200 focus:outline-none relative hover:opacity-90`}
-                        aria-label={`Stability level ${value}`}
-                      >
-                        <span
-                          className={`absolute -top-7 left-1/2 transform -translate-x-1/2 text-xs font-medium ${
-                            formData.jobStability === value
-                              ? "text-purple-400"
-                              : "text-gray-500"
-                          }`}
-                        >
-                          {value}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="block text-gray-300 text-sm font-medium flex items-center">
-                  <DollarSign className="w-4 h-4 mr-2 text-purple-400" />
-                  What's your approximate annual salary range? (OPTIONAL)
-                </label>
-                <select
-                  name="salarRange"
-                  value={formData.salarRange}
-                  onChange={handleInputChange}
-                  className="w-full bg-[#1a1a2e]/50 backdrop-blur-sm text-white border border-gray-800/50 rounded-xl p-3.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                >
-                  <option value="">Prefer not to say</option>
-                  <option value="0-50k">Under $50,000</option>
-                  <option value="50k-75k">$50,000 - $75,000</option>
-                  <option value="75k-100k">$75,000 - $100,000</option>
-                  <option value="100k-150k">$100,000 - $150,000</option>
-                  <option value="150k+">$150,000+</option>
-                </select>
-              </div>
-            </div>
-          </motion.div>
-        );
-      case 3:
-        return (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            className="space-y-8"
-          >
-            <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-indigo-500 text-transparent bg-clip-text">
-              Your skills and growth
-            </h2>
-
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <label className="block text-gray-300 text-sm font-medium flex items-center">
-                  <Award className="w-4 h-4 mr-2 text-purple-400" />
-                  TOP 3 Skills you feel confident in?
-                </label>
-                <div className="space-y-3 p-4 bg-[#1a1a2e]/30 backdrop-blur-sm rounded-xl border border-gray-800/50">
-                  {[0, 1, 2].map((index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                    >
-                      <input
-                        type="text"
-                        value={formData.topSkills[index]}
-                        onChange={(e) =>
-                          handleSkillChange(index, e.target.value)
-                        }
-                        placeholder={`Skill ${index + 1}`}
-                        className="w-full bg-[#1a1a2e]/70 text-white border border-gray-800/50 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                      />
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="block text-gray-300 text-sm font-medium flex items-center">
-                  <Calendar className="w-4 h-4 mr-2 text-purple-400" />
-                  How much time can you dedicate to career growth?
-                </label>
-                <select
-                  name="timeForGrowth"
-                  value={formData.timeForGrowth}
-                  onChange={handleInputChange}
-                  className="w-full bg-[#1a1a2e]/50 backdrop-blur-sm text-white border border-gray-800/50 rounded-xl p-3.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                >
-                  <option value="">Select time</option>
-                  <option value="1-3">1-3 hours/week</option>
-                  <option value="4-7">4-7 hours/week</option>
-                  <option value="8-15">8-15 hours/week</option>
-                  <option value="15+">15+ hours/week</option>
-                </select>
-              </div>
-            </div>
-          </motion.div>
-        );
-      case 4:
-        return (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            className="space-y-8"
-          >
-            <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-indigo-500 text-transparent bg-clip-text">
-              Additional information
-            </h2>
-
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <label className="block text-gray-300 text-sm font-medium flex items-center">
-                  <Linkedin className="w-4 h-4 mr-2 text-purple-400" />
-                  LinkedIn URL (optional)
-                </label>
-                <input
-                  type="url"
-                  name="linkedinUrl"
-                  value={formData.linkedinUrl}
-                  onChange={handleInputChange}
-                  placeholder="https://linkedin.com/in/yourprofile"
-                  className="w-full bg-[#1a1a2e]/50 backdrop-blur-sm text-white border border-gray-800/50 rounded-xl p-3.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <label className="block text-gray-300 text-sm font-medium flex items-center">
-                  <AlertCircle className="w-4 h-4 mr-2 text-purple-400" />
-                  What's your biggest concern in your job right now?
-                </label>
-                <textarea
-                  name="biggestConcern"
-                  value={formData.biggestConcern}
-                  onChange={handleInputChange}
-                  placeholder="e.g. Job security, skill gaps, career progression..."
-                  className="w-full bg-[#1a1a2e]/50 backdrop-blur-sm text-white border border-gray-800/50 rounded-xl p-3.5 h-28 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                />
-              </div>
-            </div>
-          </motion.div>
-        );
-      case 5:
-        return (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            className="space-y-8"
-          >
-            <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-indigo-500 text-transparent bg-clip-text">
-              Almost there!
-            </h2>
-            <p className="text-gray-300 mb-6">
-              Please confirm your information below:
-            </p>
-
-            <div className="bg-[#1a1a2e]/50 backdrop-blur-xl border border-gray-800/50 rounded-xl p-6 space-y-4 relative overflow-hidden group-hover:border-gray-700/50 transition-all duration-300">
-              <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent"></div>
-              <div className="relative">
-                <div className="flex justify-between py-2 border-b border-gray-800/30">
-                  <span className="text-gray-400">Job Title:</span>
-                  <span className="text-white font-medium">
-                    {formData.jobTitle || "Not provided"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-800/30">
-                  <span className="text-gray-400">Company:</span>
-                  <span className="text-white font-medium">
-                    {formData.company || "Not provided"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-800/30">
-                  <span className="text-gray-400">Experience:</span>
-                  <span className="text-white font-medium">
-                    {formData.experience || "Not provided"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-800/30">
-                  <span className="text-gray-400">Job Stability:</span>
-                  <span className="text-white font-medium">
-                    {formData.jobStability}/5
-                  </span>
-                </div>
-                {formData.salarRange && (
-                  <div className="flex justify-between py-2 border-b border-gray-800/30">
-                    <span className="text-gray-400">Salary Range:</span>
-                    <span className="text-white font-medium">
-                      {formData.salarRange}
-                    </span>
-                  </div>
+                key={option.value}
+                onClick={() => {
+                  handleSelectChange(currentQuestion.field, option.value);
+                  setTimeout(() => nextStep(), 300);
+                }}
+                className={cn(
+                  "w-full text-left px-5 py-4 border-2 rounded-md text-lg transition-all flex items-center justify-between",
+                  formData[currentQuestion.field] === option.value
+                    ? "border-black bg-black text-white"
+                    : "border-gray-300 hover:border-gray-500"
                 )}
-                <div className="flex justify-between py-2 border-b border-gray-800/30">
-                  <span className="text-gray-400">Top Skills:</span>
-                  <span className="text-white font-medium">
-                    {formData.topSkills.filter(Boolean).join(", ") ||
-                      "Not provided"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span className="text-gray-400">Time for Growth:</span>
-                  <span className="text-white font-medium">
-                    {formData.timeForGrowth || "Not provided"}
-                  </span>
-                </div>
-              </div>
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleSelectChange(currentQuestion.field, option.value);
+                    setTimeout(() => nextStep(), 300);
+                  }
+                }}
+                aria-label={option.label}
+              >
+                <span>{option.label}</span>
+                {formData[currentQuestion.field] === option.value && (
+                  <CheckCircle className="h-5 w-5" />
+                )}
+              </button>
+            ))}
+          </div>
+        );
+      case "rating":
+        return (
+          <div className="w-full max-w-md mt-8">
+            <div className="flex justify-between items-center gap-3">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  onClick={() => handleStabilityChange(value)}
+                  className={cn(
+                    "flex-1 aspect-square rounded-full text-2xl border-2 transition-all duration-300",
+                    formData.jobStability === value
+                      ? "border-black bg-black text-white"
+                      : value < formData.jobStability
+                      ? "border-black bg-gray-100"
+                      : "border-gray-300 hover:border-gray-500"
+                  )}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleStabilityChange(value);
+                    }
+                  }}
+                  aria-label={`Stability level ${value}`}
+                >
+                  {value}
+                </button>
+              ))}
             </div>
-
-            {submissionError && (
-              <div className="bg-red-900/20 border border-red-800 rounded-lg p-3 text-red-300 text-sm flex items-start">
-                <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
-                <span>{submissionError}</span>
+          </div>
+        );
+      case "skills":
+        return (
+          <div className="w-full max-w-md mt-8 space-y-4">
+            {[0, 1, 2].map((index) => (
+              <div key={index} className="flex items-center">
+                <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-sm mr-3">
+                  {index + 1}
+                </span>
+                <Input
+                  ref={(el) => (inputRefs.current[`skill-${index}`] = el)}
+                  type="text"
+                  value={formData.topSkills[index]}
+                  onChange={(e) => handleSkillChange(index, e.target.value)}
+                  placeholder={`Enter skill ${index + 1}`}
+                  className="flex-1 text-lg h-12 bg-transparent border-t-0 border-x-0 border-b-2 border-gray-300 rounded-none px-0 focus-visible:ring-0 focus-visible:border-b-black"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && index === 2) {
+                      nextStep();
+                    } else {
+                      handleKeyDown(e, index);
+                    }
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        );
+      case "confirm":
+        return (
+          <div className="w-full max-w-md mt-8 bg-gray-50 rounded-lg overflow-hidden">
+            {formData.jobTitle && (
+              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
+                <span className="text-gray-500">Job Title</span>
+                <span className="font-medium">{formData.jobTitle}</span>
               </div>
             )}
-          </motion.div>
-        );
-      case 6:
-        return (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col items-center text-center"
-          >
-            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center justify-center mb-8 shadow-lg shadow-purple-900/30">
-              <CheckCircle className="w-12 h-12 text-white" />
+            {formData.company && (
+              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
+                <span className="text-gray-500">Company</span>
+                <span className="font-medium">{formData.company}</span>
+              </div>
+            )}
+            {formData.experience && (
+              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
+                <span className="text-gray-500">Experience</span>
+                <span className="font-medium">{formData.experience}</span>
+              </div>
+            )}
+            <div className="flex justify-between px-5 py-4 border-b border-gray-200">
+              <span className="text-gray-500">Job Stability</span>
+              <span className="font-medium">{formData.jobStability}/5</span>
             </div>
-            <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-indigo-500 text-transparent bg-clip-text">
-              Your account has been created!
-            </h1>
-            <p className="text-gray-300 mb-10 max-w-md leading-relaxed">
-              Thank you for completing your profile. We've customized your
-              experience based on your responses.
-            </p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.4 }}
-              className="grid grid-cols-2 gap-4 w-full max-w-lg mb-10"
-            >
-              <div className="bg-[#1a1a2e]/50 backdrop-blur-xl border border-gray-800/50 rounded-xl p-5 text-center hover:border-purple-500/30 transition-all duration-300 cursor-pointer group">
-                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent rounded-xl"></div>
-                <h3 className="text-sm text-gray-300 mb-1 relative">
-                  Visit Help Center
-                </h3>
-                <p className="text-xs text-gray-500 relative">
-                  For tips and tricks
-                </p>
+            {formData.salarRange && (
+              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
+                <span className="text-gray-500">Salary Range</span>
+                <span className="font-medium">{formData.salarRange}</span>
               </div>
-              <div className="bg-[#1a1a2e]/50 backdrop-blur-xl border border-gray-800/50 rounded-xl p-5 text-center hover:border-purple-500/30 transition-all duration-300 cursor-pointer group">
-                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent rounded-xl"></div>
-                <h3 className="text-sm text-gray-300 mb-1 relative">
-                  Get Pro Plan
-                </h3>
-                <p className="text-xs text-gray-500 relative">
-                  Unlock all features
-                </p>
+            )}
+            {formData.topSkills.some(Boolean) && (
+              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
+                <span className="text-gray-500">Top Skills</span>
+                <span className="font-medium">
+                  {formData.topSkills.filter(Boolean).join(", ")}
+                </span>
               </div>
-            </motion.div>
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.4 }}
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-3.5 px-10 rounded-xl font-medium transition-all duration-300 shadow-lg shadow-purple-900/20"
-            >
-              Go to Dashboard
-            </motion.button>
-          </motion.div>
+            )}
+            {formData.timeForGrowth && (
+              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
+                <span className="text-gray-500">Time for Growth</span>
+                <span className="font-medium">{formData.timeForGrowth}</span>
+              </div>
+            )}
+            {formData.linkedinUrl && (
+              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
+                <span className="text-gray-500">LinkedIn</span>
+                <span className="font-medium">{formData.linkedinUrl}</span>
+              </div>
+            )}
+            {formData.biggestConcern && (
+              <div className="px-5 py-4">
+                <span className="text-gray-500 block mb-2">
+                  Biggest Concern
+                </span>
+                <span className="font-medium">{formData.biggestConcern}</span>
+              </div>
+            )}
+          </div>
         );
       default:
         return null;
     }
   };
 
-  const getProgressWidth = () => {
-    return `${(currentStep / totalSteps) * 100}%`;
-  };
-
   return (
-    <div className="bg-[#0f0f1a] min-h-screen text-white flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl flex rounded-2xl overflow-hidden shadow-2xl shadow-black/50">
-        {/* Left column - with purple gradient background and illustration */}
-        <div className="hidden lg:block lg:w-5/12 bg-gradient-to-b from-purple-900 to-indigo-900 p-8 rounded-l-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full opacity-10">
-            <div className="absolute top-10 left-10 w-20 h-20 rounded-full bg-purple-400 blur-xl"></div>
-            <div className="absolute bottom-40 right-10 w-32 h-32 rounded-full bg-indigo-500 blur-xl"></div>
-            <div className="absolute top-1/2 left-1/3 w-40 h-40 rounded-full bg-purple-600 blur-xl"></div>
-            {/* Add more decorative elements */}
-            {Array.from({ length: 30 }).map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-1 h-1 rounded-full bg-white"
-                style={{
-                  top: `${100}%`,
-                  left: `${100}%`,
-                  opacity: 0.7 + 0.3,
-                  boxShadow: "0 0 4px 1px rgba(255, 255, 255, 0.3)",
-                }}
-              ></div>
-            ))}
+    <div className="fixed inset-0 bg-white text-black">
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100">
+        {currentStep > 0 && (
+          <motion.div
+            className="h-full bg-black"
+            initial={{ width: `${getProgressPercentage() - 10}%` }}
+            animate={{ width: `${getProgressPercentage()}%` }}
+            transition={{ duration: 0.3 }}
+          />
+        )}
+      </div>
+
+      <div className="w-full min-h-screen flex flex-col">
+        {currentStep > 0 && currentStep <= totalQuestions && (
+          <div className="flex justify-between py-4 px-6">
+            <button
+              onClick={prevStep}
+              className="text-gray-500 hover:text-black transition-colors"
+              aria-label="Go back"
+              tabIndex={0}
+            >
+              Back
+            </button>
+            <div className="text-gray-500 text-sm">
+              {currentStep} of {totalQuestions}
+            </div>
           </div>
+        )}
 
-          <div className="relative z-10">
-            <div className="flex items-center mb-16">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center mr-3 shadow-lg">
-                <span className="text-purple-700 font-bold text-xl">C</span>
-              </div>
-              <span className="text-white font-bold text-xl">
-                CareerCompass
-              </span>
-            </div>
+        <div className="flex-1 flex flex-col justify-center items-center px-6">
+          <div className="w-full max-w-md">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+                className="mb-0"
+              >
+                <h1 className="text-3xl md:text-4xl font-medium mb-2">
+                  {currentQuestion.title}
+                </h1>
 
-            <h2 className="text-2xl font-bold mb-6 text-white">
-              Shape your career path with confidence
-            </h2>
-            <p className="text-purple-200 mb-8 leading-relaxed">
-              Our AI-powered platform helps professionals like you make
-              strategic career decisions and develop skills that matter.
-            </p>
+                {currentQuestion.subtitle && (
+                  <p className="text-lg text-gray-500 mb-1">
+                    {currentQuestion.subtitle}
+                  </p>
+                )}
 
-            <div className="space-y-5 mt-16">
-              {Array.from({ length: totalSteps + 1 }).map((_, i) => (
-                <div key={i} className="flex items-center">
-                  <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center mr-3 transition-all duration-300 ${
-                      i === currentStep
-                        ? "bg-white text-purple-700 shadow-lg shadow-purple-800/50"
-                        : i < currentStep
-                        ? "bg-purple-400 text-white"
-                        : "bg-purple-800/70 text-purple-300"
-                    }`}
-                  >
-                    {i < currentStep ? (
-                      <CheckCircle className="w-4 h-4" />
-                    ) : (
-                      <span className="text-xs">{i + 1}</span>
-                    )}
+                {currentQuestion.description && (
+                  <p className="text-gray-500">{currentQuestion.description}</p>
+                )}
+
+                {getFormField()}
+
+                {currentStep === totalQuestions && submissionError && (
+                  <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-500 flex items-start">
+                    <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
+                    <span>{submissionError}</span>
                   </div>
-                  <span
-                    className={`text-sm transition-all duration-300 ${
-                      i === currentStep
-                        ? "text-white font-medium"
-                        : i < currentStep
-                        ? "text-purple-200"
-                        : "text-purple-400"
-                    }`}
-                  >
-                    {i === 0 && "Welcome"}
-                    {i === 1 && "Work Information"}
-                    {i === 2 && "Experience"}
-                    {i === 3 && "Skills & Growth"}
-                    {i === 4 && "Additional Info"}
-                    {i === 5 && "Confirmation"}
-                    {i === 6 && "Completion"}
-                  </span>
-                </div>
-              ))}
-            </div>
+                )}
+
+                {(currentStep === 0 ||
+                  currentStep === totalQuestions + 1 ||
+                  currentQuestion.type === "text" ||
+                  currentQuestion.type === "textarea" ||
+                  currentQuestion.type === "confirm") && (
+                  <div className="mt-8">
+                    <Button
+                      onClick={
+                        currentStep === totalQuestions + 1
+                          ? () => router.push("/dashboard")
+                          : nextStep
+                      }
+                      disabled={isSubmitting}
+                      className={cn(
+                        "h-14 px-8 bg-black hover:bg-gray-800 text-white rounded-full font-normal text-lg w-full md:w-auto flex items-center justify-center",
+                        isSubmitting && "opacity-80"
+                      )}
+                      tabIndex={0}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />{" "}
+                          Submitting...
+                        </>
+                      ) : currentStep === 0 ? (
+                        <>Get Started</>
+                      ) : currentStep === totalQuestions ? (
+                        <>Submit</>
+                      ) : currentStep === totalQuestions + 1 ? (
+                        <>Go to Dashboard</>
+                      ) : (
+                        <>
+                          OK <ArrowRight className="ml-2 h-5 w-5" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
 
-        {/* Right column - with form content */}
-        <div
-          className={`w-full ${
-            currentStep === 0 || currentStep === 6 ? "lg:w-full" : "lg:w-7/12"
-          } bg-[#0f0f1a] backdrop-blur-xl p-8 rounded-r-2xl relative ${
-            currentStep === 0 || currentStep === 6 ? "lg:rounded-l-2xl" : ""
-          }`}
-        >
-          {/* Background gradient */}
-          {/* <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a2e]/10 to-transparent rounded-r-2xl"></div> */}
-
-          {/* Progress bar - mobile only */}
-          <div className="lg:hidden mb-8 relative">
-            <div className="h-1.5 w-full bg-gray-800/80 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500 ease-out"
-                style={{ width: getProgressWidth() }}
-              ></div>
-            </div>
-            <div className="flex justify-between text-xs text-gray-500 mt-2">
-              <span>Start</span>
-              <span>Finish</span>
-            </div>
-          </div>
-
-          {/* Form content */}
-          <div className="min-h-[450px] relative">{getStepContent()}</div>
-
-          {/* Navigation buttons */}
-          {currentStep > 0 && currentStep < 6 && (
-            <div className="flex justify-between mt-12">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  prevStep();
-                }}
-                className="flex items-center text-gray-400 hover:text-white transition-colors px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-lg"
-                disabled={isSubmitting}
-                type="button"
-              >
-                <ChevronLeft className="w-5 h-5 mr-1" /> Back
-              </button>
-
-              <Button
-                // whileHover={{ scale: isSubmitting ? 1 : 1.03 }}
-                // whileTap={{ scale: isSubmitting ? 1 : 0.97 }}
-                onClick={(e) => {
-                  nextStep();
-                }}
-                disabled={isSubmitting}
-                className={`bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-2.5 px-7 rounded-xl flex items-center transition-all duration-300 shadow-lg shadow-purple-900/20 ${
-                  isSubmitting ? "opacity-80 cursor-not-allowed" : ""
-                } focus:outline-none focus:ring-2 focus:ring-purple-500`}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    {currentStep === 5 ? "Complete" : "Continue"}{" "}
-                    <ChevronRight className="ml-1 w-5 h-5" />
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
+        <div className="text-center pb-6 text-sm text-gray-400">
+          Press{" "}
+          <kbd className="px-2 py-1 bg-gray-100 rounded text-xs mx-1">
+            Enter
+          </kbd>{" "}
+          to continue or{" "}
+          <kbd className="px-2 py-1 bg-gray-100 rounded text-xs mx-1">↑</kbd> to
+          go back
         </div>
       </div>
     </div>
