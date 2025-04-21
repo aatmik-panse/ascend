@@ -19,7 +19,8 @@ export function Login({ mode = "signin" }) {
   const discountCode = searchParams.get("discountCode");
 
   const handleGoogleSignIn = () => {
-    const redirectTo = `${config.domainName}/api/auth/callback`;
+    // Use authCallbackDomain instead of domainName for OAuth callbacks
+    const redirectTo = `${config.authCallbackDomain}/api/auth/callback`;
     console.log("Google sign-in redirect URL:", redirectTo);
     setLoading(true);
     const supabase = createClient();
