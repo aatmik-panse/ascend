@@ -16,6 +16,7 @@ import {
   AlertCircle,
   Loader2,
   CheckCircle,
+  Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,7 +36,7 @@ export default function CareerOnboarding() {
     experience: "",
     jobStability: 3,
     salarRange: "",
-    topSkills: ["", "", ""],
+    topSkills: ["", "", ""], // Start with 3 empty skills
     timeForGrowth: "",
     linkedinUrl: "",
     biggestConcern: "",
@@ -44,9 +45,28 @@ export default function CareerOnboarding() {
   const inputRefs = useRef({});
   const totalQuestions = 9;
 
+  // Add a new skill input field
+  const addSkill = () => {
+    setFormData({
+      ...formData,
+      topSkills: [...formData.topSkills, ""],
+    });
+    // Focus on the new skill input after it's added
+    setTimeout(() => {
+      const newSkillIndex = formData.topSkills.length;
+      if (inputRefs.current[`skill-${newSkillIndex}`]) {
+        inputRefs.current[`skill-${newSkillIndex}`].focus();
+      }
+    }, 10);
+  };
+
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
+      // Only handle global keyboard events if not inside a skill input field
+      const isInSkillInput =
+        e.target.tagName === "INPUT" && e.target.id?.startsWith("skill-");
+
+      if (e.key === "Enter" && !e.shiftKey && !isInSkillInput) {
         nextStep();
       }
       if (e.key === "ArrowUp") {
@@ -127,9 +147,12 @@ export default function CareerOnboarding() {
       return true;
     }
 
-    // Special validation for skills (require at least one skill)
+    // Special validation for skills (require at least three filled skills)
     if (currentQuestion.field === "topSkills") {
-      return formData.topSkills.some((skill) => skill.trim() !== "");
+      const filledSkills = formData.topSkills.filter(
+        (skill) => skill.trim() !== ""
+      );
+      return filledSkills.length >= 3;
     }
 
     // For regular fields, check if they're filled
@@ -228,7 +251,7 @@ export default function CareerOnboarding() {
             inputRefs.current[currentQuestion.field].focus();
           } else if (currentQuestion.type === "skills") {
             // For skills, focus on the first empty input
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < formData.topSkills.length; i++) {
               if (!formData.topSkills[i] && inputRefs.current[`skill-${i}`]) {
                 inputRefs.current[`skill-${i}`].focus();
                 break;
@@ -364,7 +387,7 @@ export default function CareerOnboarding() {
     if (
       e.key === "Tab" &&
       !e.shiftKey &&
-      index < 2 &&
+      index < formData.topSkills.length - 1 &&
       inputRefs.current[`skill-${index + 1}`]
     ) {
       setTimeout(() => {
@@ -423,7 +446,7 @@ export default function CareerOnboarding() {
                 currentQuestion.placeholder || "Type your answer here..."
               }
               className={cn(
-                "w-full text-xl h-32 bg-transparent border-2 border-gray-300 rounded-md px-4 py-3 focus-visible:ring-0 focus-visible:border-black",
+                "w-full text-xl h-32 bg-transparent border-2 border-gray-300 rounded-md px-4 py-3 focus-visible:ring-0 focus-visible:border-white",
                 validationError &&
                   !currentQuestion.optional &&
                   "border-red-500 focus-visible:border-red-500"
@@ -487,10 +510,10 @@ export default function CareerOnboarding() {
                   className={cn(
                     "flex-1 aspect-square rounded-full text-2xl border-2 transition-all duration-300",
                     formData.jobStability === value
-                      ? "border-black bg-black text-white"
+                      ? "border-white bg-black text-white"
                       : value < formData.jobStability
-                      ? "border-black bg-neutral-700"
-                      : "border-gray-300 hover:border-gray-500"
+                      ? "border-gray-300 bg-neutral-900"
+                      : "border-gray-300 hover:border-gray-500 bg-neutral-600"
                   )}
                   tabIndex={0}
                   onKeyDown={(e) => {
@@ -510,39 +533,94 @@ export default function CareerOnboarding() {
       case "skills":
         return (
           <div className="w-full max-w-md mt-8 space-y-4">
-            {[0, 1, 2].map((index) => (
+            {formData.topSkills.map((skill, index) => (
               <div key={index} className="flex items-center">
-                <span className="w-10 h-10 rounded-full bg-neutral-800 border border-b-blue-100 flex items-center justify-center text-sm mr-3">
+                <span className="w-10 h-10 border border-b-blue-100 rounded-full bg-neutral-800 flex items-center justify-center text-sm mr-3">
                   {index + 1}
                 </span>
                 <Input
                   ref={(el) => (inputRefs.current[`skill-${index}`] = el)}
                   type="text"
-                  value={formData.topSkills[index]}
+                  id={`skill-${index}`}
+                  value={skill}
                   onChange={(e) => handleSkillChange(index, e.target.value)}
                   placeholder={`Enter skill ${index + 1}`}
                   className={cn(
                     "flex-1 text-lg h-12 bg-transparent border-t-0 border-x-0 border-b-2 border-gray-300 rounded-none px-0 focus-visible:ring-0 focus-visible:border-b-neutral-600",
                     validationError &&
-                      index === 0 &&
-                      !formData.topSkills.some(Boolean) &&
+                      formData.topSkills.filter((skill) => skill.trim() !== "")
+                        .length < 3 &&
                       "border-red-500 focus-visible:border-b-red-500"
                   )}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && index === 2) {
-                      nextStep();
+                    // Handle Enter key specifically for skill inputs
+                    if (e.key === "Enter") {
+                      e.preventDefault(); // Prevent form submission
+                      e.stopPropagation(); // Stop event bubbling to global handler
+
+                      const filledSkills = formData.topSkills.filter(
+                        (s) => s.trim() !== ""
+                      );
+
+                      if (filledSkills.length >= 3) {
+                        // If we have enough skills, go to the next step
+                        nextStep();
+                      } else if (
+                        formData.topSkills[index].trim() !== "" &&
+                        index === formData.topSkills.length - 1
+                      ) {
+                        // If current field has content and it's the last one, add a new skill field
+                        addSkill();
+                      }
                     } else {
+                      // Handle other key navigation (tab, arrows, etc)
                       handleKeyDown(e, index);
                     }
                   }}
                 />
               </div>
             ))}
-            {validationError && !formData.topSkills.some(Boolean) && (
-              <p className="text-red-500 text-sm mt-1">
-                Please enter at least one skill
-              </p>
-            )}
+
+            <div className="flex justify-center self-center items-center">
+              <Button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  addSkill();
+                }}
+                className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-colors mt-2 rounded-full border border-gray-100 hover:border-white px-6 py-2 h-auto"
+                tabIndex={0}
+                aria-label="Add another skill"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    addSkill();
+                  }
+                }}
+              >
+                <Plus className="h-4 w-4" /> Add skill
+              </Button>
+
+              {validationError &&
+                formData.topSkills.filter((skill) => skill.trim() !== "")
+                  .length < 3 && (
+                  <p className="text-red-500 text-sm  m-4">
+                    Please enter at least 3 skills
+                  </p>
+                )}
+            </div>
+
+            {/* Add "Continue" button for skills section to make navigation clearer */}
+            <div className="mt-6 px-6">
+              <Button
+                onClick={nextStep}
+                className="h-12 px-24 bg-black hover:bg-gray-800 text-white rounded-full font-normal text-lg w-full md:w-auto flex items-center justify-center"
+                tabIndex={0}
+              >
+                Continue <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
           </div>
         );
       case "confirm":
