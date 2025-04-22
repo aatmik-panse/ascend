@@ -168,14 +168,6 @@ export default function CareerOnboarding() {
       // Get the Supabase client to access auth tokens
       const supabase = createClient();
 
-      // Log the form data being submitted for debugging
-      console.log("Submitting form data:", JSON.stringify(formData, null, 2));
-
-      // Validate the biggestConcern field is included
-      if (formData.biggestConcern === undefined) {
-        console.error("biggestConcern field is undefined");
-      }
-
       // Get the session which contains the access token
       const {
         data: { session },
@@ -194,8 +186,6 @@ export default function CareerOnboarding() {
         biggestConcern: formData.biggestConcern,
       };
 
-      console.log("Sending payload to API:", JSON.stringify(payload, null, 2));
-
       // Make API request with authentication header
       const response = await fetch("/api/onboarding", {
         method: "POST",
@@ -212,11 +202,14 @@ export default function CareerOnboarding() {
       });
 
       const responseData = await response.json();
-      console.log("API response:", responseData);
 
       if (!response.ok) {
         throw new Error(responseData.error || "Failed to save onboarding data");
       }
+
+      // Show a success message briefly before moving to the next step
+      // This creates a more satisfying completion feeling
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
       // Move to the completion step after successful submission
       setCurrentStep(currentStep + 1);
@@ -625,63 +618,63 @@ export default function CareerOnboarding() {
         );
       case "confirm":
         return (
-          <div className="w-full max-w-md mt-8 bg-gray-50 rounded-lg overflow-hidden">
-            {formData.jobTitle && (
-              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
-                <span className="text-gray-500">Job Title</span>
-                <span className="font-medium">{formData.jobTitle}</span>
+          <div className="w-full max-w-md mt-8">
+            <motion.div
+              className="bg-gray-50 text-gray-800 p-6 rounded-xl"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <p className="text-lg leading-relaxed">
+                <span className="font-semibold">Great progress!</span> As a{" "}
+                <span className="font-semibold">{formData.jobTitle}</span> at{" "}
+                <span className="font-semibold">{formData.company}</span> with{" "}
+                <span className="font-semibold">{formData.experience}</span>{" "}
+                experience, we'll help you leverage your stability level (
+                {formData.jobStability}/5) and top skills (
+                {formData.topSkills.filter(Boolean).join(", ")}) to reach your
+                next career milestone.
+              </p>
+
+              <p className="text-lg leading-relaxed mt-4">
+                You've committed to investing{" "}
+                <span className="font-semibold">{formData.timeForGrowth}</span>{" "}
+                weekly toward your professional growth, and we've noted your
+                primary concern:{" "}
+                <span className="italic">"{formData.biggestConcern}"</span>
+              </p>
+
+              <div className="mt-6 flex items-center">
+                <CheckCircle className="h-5 w-5 text-green-600 mr-2 flex-shrink-0" />
+                <p className="text-sm text-gray-700">
+                  We're excited to build your personalized career growth plan!
+                </p>
               </div>
-            )}
-            {formData.company && (
-              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
-                <span className="text-gray-500">Company</span>
-                <span className="font-medium">{formData.company}</span>
-              </div>
-            )}
-            {formData.experience && (
-              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
-                <span className="text-gray-500">Experience</span>
-                <span className="font-medium">{formData.experience}</span>
-              </div>
-            )}
-            <div className="flex justify-between px-5 py-4 border-b border-gray-200">
-              <span className="text-gray-500">Job Stability</span>
-              <span className="font-medium">{formData.jobStability}/5</span>
+            </motion.div>
+
+            <div className="mt-8 text-center">
+              <Button
+                onClick={submitFormData}
+                disabled={isSubmitting}
+                className={cn(
+                  "h-14 px-10 bg-black hover:bg-gray-800 text-white rounded-full font-normal text-lg w-full transition-all duration-300 transform hover:scale-105",
+                  isSubmitting && "opacity-80"
+                )}
+                tabIndex={0}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Building
+                    your roadmap...
+                  </>
+                ) : (
+                  <>
+                    Launch My Career Journey{" "}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </>
+                )}
+              </Button>
             </div>
-            {formData.salarRange && (
-              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
-                <span className="text-gray-500">Salary Range</span>
-                <span className="font-medium">{formData.salarRange}</span>
-              </div>
-            )}
-            {formData.topSkills.some(Boolean) && (
-              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
-                <span className="text-gray-500">Top Skills</span>
-                <span className="font-medium">
-                  {formData.topSkills.filter(Boolean).join(", ")}
-                </span>
-              </div>
-            )}
-            {formData.timeForGrowth && (
-              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
-                <span className="text-gray-500">Time for Growth</span>
-                <span className="font-medium">{formData.timeForGrowth}</span>
-              </div>
-            )}
-            {formData.linkedinUrl && (
-              <div className="flex justify-between px-5 py-4 border-b border-gray-200">
-                <span className="text-gray-500">LinkedIn</span>
-                <span className="font-medium">{formData.linkedinUrl}</span>
-              </div>
-            )}
-            {formData.biggestConcern && (
-              <div className="px-5 py-4">
-                <span className="text-gray-500 block mb-2">
-                  Biggest Concern
-                </span>
-                <span className="font-medium">{formData.biggestConcern}</span>
-              </div>
-            )}
           </div>
         );
       default:
