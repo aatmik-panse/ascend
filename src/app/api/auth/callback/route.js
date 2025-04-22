@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
 import config from "@/utils/config";
+import { authLogger } from "@/utils/logger";
 
 export async function GET(request) {
   try {
@@ -19,37 +20,61 @@ export async function GET(request) {
     );
     const redirectTo = decodeURIComponent(encodedRedirectTo);
 
+    authLogger("callback", "Auth callback initiated", {
+      url: request.url,
+      code: code ? "present" : "missing",
+      redirectTo,
+      priceId: priceId || "none",
+      discountCode: discountCode || "none",
+      headers: Object.fromEntries(request.headers),
+      nodeEnv: process.env.NODE_ENV,
+    });
+
     if (!code) {
-      // Use config.domainName for proper environment-based redirection
+      authLogger("callback", "No code provided in callback", null, "error");
       return NextResponse.redirect(
         new URL("/sign-in?error=no_code", config.domainName)
       );
     }
 
     const supabase = await createClient();
-    const cookieStore = await cookies();
-    // await cookies().getAll();
+    authLogger("callback", "Supabase client created");
 
     // Exchange the code for a session
+    authLogger("callback", "Exchanging code for session");
     const {
       data: { session },
       error: exchangeError,
     } = await supabase.auth.exchangeCodeForSession(code);
-    await cookies().getAll();
 
     if (exchangeError) {
-      console.error("Error exchanging code for session:", exchangeError);
+      authLogger(
+        "callback",
+        "Error exchanging code for session",
+        exchangeError,
+        "error"
+      );
       return NextResponse.redirect(
         new URL("/sign-in?error=auth_failed", config.domainName)
       );
     }
 
     if (!session) {
-      console.error("No session created after code exchange");
+      authLogger(
+        "callback",
+        "No session created after code exchange",
+        null,
+        "error"
+      );
       return NextResponse.redirect(
         new URL("/sign-in?error=session_failed", config.domainName)
       );
     }
+
+    authLogger("callback", "Session created successfully", {
+      sessionId: session.user.id,
+      email: session.user.email,
+    });
 
     // Get the user data
     const {
@@ -57,7 +82,7 @@ export async function GET(request) {
       error: userError,
     } = await supabase.auth.getUser();
     if (userError || !user) {
-      console.error("Error getting user:", userError);
+      authLogger("callback", "Error getting user", userError, "error");
       return NextResponse.redirect(
         new URL("/sign-in?error=user_not_found", config.domainName)
       );
@@ -80,7 +105,7 @@ export async function GET(request) {
       .select("*")
       .eq("user_id", user.id)
       .single();
-    console.log("user data from sb ", user);
+    authLogger("callback", "User data fetched from Supabase", { user });
 
     // Create user profile if it doesn't exist
     if (!existingProfile) {
@@ -128,14 +153,21 @@ export async function GET(request) {
       });
 
       if (insertError) {
-        console.error("Error creating user profile:", insertError);
+        authLogger(
+          "callback",
+          "Error creating user profile",
+          insertError,
+          "error"
+        );
         // Log the error but continue with redirect
       }
     }
 
     // Set session cookies
+    authLogger("callback", "Creating redirect response");
     const response = NextResponse.redirect(`${requestUrl.origin}${redirectTo}`);
 
+    authLogger("callback", "Setting session cookies");
     // Set the session cookie
     response.cookies.set("sb-access-token", session.access_token, {
       httpOnly: true,
@@ -156,15 +188,26 @@ export async function GET(request) {
 
     // Handle priceId if present (for subscription flow)
     if (priceId && priceId !== "") {
+      authLogger("callback", "Handling subscription flow", {
+        priceId,
+        discountCode,
+      });
       // Add your subscription logic here
       // await createCheckoutSession({ priceId, discountCode });
     }
 
+    authLogger(
+      "callback",
+      "Auth callback completed successfully, redirecting",
+      {
+        destination: `${requestUrl.origin}${redirectTo}`,
+      }
+    );
     return response;
   } catch (error) {
-    console.error("Auth callback error:", error);
+    authLogger("callback", "Unexpected error in auth callback", error, "error");
     return NextResponse.redirect(
-      new URL("/sign-in?error=auth_failed", config.domainName)
+      new URL("/sign-in?error=auth_callback_error", config.domainName)
     );
   }
 }

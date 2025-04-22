@@ -4,7 +4,7 @@ const config = {
   domainName:
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://www.certcy.space",
+      : "https://certcy.space",
   authCallbackDomain: "https://certcy.space", // Base domain without www for auth callbacks
 };
 

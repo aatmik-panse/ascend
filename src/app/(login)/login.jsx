@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { signInWithMagicLink, signIn, signUp } from "./actions";
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import config from "@/utils/config";
 
@@ -17,24 +17,35 @@ export function Login({ mode = "signin" }) {
   const redirect = searchParams.get("redirect");
   const priceId = searchParams.get("priceId");
   const discountCode = searchParams.get("discountCode");
+  const [callbackUrl, setCallbackUrl] = useState("");
+
+  // Set the callback URL when component mounts
+  useEffect(() => {
+    // In the browser, we can directly use window.location.origin
+    setCallbackUrl(window.location.origin);
+    console.log("Current origin:", window.location.origin);
+  }, []);
 
   const handleGoogleSignIn = () => {
-    // Use authCallbackDomain instead of domainName for OAuth callbacks
-    const redirectTo = `${config.authCallbackDomain}/api/auth/callback`;
-    console.log("Google sign-in redirect URL:", redirectTo);
+    // Use current origin for maximum compatibility
+    const redirectUrl = `${
+      callbackUrl || window.location.origin
+    }/api/auth/callback`;
+    console.log("Google sign-in redirect URL:", redirectUrl);
     setLoading(true);
+
     const supabase = createClient();
     supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${redirectTo}?priceId=${encodeURIComponent(
+        redirectTo: `${redirectUrl}?priceId=${encodeURIComponent(
           priceId || ""
         )}&discountCode=${encodeURIComponent(
           discountCode || ""
         )}&redirect=${encodeURIComponent("/onboarding")}`,
       },
     });
-    // Removed setLoading(false) as it won't execute due to the redirect
+    // Redirect will happen automatically
   };
 
   const [magicLinkState, magicLinkAction, pending] = useActionState(
@@ -52,6 +63,13 @@ export function Login({ mode = "signin" }) {
     success: "",
     requiresConfirmation: false,
   });
+
+  // Form submit handler for magic link to pass the origin
+  const handleMagicLinkSubmit = async (formData) => {
+    // Add the current origin to the form data
+    formData.append("origin", window.location.origin);
+    return magicLinkAction(formData);
+  };
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-br from-blue-950 via-gray-900 to-indigo-950 flex items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
@@ -224,6 +242,11 @@ export function Login({ mode = "signin" }) {
                         </svg>
                       </div>
                     </div>
+                    <input
+                      type="hidden"
+                      name="origin"
+                      value={callbackUrl || window.location.origin}
+                    />
                     <Button
                       type="submit"
                       className="w-full h-12 font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl transition-all hover:from-blue-500 hover:to-indigo-500 hover:shadow-lg hover:shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:ring-offset-2 focus:ring-offset-gray-900"
@@ -245,7 +268,7 @@ export function Login({ mode = "signin" }) {
 
                 {/* Magic Link Form */}
                 {authMethod === "magic" && (
-                  <form action={magicLinkAction} className="space-y-4">
+                  <form action={handleMagicLinkSubmit} className="space-y-4">
                     <div className="space-y-2">
                       <label
                         htmlFor="magic-email"
@@ -288,6 +311,11 @@ export function Login({ mode = "signin" }) {
                       type="hidden"
                       name="redirect"
                       value={redirect || ""}
+                    />
+                    <input
+                      type="hidden"
+                      name="origin"
+                      value={callbackUrl || window.location.origin}
                     />
                     <Button
                       type="submit"
@@ -357,7 +385,7 @@ export function Login({ mode = "signin" }) {
                     >
                       <path
                         fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293-1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                         clipRule="evenodd"
                       />
                     </svg>
@@ -389,6 +417,12 @@ export function Login({ mode = "signin" }) {
             </p>
           </div>
         </div>
+        {/* Output current URL for debugging */}
+        {process.env.NODE_ENV === "development" && (
+          <div className="mt-4 text-xs text-gray-400 text-center">
+            {callbackUrl ? `Using URL: ${callbackUrl}` : "URL not set yet"}
+          </div>
+        )}
       </div>
     </div>
   );
