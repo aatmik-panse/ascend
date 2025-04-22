@@ -39,28 +39,8 @@ export default function CareerOnboarding() {
   const inputRefs = useRef({});
   const totalQuestions = 9;
 
-  // Handle completion step countdown
-  const [countdown, setCountdown] = useState(3);
-
-  useEffect(() => {
-    let countdownTimer;
-
-    if (currentStep === totalQuestions + 1) {
-      countdownTimer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(countdownTimer);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (countdownTimer) clearInterval(countdownTimer);
-    };
-  }, [currentStep, totalQuestions]);
+  // Remove countdown as we don't need it for auto-redirect
+  const [countdown, setCountdown] = useState(null);
 
   // Add a new skill input field
   const addSkill = () => {
@@ -117,22 +97,6 @@ export default function CareerOnboarding() {
     setValidationError(false);
   }, [currentStep]);
 
-  // Add auto-redirect effect for the completion step
-  useEffect(() => {
-    let redirectTimer;
-
-    // If we're on the completion step, set up auto-redirect after 3 seconds
-    if (currentStep === totalQuestions + 1) {
-      redirectTimer = setTimeout(() => {
-        router.push("/dashboard");
-      }, 3000);
-    }
-
-    return () => {
-      if (redirectTimer) clearTimeout(redirectTimer);
-    };
-  }, [currentStep, router]);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -176,6 +140,12 @@ export default function CareerOnboarding() {
   // Validate the current field
   const validateCurrentField = () => {
     const currentQuestion = questions[currentStep];
+    console.log(
+      `Validating field: ${currentQuestion.id}, type: ${currentQuestion.type}`
+    );
+    console.log(
+      `Current value: ${JSON.stringify(formData[currentQuestion.field])}`
+    );
 
     // No validation needed for welcome, complete, and confirm screens
     if (
@@ -188,6 +158,9 @@ export default function CareerOnboarding() {
 
     // Skip validation for optional fields
     if (currentQuestion.optional) {
+      console.log(
+        `Field ${currentQuestion.id} is optional, skipping validation`
+      );
       return true;
     }
 
@@ -196,12 +169,43 @@ export default function CareerOnboarding() {
       const filledSkills = formData.topSkills.filter(
         (skill) => skill.trim() !== ""
       );
-      return filledSkills.length >= 3;
+      const isValid = filledSkills.length >= 3;
+      console.log(
+        `Skills validation: ${isValid ? "PASSED" : "FAILED"}, found ${
+          filledSkills.length
+        } skills`
+      );
+      return isValid;
+    }
+
+    // For select fields, check if a value has been selected
+    if (currentQuestion.type === "select") {
+      const fieldValue = formData[currentQuestion.field];
+      // For select fields, empty string, null, and undefined are all invalid
+      const isValid =
+        fieldValue !== undefined &&
+        fieldValue !== null &&
+        fieldValue.toString().trim() !== "";
+      console.log(
+        `Select field validation for ${currentQuestion.field}: ${
+          isValid ? "PASSED" : "FAILED"
+        }, value: ${fieldValue}`
+      );
+      return isValid;
     }
 
     // For regular fields, check if they're filled
     const fieldValue = formData[currentQuestion.field];
-    return fieldValue !== undefined && fieldValue.toString().trim() !== "";
+    const isValid =
+      fieldValue !== undefined &&
+      fieldValue !== null &&
+      fieldValue.toString().trim() !== "";
+    console.log(
+      `Standard field validation for ${currentQuestion.field}: ${
+        isValid ? "PASSED" : "FAILED"
+      }, value: ${fieldValue}`
+    );
+    return isValid;
   };
 
   // Validate all fields in the form
@@ -526,7 +530,6 @@ export default function CareerOnboarding() {
   };
 
   const handleGoToDashboard = () => {
-    // Add immediate redirect when button is clicked
     router.push("/dashboard");
   };
 
@@ -621,8 +624,32 @@ export default function CareerOnboarding() {
               <button
                 key={option.value}
                 onClick={() => {
+                  console.log(
+                    `Select option clicked: field=${currentQuestion.field}, value=${option.value}`
+                  );
+                  // First update the form data
                   handleSelectChange(currentQuestion.field, option.value);
-                  setTimeout(() => nextStep(), 300);
+
+                  // Allow time for the state to update before validation
+                  setTimeout(() => {
+                    // Log form data after update to verify
+                    console.log(
+                      `Form data after select: ${currentQuestion.field}=${
+                        formData[currentQuestion.field]
+                      }`
+                    );
+                    const isValid = validateCurrentField();
+                    console.log(
+                      `Validation result after select: ${
+                        isValid ? "VALID" : "INVALID"
+                      }`
+                    );
+
+                    // Only proceed if the field passes validation
+                    if (isValid) {
+                      nextStep();
+                    }
+                  }, 100);
                 }}
                 className={cn(
                   "w-full text-left px-5 py-4 border-2 rounded-md text-lg transition-all flex items-center justify-between",
@@ -634,8 +661,31 @@ export default function CareerOnboarding() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
+                    console.log(
+                      `Select option keyboard event: field=${currentQuestion.field}, value=${option.value}`
+                    );
                     handleSelectChange(currentQuestion.field, option.value);
-                    setTimeout(() => nextStep(), 300);
+
+                    // Allow time for the state to update before validation
+                    setTimeout(() => {
+                      // Log form data after update to verify
+                      console.log(
+                        `Form data after select keyboard: ${
+                          currentQuestion.field
+                        }=${formData[currentQuestion.field]}`
+                      );
+                      const isValid = validateCurrentField();
+                      console.log(
+                        `Validation result after select keyboard: ${
+                          isValid ? "VALID" : "INVALID"
+                        }`
+                      );
+
+                      // Only proceed if the field passes validation
+                      if (isValid) {
+                        nextStep();
+                      }
+                    }, 100);
                   }
                 }}
                 aria-label={option.label}
@@ -825,31 +875,6 @@ export default function CareerOnboarding() {
                 <span>{submissionError}</span>
               </div>
             )}
-
-            <div className="mt-8 text-center">
-              <Button
-                onClick={handleConfirmSubmit}
-                disabled={isSubmitting}
-                className={cn(
-                  "h-14 px-10 bg-black hover:bg-gray-800 text-white rounded-full font-normal text-lg w-full transition-all duration-300 transform hover:scale-105",
-                  isSubmitting && "opacity-80"
-                )}
-                tabIndex={0}
-                aria-label="Submit onboarding information"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Building
-                    your roadmap...
-                  </>
-                ) : (
-                  <>
-                    Launch My Career Journey{" "}
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </>
-                )}
-              </Button>
-            </div>
           </div>
         );
       case "complete":
@@ -880,22 +905,13 @@ export default function CareerOnboarding() {
               </p>
 
               <div className="flex flex-col items-center justify-center">
-                <motion.div
-                  className="mb-4 text-gray-500 flex items-center gap-2"
-                  animate={{ opacity: [1, 0.5, 1] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                >
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Redirecting to dashboard in {countdown} seconds</span>
-                </motion.div>
-
                 <Button
                   onClick={handleGoToDashboard}
                   className="h-12 px-10 bg-black hover:bg-gray-800 text-white rounded-full font-medium text-lg transition-all duration-300 transform hover:scale-105"
                   tabIndex={0}
-                  aria-label="Go to dashboard immediately"
+                  aria-label="Go to dashboard"
                 >
-                  Go to Dashboard Now <ArrowRight className="ml-2 h-5 w-5" />
+                  Go to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>
             </motion.div>
