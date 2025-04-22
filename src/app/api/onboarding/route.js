@@ -46,12 +46,6 @@ export async function POST(request) {
       );
     }
 
-    // Prepare data for database - handle topSkills array properly
-    // Filter out empty skills
-    const topSkills = Array.isArray(onboardingData.topSkills)
-      ? onboardingData.topSkills.filter(Boolean)
-      : [];
-
     let userId = null;
 
     // If we have a Supabase user, get or create corresponding Prisma user
@@ -95,42 +89,59 @@ export async function POST(request) {
       }
     }
 
-    // Extract and log all fields to identify any missing ones
+    // Extract and log all fields that match our schema
     const {
       jobTitle,
-      company,
       experience,
-      jobStability,
-      salarRange,
+      topSkills: rawTopSkills,
+      enjoyDislike,
+      motivators,
       timeForGrowth,
       linkedinUrl,
+      industryInterest,
       biggestConcern,
     } = onboardingData;
 
+    // Filter out empty skills
+    const topSkills = Array.isArray(rawTopSkills)
+      ? rawTopSkills.filter(Boolean)
+      : [];
+
     console.log("Individual fields extracted from request:");
     console.log("- jobTitle:", jobTitle);
+    console.log("- experience:", experience);
+    console.log("- topSkills:", topSkills);
+    console.log("- enjoyDislike:", enjoyDislike);
+    console.log("- motivators:", motivators);
+    console.log("- timeForGrowth:", timeForGrowth);
+    console.log("- linkedinUrl:", linkedinUrl);
+    console.log("- industryInterest:", industryInterest);
     console.log("- biggestConcern:", biggestConcern);
-    console.log("- jobStability:", jobStability);
-    console.log("- salarRange:", salarRange);
 
     // Create onboarding record in database
     console.log(`Creating onboarding data with userId: ${userId}`);
 
-    // Create the data object with explicit assignment of each field
+    // Create the data object with explicit assignment of each field based on schema
     const createData = {
-      // Use the user ID field to connect to the User model
-      ...(userId ? { userId } : {}),
+      // Connect to the User by ID if available
+      ...(userId
+        ? {
+            User: {
+              connect: { id: userId },
+            },
+          }
+        : {}),
 
-      // Required field
-      jobTitle: jobTitle,
+      // Required fields
+      jobTitle,
+      experience,
+      motivators,
+      timeForGrowth,
+      industryInterest,
 
-      // Optional fields - explicitly handle the biggestConcern field
-      company: company || null,
-      experience: experience || null,
-      jobStability: jobStability || 3,
-      salaryRange: salarRange || null,
-      topSkills: topSkills,
-      timeForGrowth: timeForGrowth || null,
+      // Optional fields
+      topSkills,
+      enjoyDislike: enjoyDislike || null,
       linkedinUrl: linkedinUrl || null,
       biggestConcern: biggestConcern || null,
     };
@@ -149,18 +160,18 @@ export async function POST(request) {
 
     // Optionally, also store in Supabase if needed
     if (supabaseUser) {
-      // Insert the same data into Supabase
+      // Insert the same data into Supabase using snake_case field names
       const { error } = await supabase.from("onboarding_data").insert({
         user_id: supabaseUser.id,
         job_title: jobTitle,
-        company: company,
-        experience: experience,
-        job_stability: jobStability,
-        salary_range: salarRange,
+        experience,
         top_skills: topSkills,
+        enjoy_dislike: enjoyDislike,
+        motivators,
         time_for_growth: timeForGrowth,
         linkedin_url: linkedinUrl,
-        biggest_concern: biggestConcern, // Explicit assignment
+        industry_interest: industryInterest,
+        biggest_concern: biggestConcern,
       });
 
       if (error) {
@@ -223,16 +234,16 @@ export async function GET(request) {
     if (userId) {
       console.log(`Looking for onboarding data for user: ${userId}`);
 
-      // Get data from Prisma - first try user_id field
+      // Get data from Prisma - using the correct relation field
       let data = await prisma.onboardingData.findFirst({
         where: {
-          OR: [{ userId: userId }, { user: { user_id: userId } }],
+          OR: [{ User: { id: userId } }, { User: { user_id: userId } }],
         },
         orderBy: {
           createdAt: "desc",
         },
         include: {
-          user: true,
+          User: true,
         },
       });
 
