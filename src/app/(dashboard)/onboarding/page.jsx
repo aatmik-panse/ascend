@@ -3,16 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
-  ChevronRight,
   ArrowRight,
-  Briefcase,
-  Building,
-  Clock,
-  TrendingUp,
-  DollarSign,
-  Award,
-  Calendar,
-  Linkedin,
   AlertCircle,
   Loader2,
   CheckCircle,
@@ -42,8 +33,34 @@ export default function CareerOnboarding() {
     biggestConcern: "",
   });
 
+  // Add a state to track if submission is explicitly requested
+  const [submissionRequested, setSubmissionRequested] = useState(false);
+
   const inputRefs = useRef({});
   const totalQuestions = 9;
+
+  // Handle completion step countdown
+  const [countdown, setCountdown] = useState(3);
+
+  useEffect(() => {
+    let countdownTimer;
+
+    if (currentStep === totalQuestions + 1) {
+      countdownTimer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownTimer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (countdownTimer) clearInterval(countdownTimer);
+    };
+  }, [currentStep, totalQuestions]);
 
   // Add a new skill input field
   const addSkill = () => {
@@ -62,11 +79,22 @@ export default function CareerOnboarding() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Only handle global keyboard events if not inside a skill input field
-      const isInSkillInput =
-        e.target.tagName === "INPUT" && e.target.id?.startsWith("skill-");
+      console.log(
+        "Global keydown event:",
+        e.key,
+        "Target:",
+        e.target.tagName,
+        e.target.id
+      );
 
-      if (e.key === "Enter" && !e.shiftKey && !isInSkillInput) {
+      // Only handle global keyboard events if not inside an input field
+      const isInInput =
+        e.target.tagName === "INPUT" ||
+        e.target.tagName === "TEXTAREA" ||
+        e.target.id?.startsWith("skill-");
+
+      if (e.key === "Enter" && !e.shiftKey && !isInInput) {
+        console.log("Global Enter key detected - not in input field");
         nextStep();
       }
       if (e.key === "ArrowUp") {
@@ -88,6 +116,22 @@ export default function CareerOnboarding() {
     // Clear validation error when step changes
     setValidationError(false);
   }, [currentStep]);
+
+  // Add auto-redirect effect for the completion step
+  useEffect(() => {
+    let redirectTimer;
+
+    // If we're on the completion step, set up auto-redirect after 3 seconds
+    if (currentStep === totalQuestions + 1) {
+      redirectTimer = setTimeout(() => {
+        router.push("/dashboard");
+      }, 3000);
+    }
+
+    return () => {
+      if (redirectTimer) clearTimeout(redirectTimer);
+    };
+  }, [currentStep, router]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -160,7 +204,45 @@ export default function CareerOnboarding() {
     return fieldValue !== undefined && fieldValue.toString().trim() !== "";
   };
 
+  // Validate all fields in the form
+  const validateAllFields = () => {
+    // Track which required fields haven't been completed yet
+    const missingFields = [];
+
+    // Check each required field
+    if (!formData.jobTitle.trim()) {
+      missingFields.push("Job Title");
+    }
+    if (!formData.company.trim()) {
+      missingFields.push("Company");
+    }
+    if (!formData.experience) {
+      missingFields.push("Experience");
+    }
+
+    // Check skills (need at least 3)
+    const filledSkills = formData.topSkills.filter(
+      (skill) => skill.trim() !== ""
+    );
+    if (filledSkills.length < 3) {
+      missingFields.push("Skills (need at least 3)");
+    }
+
+    // Check time for growth
+    if (!formData.timeForGrowth) {
+      missingFields.push("Time for Growth");
+    }
+
+    // Note: biggestConcern is now optional, so we don't check for it
+
+    return {
+      isValid: missingFields.length === 0,
+      missingFields,
+    };
+  };
+
   const submitFormData = async () => {
+    console.log("submitFormData called - starting submission process");
     setIsSubmitting(true);
     setSubmissionError(null);
 
@@ -174,6 +256,7 @@ export default function CareerOnboarding() {
       } = await supabase.auth.getSession();
 
       // Prepare the data payload, explicitly including all fields
+      // For biggestConcern, set default to empty string if not provided
       const payload = {
         jobTitle: formData.jobTitle,
         company: formData.company,
@@ -182,11 +265,15 @@ export default function CareerOnboarding() {
         salarRange: formData.salarRange,
         topSkills: formData.topSkills.filter(Boolean),
         timeForGrowth: formData.timeForGrowth,
-        linkedinUrl: formData.linkedinUrl,
-        biggestConcern: formData.biggestConcern,
+        linkedinUrl: formData.linkedinUrl || "",
+        // Set biggestConcern to empty string if not provided, to avoid null/undefined issues
+        biggestConcern: formData.biggestConcern || "",
       };
 
+      console.log("Submission payload prepared:", payload);
+
       // Make API request with authentication header
+      console.log("Making API request to /api/onboarding");
       const response = await fetch("/api/onboarding", {
         method: "POST",
         headers: {
@@ -202,6 +289,7 @@ export default function CareerOnboarding() {
       });
 
       const responseData = await response.json();
+      console.log("API response received:", responseData);
 
       if (!response.ok) {
         throw new Error(responseData.error || "Failed to save onboarding data");
@@ -209,10 +297,15 @@ export default function CareerOnboarding() {
 
       // Show a success message briefly before moving to the next step
       // This creates a more satisfying completion feeling
+      console.log("Submission successful, waiting before transitioning");
       await new Promise((resolve) => setTimeout(resolve, 600));
 
       // Move to the completion step after successful submission
+      console.log("Moving to completion step");
       setCurrentStep(currentStep + 1);
+
+      // Reset submission requested flag
+      setSubmissionRequested(false);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionError(
@@ -223,17 +316,59 @@ export default function CareerOnboarding() {
     }
   };
 
+  const handleConfirmSubmit = () => {
+    console.log("Confirm submit button clicked");
+
+    // Set flag to indicate explicit submission request
+    setSubmissionRequested(true);
+
+    // Validate all fields before submitting
+    const { isValid, missingFields } = validateAllFields();
+
+    if (isValid) {
+      console.log("All fields are valid, proceeding with submission");
+      // All fields are complete, proceed with submission
+      submitFormData();
+    } else {
+      console.log("Validation failed, missing fields:", missingFields);
+      // Show validation error with missing fields
+      setSubmissionError(
+        `Please complete all required fields: ${missingFields.join(", ")}`
+      );
+      setValidationError(true);
+      prevStep();
+    }
+  };
+
   const nextStep = () => {
+    console.log(
+      "nextStep called, currentStep:",
+      currentStep,
+      "totalQuestions:",
+      totalQuestions
+    );
+
     if (currentStep < totalQuestions + 1) {
       if (currentStep === totalQuestions) {
-        // For the submit step, we always need to proceed
-        submitFormData();
+        // For the confirm step, we should only submit if explicitly requested
+        if (submissionRequested) {
+          console.log(
+            "Submission was explicitly requested, proceeding with form submission"
+          );
+          submitFormData();
+        } else {
+          console.log(
+            "At confirm step but submission not explicitly requested - not submitting"
+          );
+        }
       } else {
         // For other steps, validate the current field
         if (validateCurrentField()) {
+          console.log("Field valid, moving to next step:", currentStep + 1);
           setCurrentStep(currentStep + 1);
           setValidationError(false);
         } else {
+          console.log("Field validation failed");
           setValidationError(true);
           // Focus on the input field if validation fails
           const currentQuestion = questions[currentStep];
@@ -359,6 +494,7 @@ export default function CareerOnboarding() {
       field: "biggestConcern",
       placeholder: "e.g. Job security, skill gaps, career progression...",
       type: "textarea",
+      optional: false,
     },
     {
       id: "confirm",
@@ -387,6 +523,11 @@ export default function CareerOnboarding() {
         inputRefs.current[`skill-${index + 1}`].focus();
       }, 10);
     }
+  };
+
+  const handleGoToDashboard = () => {
+    // Add immediate redirect when button is clicked
+    router.push("/dashboard");
   };
 
   const getFormField = () => {
@@ -445,6 +586,26 @@ export default function CareerOnboarding() {
                   "border-red-500 focus-visible:border-red-500"
               )}
               required={!currentQuestion.optional}
+              onKeyDown={(e) => {
+                console.log("Textarea keydown:", e.key);
+                if (e.key === "Enter") {
+                  console.log(
+                    "Enter key in textarea - preventing form submission"
+                  );
+                  e.stopPropagation(); // Stop event bubbling to global handler
+
+                  // If user presses Shift+Enter, allow normal newline behavior
+                  if (!e.shiftKey) {
+                    // Even without shift, we still allow default behavior (newline)
+                    // but add a message to be clear
+                    console.log(
+                      "Adding newline in textarea (no shift pressed)"
+                    );
+                  }
+
+                  // Crucial: Don't call nextStep() here
+                }
+              }}
             />
             {validationError && !currentQuestion.optional && (
               <p className="text-red-500 text-sm mt-1">
@@ -639,9 +800,15 @@ export default function CareerOnboarding() {
               <p className="text-lg leading-relaxed mt-4">
                 You've committed to investing{" "}
                 <span className="font-semibold">{formData.timeForGrowth}</span>{" "}
-                weekly toward your professional growth, and we've noted your
-                primary concern:{" "}
-                <span className="italic">"{formData.biggestConcern}"</span>
+                weekly toward your professional growth
+                {formData.biggestConcern ? (
+                  <>
+                    , and we've noted your primary concern:{" "}
+                    <span className="italic">"{formData.biggestConcern}"</span>
+                  </>
+                ) : (
+                  "."
+                )}
               </p>
 
               <div className="mt-6 flex items-center">
@@ -652,15 +819,23 @@ export default function CareerOnboarding() {
               </div>
             </motion.div>
 
+            {submissionError && (
+              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 flex items-start">
+                <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
+                <span>{submissionError}</span>
+              </div>
+            )}
+
             <div className="mt-8 text-center">
               <Button
-                onClick={submitFormData}
+                onClick={handleConfirmSubmit}
                 disabled={isSubmitting}
                 className={cn(
                   "h-14 px-10 bg-black hover:bg-gray-800 text-white rounded-full font-normal text-lg w-full transition-all duration-300 transform hover:scale-105",
                   isSubmitting && "opacity-80"
                 )}
                 tabIndex={0}
+                aria-label="Submit onboarding information"
               >
                 {isSubmitting ? (
                   <>
@@ -675,6 +850,55 @@ export default function CareerOnboarding() {
                 )}
               </Button>
             </div>
+          </div>
+        );
+      case "complete":
+        return (
+          <div className="w-full max-w-md mt-8">
+            <motion.div
+              className="bg-gray-50 text-gray-800 p-8 rounded-xl text-center"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6"
+              >
+                <CheckCircle className="h-10 w-10 text-green-600" />
+              </motion.div>
+
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Profile Complete!
+              </h3>
+
+              <p className="text-gray-600 mb-6">
+                We've customized your dashboard based on your career profile.
+                Your personalized insights are ready!
+              </p>
+
+              <div className="flex flex-col items-center justify-center">
+                <motion.div
+                  className="mb-4 text-gray-500 flex items-center gap-2"
+                  animate={{ opacity: [1, 0.5, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                >
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Redirecting to dashboard in {countdown} seconds</span>
+                </motion.div>
+
+                <Button
+                  onClick={handleGoToDashboard}
+                  className="h-12 px-10 bg-black hover:bg-gray-800 text-white rounded-full font-medium text-lg transition-all duration-300 transform hover:scale-105"
+                  tabIndex={0}
+                  aria-label="Go to dashboard immediately"
+                >
+                  Go to Dashboard Now <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+            </motion.div>
           </div>
         );
       default:
@@ -753,17 +977,30 @@ export default function CareerOnboarding() {
                   currentQuestion.type === "confirm") && (
                   <div className="mt-8">
                     <Button
-                      onClick={
-                        currentStep === totalQuestions + 1
-                          ? () => router.push("/dashboard")
-                          : nextStep
-                      }
+                      onClick={(e) => {
+                        console.log("Button clicked at step:", currentStep);
+                        e.preventDefault(); // Prevent any default form submission
+
+                        if (currentStep === totalQuestions + 1) {
+                          handleGoToDashboard();
+                        } else if (currentStep === totalQuestions) {
+                          // At confirm step, explicitly call handleConfirmSubmit
+                          handleConfirmSubmit();
+                        } else {
+                          nextStep();
+                        }
+                      }}
                       disabled={isSubmitting}
                       className={cn(
                         "h-12 px-16 bg-black hover:bg-gray-800 text-white rounded-full font-normal text-lg w-full md:w-auto flex items-center justify-center",
                         isSubmitting && "opacity-80"
                       )}
                       tabIndex={0}
+                      aria-label={
+                        currentStep === totalQuestions
+                          ? "Submit onboarding information"
+                          : "Continue to next step"
+                      }
                     >
                       {isSubmitting ? (
                         <>
@@ -790,13 +1027,24 @@ export default function CareerOnboarding() {
         </div>
 
         <div className="text-center pb-16 text-sm text-gray-100">
-          Press{" "}
-          <kbd className="px-2 py-1 bg-neutral-600 rounded text-xs mx-1">
-            Enter
-          </kbd>{" "}
-          to continue or{" "}
-          <kbd className="px-2 py-1 bg-neutral-600 rounded text-xs mx-1">↑</kbd>{" "}
-          to go back
+          {currentStep !== totalQuestions ? (
+            <>
+              Press{" "}
+              <kbd className="px-2 py-1 bg-neutral-600 rounded text-xs mx-1">
+                Enter
+              </kbd>{" "}
+              to continue or{" "}
+              <kbd className="px-2 py-1 bg-neutral-600 rounded text-xs mx-1">
+                ↑
+              </kbd>{" "}
+              to go back
+            </>
+          ) : (
+            // At confirmation step, instruct user to click the button
+            <span className="text-yellow-300 font-medium">
+              Click the Submit button above to complete your profile
+            </span>
+          )}
         </div>
       </div>
     </div>
