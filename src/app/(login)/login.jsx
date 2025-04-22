@@ -245,7 +245,7 @@ export function Login({ mode = "signin" }) {
                     <input
                       type="hidden"
                       name="origin"
-                      value={callbackUrl || window.location.origin}
+                      value={callbackUrl || "https://certcy.space"}
                     />
                     <Button
                       type="submit"
@@ -315,7 +315,7 @@ export function Login({ mode = "signin" }) {
                     <input
                       type="hidden"
                       name="origin"
-                      value={callbackUrl || window.location.origin}
+                      value={callbackUrl || "https://certcy.space"}
                     />
                     <Button
                       type="submit"

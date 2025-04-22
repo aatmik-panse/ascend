@@ -36,7 +36,7 @@ model OnboardingData {
   jobTitle         String
   experience       String
   topSkills        String[]
-  enjoyDislike     String
+  enjoyDislike     String?
   motivators       String
   timeForGrowth    String
   linkedinUrl      String?  // Optional LinkedIn URL field

@@ -24,7 +24,7 @@ export function getCallbackUrl() {
     } else {
       url =
         process.env.NEXT_PUBLIC_AUTH_CALLBACK_URL_PROD ||
-        "http://localhost:3000";
+        "https://certcy.space";
       source = "env-prod-url";
     }
   }
