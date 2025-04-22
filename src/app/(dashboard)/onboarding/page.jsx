@@ -1008,7 +1008,7 @@ export default function CareerOnboarding() {
                       }}
                       disabled={isSubmitting}
                       className={cn(
-                        "h-12 px-16 bg-black hover:bg-gray-800 text-white rounded-full font-normal text-lg w-full md:w-auto flex items-center justify-center",
+                        "h-12 px-16 bg-black hover:bg-gray-800 text-white rounded-xl font-normal text-lg w-full md:w-auto flex items-center justify-center",
                         isSubmitting && "opacity-80"
                       )}
                       tabIndex={0}
