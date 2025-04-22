@@ -28,6 +28,7 @@ export default function CareerOnboarding() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState(null);
+  const [validationError, setValidationError] = useState(false);
   const [formData, setFormData] = useState({
     jobTitle: "",
     company: "",
@@ -64,6 +65,8 @@ export default function CareerOnboarding() {
         inputRefs.current[currentQuestion.field].focus();
       }, 400);
     }
+    // Clear validation error when step changes
+    setValidationError(false);
   }, [currentStep]);
 
   const handleInputChange = (e) => {
@@ -72,6 +75,9 @@ export default function CareerOnboarding() {
       ...formData,
       [name]: value,
     });
+
+    // Clear validation error when user types
+    setValidationError(false);
   };
 
   const handleSelectChange = (name, value) => {
@@ -79,6 +85,8 @@ export default function CareerOnboarding() {
       ...formData,
       [name]: value,
     });
+
+    setValidationError(false);
   };
 
   const handleSkillChange = (index, value) => {
@@ -88,6 +96,8 @@ export default function CareerOnboarding() {
       ...formData,
       topSkills: updatedSkills,
     });
+
+    setValidationError(false);
   };
 
   const handleStabilityChange = (value) => {
@@ -97,6 +107,34 @@ export default function CareerOnboarding() {
     });
 
     setTimeout(() => nextStep(), 500);
+  };
+
+  // Validate the current field
+  const validateCurrentField = () => {
+    const currentQuestion = questions[currentStep];
+
+    // No validation needed for welcome, complete, and confirm screens
+    if (
+      currentQuestion.id === "welcome" ||
+      currentQuestion.id === "complete" ||
+      currentQuestion.id === "confirm"
+    ) {
+      return true;
+    }
+
+    // Skip validation for optional fields
+    if (currentQuestion.optional) {
+      return true;
+    }
+
+    // Special validation for skills (require at least one skill)
+    if (currentQuestion.field === "topSkills") {
+      return formData.topSkills.some((skill) => skill.trim() !== "");
+    }
+
+    // For regular fields, check if they're filled
+    const fieldValue = formData[currentQuestion.field];
+    return fieldValue !== undefined && fieldValue.toString().trim() !== "";
   };
 
   const submitFormData = async () => {
@@ -172,9 +210,32 @@ export default function CareerOnboarding() {
   const nextStep = () => {
     if (currentStep < totalQuestions + 1) {
       if (currentStep === totalQuestions) {
+        // For the submit step, we always need to proceed
         submitFormData();
       } else {
-        setCurrentStep(currentStep + 1);
+        // For other steps, validate the current field
+        if (validateCurrentField()) {
+          setCurrentStep(currentStep + 1);
+          setValidationError(false);
+        } else {
+          setValidationError(true);
+          // Focus on the input field if validation fails
+          const currentQuestion = questions[currentStep];
+          if (
+            currentQuestion?.field &&
+            inputRefs.current[currentQuestion.field]
+          ) {
+            inputRefs.current[currentQuestion.field].focus();
+          } else if (currentQuestion.type === "skills") {
+            // For skills, focus on the first empty input
+            for (let i = 0; i < 3; i++) {
+              if (!formData.topSkills[i] && inputRefs.current[`skill-${i}`]) {
+                inputRefs.current[`skill-${i}`].focus();
+                break;
+              }
+            }
+          }
+        }
       }
     }
   };
@@ -182,6 +243,7 @@ export default function CareerOnboarding() {
   const prevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
+      setValidationError(false);
     }
   };
 
@@ -333,10 +395,20 @@ export default function CareerOnboarding() {
               placeholder={
                 currentQuestion.placeholder || "Type your answer here..."
               }
-              className="w-full text-xl h-14 bg-transparent border-t-0 border-x-0 border-b-2 border-gray-300 rounded-none px-0 focus-visible:ring-0 focus-visible:border-b-black"
+              className={cn(
+                "w-full text-xl h-14 bg-transparent border-t-0 border-x-0 border-b-2 border-gray-300 rounded-none px-0 focus-visible:ring-0 focus-visible:border-b-gray-300",
+                validationError &&
+                  !currentQuestion.optional &&
+                  "border-red-500 focus-visible:border-b-red-500"
+              )}
               required={!currentQuestion.optional}
               onKeyDown={(e) => e.key === "Enter" && nextStep()}
             />
+            {validationError && !currentQuestion.optional && (
+              <p className="text-red-500 text-sm mt-1">
+                This field is required
+              </p>
+            )}
           </div>
         );
       case "textarea":
@@ -350,9 +422,19 @@ export default function CareerOnboarding() {
               placeholder={
                 currentQuestion.placeholder || "Type your answer here..."
               }
-              className="w-full text-xl h-32 bg-transparent border-2 border-gray-300 rounded-md px-4 py-3 focus-visible:ring-0 focus-visible:border-black"
+              className={cn(
+                "w-full text-xl h-32 bg-transparent border-2 border-gray-300 rounded-md px-4 py-3 focus-visible:ring-0 focus-visible:border-black",
+                validationError &&
+                  !currentQuestion.optional &&
+                  "border-red-500 focus-visible:border-red-500"
+              )}
               required={!currentQuestion.optional}
             />
+            {validationError && !currentQuestion.optional && (
+              <p className="text-red-500 text-sm mt-1">
+                This field is required
+              </p>
+            )}
           </div>
         );
       case "select":
@@ -368,8 +450,8 @@ export default function CareerOnboarding() {
                 className={cn(
                   "w-full text-left px-5 py-4 border-2 rounded-md text-lg transition-all flex items-center justify-between",
                   formData[currentQuestion.field] === option.value
-                    ? "border-black bg-black text-white"
-                    : "border-gray-300 hover:border-gray-500"
+                    ? "border-gray-50 bg-black text-white"
+                    : "border-gray-400 hover:border-gray-500"
                 )}
                 tabIndex={0}
                 onKeyDown={(e) => {
@@ -387,6 +469,11 @@ export default function CareerOnboarding() {
                 )}
               </button>
             ))}
+            {validationError && !currentQuestion.optional && (
+              <p className="text-red-500 text-sm mt-1">
+                Please select an option
+              </p>
+            )}
           </div>
         );
       case "rating":
@@ -402,7 +489,7 @@ export default function CareerOnboarding() {
                     formData.jobStability === value
                       ? "border-black bg-black text-white"
                       : value < formData.jobStability
-                      ? "border-black bg-gray-100"
+                      ? "border-black bg-neutral-700"
                       : "border-gray-300 hover:border-gray-500"
                   )}
                   tabIndex={0}
@@ -425,7 +512,7 @@ export default function CareerOnboarding() {
           <div className="w-full max-w-md mt-8 space-y-4">
             {[0, 1, 2].map((index) => (
               <div key={index} className="flex items-center">
-                <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-sm mr-3">
+                <span className="w-10 h-10 rounded-full bg-neutral-800 border border-b-blue-100 flex items-center justify-center text-sm mr-3">
                   {index + 1}
                 </span>
                 <Input
@@ -434,7 +521,13 @@ export default function CareerOnboarding() {
                   value={formData.topSkills[index]}
                   onChange={(e) => handleSkillChange(index, e.target.value)}
                   placeholder={`Enter skill ${index + 1}`}
-                  className="flex-1 text-lg h-12 bg-transparent border-t-0 border-x-0 border-b-2 border-gray-300 rounded-none px-0 focus-visible:ring-0 focus-visible:border-b-black"
+                  className={cn(
+                    "flex-1 text-lg h-12 bg-transparent border-t-0 border-x-0 border-b-2 border-gray-300 rounded-none px-0 focus-visible:ring-0 focus-visible:border-b-neutral-600",
+                    validationError &&
+                      index === 0 &&
+                      !formData.topSkills.some(Boolean) &&
+                      "border-red-500 focus-visible:border-b-red-500"
+                  )}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && index === 2) {
                       nextStep();
@@ -445,6 +538,11 @@ export default function CareerOnboarding() {
                 />
               </div>
             ))}
+            {validationError && !formData.topSkills.some(Boolean) && (
+              <p className="text-red-500 text-sm mt-1">
+                Please enter at least one skill
+              </p>
+            )}
           </div>
         );
       case "confirm":
@@ -514,7 +612,7 @@ export default function CareerOnboarding() {
   };
 
   return (
-    <div className="fixed inset-0 bg-white text-black">
+    <div className="fixed inset-0 bg-neutral-900/25 text-white">
       <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100">
         {currentStep > 0 && (
           <motion.div
@@ -591,7 +689,7 @@ export default function CareerOnboarding() {
                       }
                       disabled={isSubmitting}
                       className={cn(
-                        "h-14 px-8 bg-black hover:bg-gray-800 text-white rounded-full font-normal text-lg w-full md:w-auto flex items-center justify-center",
+                        "h-12 px-16 bg-black hover:bg-gray-800 text-white rounded-full font-normal text-lg w-full md:w-auto flex items-center justify-center",
                         isSubmitting && "opacity-80"
                       )}
                       tabIndex={0}
@@ -620,14 +718,14 @@ export default function CareerOnboarding() {
           </div>
         </div>
 
-        <div className="text-center pb-6 text-sm text-gray-400">
+        <div className="text-center pb-16 text-sm text-gray-100">
           Press{" "}
-          <kbd className="px-2 py-1 bg-gray-100 rounded text-xs mx-1">
+          <kbd className="px-2 py-1 bg-neutral-600 rounded text-xs mx-1">
             Enter
           </kbd>{" "}
           to continue or{" "}
-          <kbd className="px-2 py-1 bg-gray-100 rounded text-xs mx-1">↑</kbd> to
-          go back
+          <kbd className="px-2 py-1 bg-neutral-600 rounded text-xs mx-1">↑</kbd>{" "}
+          to go back
         </div>
       </div>
     </div>
