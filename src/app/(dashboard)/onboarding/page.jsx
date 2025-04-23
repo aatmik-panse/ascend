@@ -345,7 +345,7 @@ export default function CareerOnboarding() {
     // Phase 1: Quick Profile
     {
       id: "welcome",
-      title: "Welcome to PivotAI!",
+      title: "Welcome to Certcy!",
       subtitle:
         "We'll analyze your profile and suggest new career paths—no guesswork.",
       type: "welcome",
@@ -701,11 +701,11 @@ export default function CareerOnboarding() {
               transition={{ duration: 0.4 }}
             >
               <p className="text-lg leading-relaxed mb-4">
-                <span className="font-semibold">Perfect!</span> We've learned
-                that you're a{" "}
+                <span className="font-semibold">Perfect!</span> We&apos;ve
+                learned that you&apos;re a{" "}
                 <span className="font-semibold">{formData.jobTitle}</span> with{" "}
                 <span className="font-semibold">{formData.experience}</span>{" "}
-                experience, skilled in{" "}
+                year&apos;s of experience, skilled in{" "}
                 <span className="font-semibold">
                   {formData.topSkills.filter(Boolean).join(", ")}
                 </span>
@@ -713,7 +713,7 @@ export default function CareerOnboarding() {
               </p>
 
               <p className="text-lg leading-relaxed mb-4">
-                You're motivated most by{" "}
+                You&apos;re motivated most by{" "}
                 <span className="font-semibold">
                   {formData.motivators === "impact"
                     ? "making an impact"
@@ -727,7 +727,7 @@ export default function CareerOnboarding() {
                 </span>{" "}
                 and can dedicate{" "}
                 <span className="font-semibold">{formData.timeForGrowth}</span>{" "}
-                to professional growth each week.
+                hours to professional growth each week.
               </p>
 
               <p className="text-lg leading-relaxed">
@@ -737,7 +737,10 @@ export default function CareerOnboarding() {
                 </span>{" "}
                 will help us identify optimal pivot paths for you.
                 {formData.linkedinUrl && (
-                  <> We'll also analyze insights from your LinkedIn profile.</>
+                  <>
+                    {" "}
+                    We&apos;ll also analyze insights from your LinkedIn profile.
+                  </>
                 )}
               </p>
 
@@ -887,7 +890,7 @@ export default function CareerOnboarding() {
                       }}
                       disabled={isSubmitting}
                       className={cn(
-                        "h-12 px-16 bg-black hover:bg-gray-800 text-white rounded-full font-normal text-lg w-full md:w-auto flex items-center justify-center",
+                        "h-12 px-16 bg-gray-100 hover:bg-white text-black font-black rounded-md  text-lg w-full md:w-auto flex items-center justify-center",
                         isSubmitting && "opacity-80"
                       )}
                       tabIndex={0}
