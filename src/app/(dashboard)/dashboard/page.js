@@ -140,14 +140,14 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <main className="flex flex-col gap-6 p-6 max-w-6xl mx-auto ">
+    <main className="flex flex-col gap-6 p-6 max-w-6xl mx-auto bg-zinc-950 text-zinc-100 rounded-2xl">
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Pivot Snapshot */}
         <Card
-          className="col-span-1 md:col-span-2 bg-card border border-border text-card-foreground"
+          className="col-span-1 md:col-span-2 bg-zinc-900 border border-zinc-800 text-zinc-100 shadow-md"
           aria-label="Pivot Snapshot"
         >
-          <CardHeader>
+          <CardHeader className="border-b border-zinc-800 pb-3">
             <CardTitle>
               <Sparkles
                 className="inline mr-2 text-yellow-500"
@@ -155,39 +155,42 @@ const Dashboard = () => {
               />
               Pivot Snapshot
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-zinc-400">
               Top AI-recommended roles for your pivot journey
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="flex flex-col gap-4">
               {pivotSnapshot.map((role, idx) => (
                 <div
                   key={role.title}
-                  className="flex items-center gap-4 p-3 rounded-lg bg-muted text-muted-foreground dark:bg-zinc-900/70 dark:text-zinc-200"
+                  className="flex items-center gap-4 p-3 rounded-lg bg-zinc-800/70 text-zinc-200"
                 >
-                  <Avatar>
-                    <AvatarFallback>{role.title[0]}</AvatarFallback>
+                  <Avatar className="border border-blue-500/20">
+                    <AvatarFallback className="bg-blue-600/20 text-blue-400">
+                      {role.title[0]}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-lg font-semibold text-card-foreground">
+                      <span className="text-lg font-semibold text-white">
                         {role.title}
                       </span>
-                      <Badge variant="outline" className="ml-2">
+                      <Badge
+                        variant="outline"
+                        className="ml-2 bg-blue-900/20 border-blue-500/30 text-blue-300"
+                      >
                         {role.fitScore}% Fit
                       </Badge>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      {role.reason}
-                    </div>
+                    <div className="text-sm text-zinc-400">{role.reason}</div>
                   </div>
                   {idx === 0 && (
                     <Link href="/pivot" passHref legacyBehavior>
                       <Button
                         tabIndex="0"
                         aria-label="Explore more pivot roles"
-                        className="ml-4"
+                        className="ml-4 bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:bg-blue-600/30"
                         variant="secondary"
                         onKeyDown={(e) => {
                           if (e.key === "Enter")
@@ -206,10 +209,10 @@ const Dashboard = () => {
 
         {/* Layoff Tracker */}
         <Card
-          className="col-span-1 bg-card border border-border text-card-foreground"
+          className="col-span-1 bg-zinc-900 border border-zinc-800 text-zinc-100 shadow-md"
           aria-label="Layoff Tracker"
         >
-          <CardHeader>
+          <CardHeader className="border-b border-zinc-800 pb-3">
             <CardTitle>
               <TrendingUp
                 className="inline mr-2 text-red-500"
@@ -217,23 +220,29 @@ const Dashboard = () => {
               />
               Layoff Tracker
             </CardTitle>
-            <CardDescription>Recent layoffs (last 7–30 days)</CardDescription>
+            <CardDescription className="text-zinc-400">
+              Recent layoffs (last 7–30 days)
+            </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="h-40 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={layoffData.chart}>
                   <XAxis
                     dataKey="company"
-                    stroke="#a1a1aa"
+                    stroke="#71717a"
                     className="text-xs"
                   />
-                  <YAxis stroke="#a1a1aa" className="text-xs" />
+                  <YAxis stroke="#71717a" className="text-xs" />
                   <Tooltip
                     contentStyle={{
-                      background: "rgba(24,24,27,0.95)",
-                      border: "1px solid #27272a",
+                      backgroundColor: "#18181b",
+                      borderColor: "#3f3f46",
                       color: "#fafafa",
+                      borderRadius: "0.375rem",
+                    }}
+                    labelStyle={{
+                      color: "#d4d4d8",
                     }}
                     wrapperStyle={{ outline: "none" }}
                   />
@@ -242,8 +251,10 @@ const Dashboard = () => {
               </ResponsiveContainer>
             </div>
             <div className="mt-4">
-              <div className="font-semibold mb-1">Most affected roles:</div>
-              <ul className="list-disc list-inside text-sm text-muted-foreground">
+              <div className="font-semibold mb-1 text-zinc-100">
+                Most affected roles:
+              </div>
+              <ul className="list-disc list-inside text-sm text-zinc-400">
                 {layoffData.mostAffectedRoles.map((role) => (
                   <li key={role}>{role}</li>
                 ))}
@@ -252,7 +263,7 @@ const Dashboard = () => {
             <Button
               tabIndex="0"
               aria-label="Explore stable pivot roles"
-              className="mt-4 w-full"
+              className="mt-4 w-full bg-zinc-800 text-zinc-100 border border-zinc-700 hover:bg-zinc-700"
               variant="outline"
               onClick={() => (window.location.href = "/pivots")}
               onKeyDown={(e) => {
@@ -268,27 +279,41 @@ const Dashboard = () => {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Today's Action */}
         <Card
-          className="col-span-1 bg-card border border-border text-card-foreground"
-          aria-label="Today’s Action"
+          className="col-span-1 bg-zinc-900 border border-zinc-800 text-zinc-100 shadow-md"
+          aria-label="Today's Action"
         >
-          <CardHeader>
+          <CardHeader className="border-b border-zinc-800 pb-3">
             <CardTitle>
               <ClipboardList
                 className="inline mr-2 text-blue-500"
                 aria-hidden="true"
               />
-              Today’s Action
+              Today's Action
             </CardTitle>
-            <CardDescription>Stay on track with your roadmap</CardDescription>
+            <CardDescription className="text-zinc-400">
+              Stay on track with your roadmap
+            </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="flex flex-col gap-2">
-              <div className="font-medium">{todayAction.action}</div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="font-medium text-zinc-100">
+                {todayAction.action}
+              </div>
+              <div className="flex items-center gap-2 text-sm text-zinc-400">
                 <span>Time left this week:</span>
-                <Badge variant="secondary">{todayAction.timeLeft}</Badge>
+                <Badge
+                  variant="secondary"
+                  className="bg-indigo-900/30 text-indigo-300 border border-indigo-500/20"
+                >
+                  {todayAction.timeLeft}
+                </Badge>
                 <span>vs. commitment:</span>
-                <Badge variant="outline">{todayAction.weeklyCommitment}</Badge>
+                <Badge
+                  variant="outline"
+                  className="border-zinc-700 text-zinc-300"
+                >
+                  {todayAction.weeklyCommitment}
+                </Badge>
               </div>
             </div>
           </CardContent>
@@ -296,10 +321,10 @@ const Dashboard = () => {
 
         {/* Progress Summary */}
         <Card
-          className="col-span-1 bg-card border border-border text-card-foreground"
+          className="col-span-1 bg-zinc-900 border border-zinc-800 text-zinc-100 shadow-md"
           aria-label="Progress Summary"
         >
-          <CardHeader>
+          <CardHeader className="border-b border-zinc-800 pb-3">
             <CardTitle>
               <Flame
                 className="inline mr-2 text-orange-500"
@@ -307,29 +332,47 @@ const Dashboard = () => {
               />
               Progress Summary
             </CardTitle>
-            <CardDescription>Your Pivot Path progress</CardDescription>
+            <CardDescription className="text-zinc-400">
+              Your Pivot Path progress
+            </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="mb-3">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium">Roadmap Progress</span>
-                <span className="text-xs">{progressSummary.progress}%</span>
+                <span className="text-sm font-medium text-zinc-100">
+                  Roadmap Progress
+                </span>
+                <span className="text-xs text-zinc-400">
+                  {progressSummary.progress}%
+                </span>
               </div>
-              <Progress value={progressSummary.progress || 0} />
+              <Progress
+                value={progressSummary.progress || 0}
+                className="bg-zinc-800"
+              />
             </div>
             <div className="mb-3">
-              <div className="text-sm font-medium mb-1">Skills Learned</div>
+              <div className="text-sm font-medium mb-1 text-zinc-100">
+                Skills Learned
+              </div>
               <div className="flex flex-wrap gap-2">
                 {(progressSummary.skills || []).map((skill) => (
-                  <Badge key={skill} variant="outline">
+                  <Badge
+                    key={skill}
+                    variant="outline"
+                    className="border-blue-500/20 bg-blue-900/10 text-blue-300"
+                  >
                     {skill}
                   </Badge>
                 ))}
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Streak:</span>
-              <Badge variant="secondary">
+              <span className="text-sm font-medium text-zinc-100">Streak:</span>
+              <Badge
+                variant="secondary"
+                className="bg-indigo-900/30 text-indigo-300 border border-indigo-500/20"
+              >
                 {progressSummary.streak || 0} days
               </Badge>
             </div>
@@ -338,10 +381,10 @@ const Dashboard = () => {
 
         {/* Shortcuts Panel */}
         <Card
-          className="col-span-1 bg-card border border-border text-card-foreground"
+          className="col-span-1 bg-zinc-900 border border-zinc-800 text-zinc-100 shadow-md"
           aria-label="Shortcuts Panel"
         >
-          <CardHeader>
+          <CardHeader className="border-b border-zinc-800 pb-3">
             <CardTitle>
               <Rocket
                 className="inline mr-2 text-green-500"
@@ -349,9 +392,11 @@ const Dashboard = () => {
               />
               Shortcuts
             </CardTitle>
-            <CardDescription>Quick access to tools</CardDescription>
+            <CardDescription className="text-zinc-400">
+              Quick access to tools
+            </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="flex flex-col gap-3">
               {shortcuts.map(({ label, icon: Icon, href, aria }) => (
                 <Link href={href} passHref legacyBehavior key={label}>
@@ -359,7 +404,7 @@ const Dashboard = () => {
                     tabIndex="0"
                     aria-label={aria}
                     variant="ghost"
-                    className="justify-start gap-2 w-full"
+                    className="justify-start gap-2 w-full text-zinc-300 hover:bg-zinc-800 hover:text-blue-300"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") window.location.href = href;
                     }}
