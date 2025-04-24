@@ -514,27 +514,26 @@ const Counseling = () => {
                       </button>
                     ))}
                   </div>
-
                   <div className="grid gap-2 animate-in fade-in-50 duration-200">
                     {getFilteredPrompts().map((prompt, index) => (
                       <Button
                         key={index}
                         variant="outline"
-                        className="text-sm justify-start bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-800 hover:text-black font-medium group transition-all duration-200 h-auto w-full overflow-hidden"
+                        className="
+                            flex flex-wrap items-start justify-start gap-2
+                            w-full p-2 text-sm font-medium
+                            bg-gray-50 border-gray-200
+                            text-gray-800 hover:bg-gray-100 hover:text-black
+                            transition-all duration-200
+                            h-fit
+                          "
                         onClick={() => handlePromptClick(prompt)}
-                        tabIndex="0"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            handlePromptClick(prompt);
-                          }
-                        }}
+                        title={prompt} /* optional tooltip on hover */
                       >
-                        <ChevronRight
-                          className="h-3.5 w-3.5 mr-2 group-hover:translate-x-0.5 transition-transform"
-                          aria-hidden="true"
-                        />
-                        {prompt}
+                        <ChevronRight className="h-3.5 w-3.5 shrink-0 self-center" />
+                        <span className="flex-1 whitespace-normal break-words">
+                          {prompt}
+                        </span>
                       </Button>
                     ))}
                   </div>
