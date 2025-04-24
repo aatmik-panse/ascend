@@ -40,6 +40,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { FloatingDock } from "@/components/ui/floating-dock";
+import Markdown from "react-markdown";
 
 const Counseling = () => {
   const [message, setMessage] = useState("");
@@ -383,10 +384,8 @@ const Counseling = () => {
                               : "bg-gray-100 text-gray-800 p-3 sm:p-4 rounded-md border border-gray-300"
                           }`}
                         >
-                          <p className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base">
-                            {msg.text}
-                          </p>
-
+                          <p className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base"></p>
+                          <Markdown>{msg.text}</Markdown>
                           {msg.sender === "bot" && (
                             <TooltipProvider>
                               <Tooltip>
