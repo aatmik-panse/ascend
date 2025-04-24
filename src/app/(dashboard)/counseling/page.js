@@ -312,7 +312,7 @@ const Counseling = () => {
                 </div>
               </CardHeader>
               <CardContent className="pt-6 pb-6">
-                {showWelcomeMessage && (
+                {/* {showWelcomeMessage && (
                   <div className="mb-5 bg-gray-50 rounded-md p-4 border border-gray-200 relative animate-in slide-in-from-top-4 duration-300">
                     <button
                       onClick={() => setShowWelcomeMessage(false)}
@@ -348,11 +348,11 @@ const Counseling = () => {
                       </Badge>
                     </div>
                   </div>
-                )}
+                )} */}
 
                 <div
                   ref={chatContainerRef}
-                  className="h-[450px] mb-5 overflow-y-auto rounded-md bg-gray-50 p-5 shadow-inner border border-gray-200"
+                  className="h-[560px] mb-5 overflow-y-auto rounded-md bg-gray-50 p-5 shadow-inner border border-gray-200"
                 >
                   <div className="space-y-4">
                     {chatMessages.map((msg, index) => (
@@ -368,22 +368,22 @@ const Counseling = () => {
                             : "slide-in-from-left-5"
                         } duration-200`}
                       >
-                        {msg.sender === "bot" && (
+                        {/* {msg.sender === "bot" && (
                           <div className="p-2 rounded-md bg-black flex-shrink-0">
                             <Bot className="h-5 w-5 text-white" />
                           </div>
-                        )}
+                        )} */}
 
                         <div
-                          className={`max-w-[80%] relative group ${
+                          className={`max-w-[95%] sm:max-w-[75%] md:max-w-[85%] lg:max-w-[90%] relative group ${
                             msg.sender === "system"
                               ? "bg-gray-200 text-gray-800 text-sm py-2 px-4 rounded-full border border-gray-300"
                               : msg.sender === "user"
-                              ? "bg-black text-white p-4 rounded-md"
-                              : "bg-gray-100 text-gray-800 p-4 rounded-md border border-gray-300"
+                              ? "bg-black text-white p-3 sm:p-4 rounded-md"
+                              : "bg-gray-100 text-gray-800 p-3 sm:p-4 rounded-md border border-gray-300"
                           }`}
                         >
-                          <p className="whitespace-pre-wrap leading-relaxed">
+                          <p className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base">
                             {msg.text}
                           </p>
 
