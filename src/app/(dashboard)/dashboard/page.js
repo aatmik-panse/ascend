@@ -288,7 +288,7 @@ const Dashboard = () => {
                 className="inline mr-2 text-blue-500"
                 aria-hidden="true"
               />
-              Today's Action
+              Today&apos;s Action
             </CardTitle>
             <CardDescription className="text-zinc-400">
               Stay on track with your roadmap
