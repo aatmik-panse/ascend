@@ -508,7 +508,7 @@ const CareerPathTest = () => {
                 Your {pathName} Assessment Results
               </CardTitle>
               <CardDescription className="text-zinc-400">
-                Based on your answers, we've tailored these course
+                Based on your answers, we&apos;ve tailored these course
                 recommendations for you
               </CardDescription>
             </CardHeader>

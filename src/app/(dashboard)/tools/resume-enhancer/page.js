@@ -144,7 +144,8 @@ export default function ResumeEnhancer() {
                 Upload Your Resume
               </CardTitle>
               <CardDescription className="text-zinc-400">
-                We'll analyze your resume against your target job description
+                We&apos;ll analyze your resume against your target job
+                description
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -279,7 +280,7 @@ export default function ResumeEnhancer() {
                 Target Role Information
               </CardTitle>
               <CardDescription className="text-zinc-400">
-                Tell us about the job you're applying for
+                Tell us about the job you&apos;re applying for
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

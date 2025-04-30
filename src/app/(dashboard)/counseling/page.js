@@ -756,7 +756,7 @@ const Counseling = () => {
                   {filteredNotes.length === 0 && searchQuery ? (
                     <div className="text-center py-8 bg-gray-50 rounded-md">
                       <p className="text-gray-600">
-                        No notes matching "{searchQuery}"
+                        No notes matching &apos;{searchQuery}&apos;
                       </p>
                       <Button
                         variant="link"
