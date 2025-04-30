@@ -10,9 +10,14 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 export function NewNavbar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
   const navItems = [
     {
       name: "Features",
@@ -30,18 +35,73 @@ export function NewNavbar() {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Check authentication status when component mounts
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        setIsLoading(true);
+        const supabase = createClient();
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser();
+
+        if (error) {
+          console.error("Error checking auth status:", error);
+          setIsLoggedIn(false);
+        } else {
+          setIsLoggedIn(!!user);
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error);
+        setIsLoggedIn(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
+
+  const handleNavigation = (path) => {
+    router.push(path);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <div className="relative w-full ">
+    <div className="relative w-full">
       <Navbar>
         {/* Desktop Navigation */}
         <NavBody>
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
-            {/* <NavbarButton variant="secondary">Login</NavbarButton> */}
-            <NavbarButton variant="primary" href="/waitlist">
-              Get Started
-            </NavbarButton>
+            {!isLoading &&
+              (isLoggedIn ? (
+                <NavbarButton
+                  variant="primary"
+                  onClick={() => handleNavigation("/dashboard")}
+                  aria-label="Go to dashboard"
+                  tabIndex="0"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleNavigation("/dashboard");
+                  }}
+                >
+                  Dashboard
+                </NavbarButton>
+              ) : (
+                <NavbarButton
+                  variant="primary"
+                  onClick={() => handleNavigation("/waitlist")}
+                  aria-label="Get started"
+                  tabIndex="0"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleNavigation("/waitlist");
+                  }}
+                >
+                  Get Started
+                </NavbarButton>
+              ))}
           </div>
         </NavBody>
 
@@ -70,19 +130,24 @@ export function NewNavbar() {
               </a>
             ))}
             <div className="flex w-full flex-col gap-4">
-              {/* <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full">
-                Login
-              </NavbarButton> */}
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-              >
-                Get Started
-              </NavbarButton>
+              {!isLoading &&
+                (isLoggedIn ? (
+                  <NavbarButton
+                    onClick={() => handleNavigation("/dashboard")}
+                    variant="primary"
+                    className="w-full"
+                  >
+                    Dashboard
+                  </NavbarButton>
+                ) : (
+                  <NavbarButton
+                    onClick={() => handleNavigation("/waitlist")}
+                    variant="primary"
+                    className="w-full"
+                  >
+                    Get Started
+                  </NavbarButton>
+                ))}
             </div>
           </MobileNavMenu>
         </MobileNav>
