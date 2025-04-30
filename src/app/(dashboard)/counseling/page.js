@@ -24,8 +24,10 @@ import {
   Filter,
   RefreshCw,
   AlertCircle,
+  Bell,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { toast, Toaster } from "react-hot-toast";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -356,6 +358,43 @@ const Counseling = () => {
     );
   };
 
+  const handleNotifyMentor = () => {
+    toast.custom(
+      (t) => (
+        <div
+          className={`${
+            t.visible ? "animate-enter" : "animate-leave"
+          } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+        >
+          <div className="flex-1 w-0 p-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0 pt-0.5">
+                <Calendar className="h-10 w-10 text-blue-500 bg-blue-50 p-2 rounded-md" />
+              </div>
+              <div className="ml-3 flex-1">
+                <p className="text-sm font-medium text-gray-900">
+                  Notification Set!
+                </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  We'll let you know when mentor matching becomes available.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex border-l border-gray-200">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-blue-600 hover:text-blue-500 focus:outline-none"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: 5000 }
+    );
+  };
+
   // Define dock items for navigation
   const dockItems = [
     {
@@ -398,6 +437,7 @@ const Counseling = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-black bg-white relative rounded-2xl">
+      <Toaster position="top-center" />
       {/* Tab Contents */}
       {activeTab === "chat" && (
         <div className="animate-in fade-in-50 duration-300">
@@ -834,7 +874,60 @@ const Counseling = () => {
         </div>
       )}
 
-      {activeTab === "mentors" && <></>}
+      {activeTab === "mentors" && (
+        <div className="animate-in fade-in-50 duration-300">
+          <Card className="bg-white border border-gray-200 shadow-sm rounded-md overflow-hidden">
+            <div className="py-16 px-6 flex flex-col items-center text-center">
+              <div className="p-4 rounded-full bg-blue-50 mb-6">
+                <Calendar className="h-12 w-12 text-blue-500" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-3">
+                Mentor Matching Coming Soon
+              </h2>
+              <p className="text-gray-600 max-w-lg mb-8">
+                We're working on connecting you with industry professionals for
+                personalized career guidance. Get matched with mentors who've
+                walked the path you're pursuing.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl w-full mb-8">
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col items-center">
+                  <VideoIcon className="h-8 w-8 text-gray-600 mb-3" />
+                  <h3 className="font-medium text-gray-800">
+                    1:1 Video Sessions
+                  </h3>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col items-center">
+                  <MessageSquare className="h-8 w-8 text-gray-600 mb-3" />
+                  <h3 className="font-medium text-gray-800">
+                    Professional Feedback
+                  </h3>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col items-center">
+                  <Star className="h-8 w-8 text-gray-600 mb-3" />
+                  <h3 className="font-medium text-gray-800">
+                    Industry Connections
+                  </h3>
+                </div>
+              </div>
+              <Button
+                className="bg-black hover:bg-gray-800 text-white"
+                tabIndex="0"
+                aria-label="Get notified when mentor matching launches"
+                onClick={handleNotifyMentor}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleNotifyMentor();
+                  }
+                }}
+              >
+                <Bell className="h-4 w-4 mr-2" />
+                Notify Me When Available
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Enhanced Floating Dock Navigation */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
