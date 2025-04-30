@@ -20,6 +20,28 @@ export async function GET(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Check if a specific career path ID is requested
+    const { searchParams } = new URL(req.url);
+    const pathId = searchParams.get("pathId");
+
+    if (pathId) {
+      const careerPath = await prisma.careerRecommendation.findUnique({
+        where: {
+          id: pathId,
+          userId: user.id,
+        },
+      });
+
+      if (!careerPath) {
+        return NextResponse.json(
+          { error: "Career path not found" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({ recommendations: [careerPath] });
+    }
+
     // Check if career recommendations already exist
     const existingRecommendations = await prisma.careerRecommendation.findMany({
       where: { userId: user.id },

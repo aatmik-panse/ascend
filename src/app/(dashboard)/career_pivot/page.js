@@ -33,6 +33,7 @@ import { toast } from "sonner";
 const CareerPivot = () => {
   const [careerPaths, setCareerPaths] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingPath, setLoadingPath] = useState(null); // Track which path is currently loading
   const router = useRouter();
 
   useEffect(() => {
@@ -58,10 +59,10 @@ const CareerPivot = () => {
         }));
 
         setCareerPaths(formattedRecommendations);
-        setLoading(false);
       } catch (error) {
         console.error("Failed to fetch career recommendations:", error);
         toast.error("Failed to fetch career recommendations");
+      } finally {
         setLoading(false);
       }
     };
@@ -69,8 +70,32 @@ const CareerPivot = () => {
     fetchCareerRecommendations();
   }, []);
 
-  const handleExplore = (pathId) => {
-    router.push(`/career_pivot/test/${pathId}`);
+  const handleExplore = async (pathId) => {
+    try {
+      // Set loading state for this specific path - this will disable all buttons
+      setLoadingPath(pathId);
+
+      // First, create or fetch the test for this career path
+      const response = await fetch("/api/career-tests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ careerPathId: pathId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to prepare test");
+      }
+
+      // Redirect to the test page
+      router.push(`/career_pivot/test/${pathId}`);
+    } catch (error) {
+      console.error("Error preparing career path test:", error);
+      toast.error("Failed to prepare test. Please try again.");
+      setLoadingPath(null); // Clear loading state on error to re-enable all buttons
+    }
   };
 
   const getMatchColor = (match) => {
@@ -225,17 +250,30 @@ const CareerPivot = () => {
                   <Button
                     className="w-full bg-black hover:bg-gray-800 text-white transition-all duration-300 group"
                     onClick={() => handleExplore(path.id)}
-                    tabIndex="0"
+                    disabled={loadingPath !== null} // Disable ALL buttons if any path is loading
+                    tabIndex={loadingPath !== null ? "-1" : "0"} // Remove from tab order when disabled
                     aria-label={`Explore ${path.title} career path`}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
+                      if (
+                        (e.key === "Enter" || e.key === " ") &&
+                        loadingPath === null
+                      ) {
                         e.preventDefault();
                         handleExplore(path.id);
                       }
                     }}
                   >
-                    Explore Path
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    {loadingPath === path.id ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Preparing Test...
+                      </>
+                    ) : (
+                      <>
+                        Explore Path
+                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
                   </Button>
                 </CardFooter>
 

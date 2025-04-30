@@ -100,3 +100,46 @@ model CareerRecommendation {
 
   @@index([userId])
 }
+
+model CareerPathTest {
+  id              String         @id @default(cuid())
+  userId          String
+  careerPathId    String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  questions       TestQuestion[]
+  userResponses   TestResponse[]
+  completedAt     DateTime?
+  score           Int?
+  recommendations String[]
+
+  @@index([userId])
+  @@index([careerPathId])
+}
+
+model TestQuestion {
+  id             String         @id @default(cuid())
+  testId         String
+  questionText   String
+  options        String[]
+  correctAnswer  Int
+  careerPathTest CareerPathTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+  userResponses  TestResponse[]
+  order          Int
+
+  @@index([testId])
+}
+
+model TestResponse {
+  id             String         @id @default(cuid())
+  testId         String
+  questionId     String
+  userAnswer     Int
+  isCorrect      Boolean
+  answeredAt     DateTime       @default(now())
+  careerPathTest CareerPathTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+  question       TestQuestion   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([testId])
+  @@index([questionId])
+}
