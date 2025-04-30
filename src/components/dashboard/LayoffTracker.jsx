@@ -1,99 +1,133 @@
+"use client";
 import React from "react";
+import { cn } from "@/lib/utils";
+import { TrendingDown, InfoIcon } from "lucide-react";
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
   XAxis,
   YAxis,
+  Tooltip,
   ResponsiveContainer,
-  Cell,
+  Legend,
 } from "recharts";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
-const layoffData = [
-  { name: "TechCorp", value: 1200 },
-  { name: "RetailX", value: 900 },
-  { name: "FinServe", value: 700 },
-  { name: "EduPlus", value: 500 },
-  { name: "HealthNow", value: 400 },
-];
+export const LayoffTracker = ({ className }) => {
+  // Tech layoff data formatted for Recharts
+  const data = [
+    { year: "2020", count: 119585, label: "119,585", isProjected: false },
+    { year: "2021", count: 24761, label: "24,761", isProjected: false },
+    { year: "2022", count: 243952, label: "243,952", isProjected: false },
+    { year: "2023", count: 429608, label: "429,608", isProjected: false },
+    { year: "2024", count: 238771, label: "238,771", isProjected: false },
+    { year: "2025 YTD", count: 155252, label: "155,252", isProjected: true },
+  ];
 
-const affectedRoles = [
-  "Customer Support",
-  "Sales Associate",
-  "QA Tester",
-  "Operations Manager",
-  "Marketing Specialist",
-];
+  // Format large numbers with K or M suffix
+  const formatYAxis = (value) => {
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(1)}M`;
+    }
+    if (value >= 1000) {
+      return `${(value / 1000).toFixed(0)}K`;
+    }
+    return value;
+  };
 
-export function LayoffTracker({ className }) {
+  // Custom tooltip to show formatted numbers
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-zinc-900/90 border border-zinc-800 p-2 rounded-lg text-xs">
+          <p className="text-zinc-300 font-medium">{data.year}</p>
+          <p className="text-zinc-100 font-semibold">
+            {new Intl.NumberFormat().format(data.count)} employees
+          </p>
+          <p className="text-zinc-400 text-xs">
+            {data.isProjected ? "Projected" : "Historical"}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div
-      className={cn(
-        "card-gradient p-6 space-y-4 hover:shadow-lg transition-all duration-300",
-        className
-      )}
-    >
-      <div className="flex items-center gap-2 mb-2">
-        <h3 className="text-xl font-bold text-white">Layoff Tracker</h3>
+    <div className={cn("flex flex-col h-full", className)}>
+      <div className="flex items-center space-x-2 mb-4">
+        <div className="p-1.5 rounded-md bg-red-500/20">
+          <TrendingDown className="h-5 w-5 text-red-500" />
+        </div>
+        <h2 className="text-xl font-semibold">Tech Layoff Tracker</h2>
       </div>
-      <p className="text-sm text-zinc-400 mb-4">
-        Recent layoffs (last 7–30 days)
-      </p>
 
-      <div className="h-48 mb-6">
+      <div className="flex-1 min-h-[240px] relative">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={layoffData}
-            margin={{ top: 0, right: 0, left: -15, bottom: 0 }}
+            data={data}
+            margin={{ top: 10, right: 10, left: -15, bottom: 5 }}
           >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="rgba(255, 255, 255, 0.05)"
+              vertical={false}
+            />
             <XAxis
-              dataKey="name"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "#A0A0A0", fontSize: 10 }}
+              dataKey="year"
+              tick={{ fill: "rgba(255, 255, 255, 0.7)", fontSize: 12 }}
+              axisLine={{ stroke: "rgba(255, 255, 255, 0.1)" }}
+              tickLine={{ stroke: "rgba(255, 255, 255, 0.1)" }}
             />
             <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "#A0A0A0", fontSize: 10 }}
-              domain={[0, 1200]}
-              ticks={[0, 300, 600, 900, 1200]}
+              tickFormatter={formatYAxis}
+              tick={{ fill: "rgba(255, 255, 255, 0.7)", fontSize: 12 }}
+              axisLine={{ stroke: "rgba(255, 255, 255, 0.1)" }}
+              tickLine={{ stroke: "rgba(255, 255, 255, 0.1)" }}
             />
-            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-              {layoffData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill="#ef4444" />
-              ))}
-            </Bar>
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ fill: "rgba(255, 255, 255, 0.05)" }}
+            />
+            <Bar
+              dataKey="count"
+              name="Employees Impacted"
+              fill={(data) =>
+                data.isProjected
+                  ? "rgba(255, 99, 132, 0.5)"
+                  : "rgba(75, 192, 192, 0.5)"
+              }
+              stroke={(data) =>
+                data.isProjected ? "rgb(255, 99, 132)" : "rgb(75, 192, 192)"
+              }
+              strokeWidth={1}
+              radius={[4, 4, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      <div>
-        <h4 className="font-semibold text-white mb-2">Most affected roles:</h4>
-        <ul className="space-y-1 mb-6">
-          {affectedRoles.map((role, index) => (
-            <li
-              key={index}
-              className="text-sm text-zinc-400 flex items-center gap-2"
-            >
-              <span className="text-red-500">•</span> {role}
-            </li>
-          ))}
-        </ul>
+      <div className="mt-4 flex items-center justify-between text-xs text-zinc-400">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center">
+            <div className="h-3 w-3 rounded-sm bg-[rgba(75,192,192,0.5)] mr-1"></div>
+            <span>Historical</span>
+          </div>
+          <div className="flex items-center">
+            <div className="h-3 w-3 rounded-sm bg-[rgba(255,99,132,0.5)] mr-1"></div>
+            <span>Projected</span>
+          </div>
+        </div>
+        <p className="text-right">Source: trueup.io/layoffs</p>
+      </div>
 
-        <Button
-          className="w-full bg-zinc-800 hover:bg-zinc-700 text-white"
-          tabIndex="0"
-          aria-label="Explore stable pivot roles"
-          onClick={() => (window.location.href = "/career_pivot")}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") window.location.href = "/career_pivot";
-          }}
-        >
-          Explore stable pivot roles
-        </Button>
+      <div className="mt-3 pt-3 border-t border-zinc-800 text-sm">
+        <p className="text-zinc-400">
+          As of May 1, 2025, over 155K tech employees have been impacted by
+          layoffs this year, on track to exceed 2021 numbers.
+        </p>
       </div>
     </div>
   );
-}
+};

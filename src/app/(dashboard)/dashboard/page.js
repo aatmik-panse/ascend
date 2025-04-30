@@ -5,6 +5,7 @@ import { LayoffTracker } from "@/components/dashboard/LayoffTracker";
 import { TodaysAction } from "@/components/dashboard/TodaysAction";
 import { ProgressSummary } from "@/components/dashboard/ProgressSummary";
 import { Shortcuts } from "@/components/dashboard/Shortcuts";
+import { RecommendedPivots } from "@/components/dashboard/RecommendedPivots";
 
 const Dashboard = () => {
   // Common card styling class to ensure consistency
@@ -15,10 +16,15 @@ const Dashboard = () => {
     <main className="p-8 max-w-7xl mx-auto bg-zinc-950 text-zinc-100 rounded-2xl animate-fade-in">
       {/* Main sections with top row (2-column) and bottom row (3-column) layout */}
       <section className="space-y-8">
-        {/* Top row - Pivot and Layoff tracking */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <PivotSnapshot className={`${cardStyle} hover-scale`} />
-          <LayoffTracker className={`${cardStyle} hover-scale`} />
+        {/* Top row - Recommended Pivots, Pivot Snapshot and Layoff tracking */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <RecommendedPivots
+            className={`${cardStyle} hover-scale lg:col-span-1`}
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:col-span-2">
+            <PivotSnapshot className={`${cardStyle} hover-scale`} />
+            <LayoffTracker className={`${cardStyle} hover-scale`} />
+          </div>
         </div>
 
         {/* Bottom row - Actions, Progress and Shortcuts */}
