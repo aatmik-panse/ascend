@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, CheckCircle, CircleHelp } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle, Circle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
@@ -376,15 +376,18 @@ const CareerPathTest = () => {
   if (!currentQuestion && currentStep === "test") {
     return (
       <div className="p-8 flex justify-center items-center">
-        <Card className="bg-zinc-900 border-zinc-800 w-full max-w-xl">
+        <Card className="bg-white border border-gray-200 w-full max-w-xl shadow-md">
           <CardHeader>
-            <CardTitle>Path Not Found</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-gray-900">Path Not Found</CardTitle>
+            <CardDescription className="text-gray-600">
               The requested career path test is not available.
             </CardDescription>
           </CardHeader>
           <CardFooter>
-            <Button onClick={handleBackToCareerPaths}>
+            <Button
+              onClick={handleBackToCareerPaths}
+              className="bg-black hover:bg-gray-800 text-white"
+            >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Career Paths
             </Button>
@@ -395,82 +398,68 @@ const CareerPathTest = () => {
   }
 
   return (
-    <main className="p-8 max-w-7xl mx-auto animate-fade-in">
+    <main className="p-8 max-w-4xl mx-auto bg-white text-black rounded-lg shadow-lg">
       {currentStep === "test" ? (
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="bg-white border border-gray-200 shadow-md">
           <CardHeader>
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center mb-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handlePrevious}
                 tabIndex="0"
                 aria-label="Previous question or go back"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handlePrevious();
-                  }
-                }}
+                className="text-gray-700 hover:text-black"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 {currentQuestionIndex === 0 ? "Back" : "Previous"}
               </Button>
-              <Badge
-                variant="outline"
-                className="bg-blue-600/20 border-blue-800 text-blue-400"
-              >
+              <Badge className="bg-blue-100 text-blue-700 border border-blue-200">
                 Question {currentQuestionIndex + 1} of {questions.length}
               </Badge>
             </div>
-            <Progress value={progress} className="h-2 bg-zinc-800" />
-            <CardTitle className="text-xl mt-4">
+            <Progress value={progress} className="h-2 bg-gray-200" />
+            <CardTitle className="text-xl mt-4 text-gray-900">
               {pathName} Assessment
             </CardTitle>
-            <CardDescription className="text-zinc-400">
-              Test your knowledge and aptitude for this career path
+            <CardDescription className="text-gray-600">
+              Test your knowledge and aptitude for this career path.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="bg-zinc-800/50 p-4 rounded-lg">
-              <h3 className="font-medium text-white mb-2">
+            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+              <h3 className="font-medium text-gray-900 mb-4">
                 {currentQuestion?.question}
               </h3>
-              <div className="space-y-3 mt-4">
+              <div className="space-y-3">
                 {currentQuestion?.options.map((option, index) => (
                   <div
                     key={index}
                     onClick={() =>
                       handleAnswerSelect(currentQuestion.id, index)
                     }
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        handleAnswerSelect(currentQuestion.id, index);
-                      }
-                    }}
                     tabIndex="0"
                     aria-label={`Select answer: ${option}`}
                     className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
                       answers[currentQuestion.id] === index
-                        ? "bg-blue-600/30 border border-blue-500"
-                        : "bg-zinc-900 border border-zinc-700 hover:border-zinc-600"
+                        ? "bg-blue-100 border border-blue-300"
+                        : "bg-white border border-gray-200 hover:bg-gray-100"
                     }`}
                   >
                     <div
                       className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 ${
                         answers[currentQuestion.id] === index
                           ? "bg-blue-500 text-white"
-                          : "bg-zinc-800 text-zinc-500"
+                          : "bg-gray-200 text-gray-500"
                       }`}
                     >
                       {answers[currentQuestion.id] === index ? (
                         <CheckCircle className="w-4 h-4" />
                       ) : (
-                        <CircleHelp className="w-4 h-4" />
+                        <Circle className="w-4 h-4" />
                       )}
                     </div>
-                    <span className="text-sm">{option}</span>
+                    <span className="text-sm text-gray-800">{option}</span>
                   </div>
                 ))}
               </div>
@@ -484,14 +473,6 @@ const CareerPathTest = () => {
               className="bg-blue-600 hover:bg-blue-700 text-white"
               tabIndex="0"
               aria-label="Next question or see results"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  if (answers[currentQuestion?.id] !== undefined) {
-                    handleNext();
-                  }
-                }
-              }}
             >
               {currentQuestionIndex < questions.length - 1
                 ? "Next"
@@ -502,55 +483,54 @@ const CareerPathTest = () => {
         </Card>
       ) : (
         <div className="space-y-8">
-          <Card className="bg-zinc-900 border-zinc-800">
+          <Card className="bg-white border border-gray-200 shadow-md">
             <CardHeader>
-              <CardTitle className="text-2xl">
+              <CardTitle className="text-2xl text-gray-900">
                 Your {pathName} Assessment Results
               </CardTitle>
-              <CardDescription className="text-zinc-400">
+              <CardDescription className="text-gray-600">
                 Based on your answers, we&apos;ve tailored these course
-                recommendations for you
+                recommendations for you.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-lg font-medium text-white">Your Score</h3>
-                  <p className="text-sm text-zinc-400">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Your Score
+                  </h3>
+                  <p className="text-sm text-gray-600">
                     {score >= 70
                       ? "Great job! You have a strong foundation for this career path."
                       : "You're on the right track. These courses will help you build your skills."}
                   </p>
                 </div>
-                <div className="w-24 h-24 rounded-full flex items-center justify-center bg-blue-600/20 border-4 border-blue-600">
-                  <span className="text-2xl font-bold text-white">
+                <div className="w-24 h-24 rounded-full flex items-center justify-center bg-blue-100 border-4 border-blue-500">
+                  <span className="text-2xl font-bold text-blue-700">
                     {score}%
                   </span>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-white mb-4">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
                   Recommended Courses
                 </h3>
                 <div className="space-y-4">
                   {recommendations.map((course, index) => (
                     <div
                       key={index}
-                      className="bg-zinc-800/50 p-4 rounded-lg hover:bg-zinc-800/70 transition-colors"
+                      className="bg-gray-50 p-4 rounded-lg shadow-sm hover:bg-gray-100 transition-colors"
                     >
                       <div className="flex justify-between">
-                        <h4 className="font-medium text-white">
+                        <h4 className="font-medium text-gray-900">
                           {course.title}
                         </h4>
-                        <Badge
-                          variant="outline"
-                          className="bg-blue-600/10 border-blue-800/50 text-blue-400"
-                        >
+                        <Badge className="bg-blue-100 text-blue-700 border border-blue-200">
                           {course.level}
                         </Badge>
                       </div>
-                      <div className="flex items-center mt-2 text-sm text-zinc-400">
+                      <div className="flex items-center mt-2 text-sm text-gray-600">
                         <span>{course.provider}</span>
                         <span className="mx-2">•</span>
                         <span>{course.duration}</span>
@@ -559,16 +539,10 @@ const CareerPathTest = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-blue-400 border-blue-800/50 hover:bg-blue-900/20"
+                          className="text-blue-600 border-blue-300 hover:bg-blue-100"
                           onClick={() => window.open(course.url, "_blank")}
                           tabIndex="0"
                           aria-label={`View course: ${course.title}`}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              window.open(course.url, "_blank");
-                            }
-                          }}
                         >
                           View Course
                           <ArrowRight className="ml-2 h-4 w-4" />
@@ -582,15 +556,9 @@ const CareerPathTest = () => {
             <CardFooter>
               <Button
                 onClick={handleBackToCareerPaths}
-                className="bg-zinc-800 hover:bg-zinc-700 text-white"
+                className="bg-gray-800 hover:bg-gray-700 text-white"
                 tabIndex="0"
                 aria-label="Explore more career paths"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleBackToCareerPaths();
-                  }
-                }}
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Explore More Career Paths
