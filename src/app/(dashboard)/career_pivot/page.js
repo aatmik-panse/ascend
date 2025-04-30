@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -20,6 +20,7 @@ import {
   Sparkles,
   Award,
   LineChart,
+  Loader2,
 } from "lucide-react";
 import {
   HoverCard,
@@ -27,93 +28,46 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { cn } from "@/lib/utils";
-
-const careerPaths = [
-  {
-    id: "data-scientist",
-    title: "Data Scientist",
-    match: 92,
-    description:
-      "Analyze and interpret complex data to help organizations make better decisions.",
-    skills: [
-      "Python",
-      "Statistics",
-      "Machine Learning",
-      "SQL",
-      "Data Visualization",
-    ],
-    growth: "High",
-    salary: "$105,000 - $150,000",
-  },
-  {
-    id: "product-manager",
-    title: "Product Manager, AI",
-    match: 87,
-    description:
-      "Lead the development of AI-powered products from conception to launch.",
-    skills: [
-      "Product Strategy",
-      "User Research",
-      "AI/ML Understanding",
-      "Leadership",
-      "Analytics",
-    ],
-    growth: "Very High",
-    salary: "$120,000 - $180,000",
-  },
-  {
-    id: "data-analyst",
-    title: "Data Analyst",
-    match: 82,
-    description:
-      "Transform raw data into actionable insights through analysis and visualization.",
-    skills: [
-      "SQL",
-      "Excel",
-      "Data Visualization",
-      "Statistics",
-      "Business Intelligence",
-    ],
-    growth: "Moderate",
-    salary: "$75,000 - $110,000",
-  },
-  {
-    id: "ux-researcher",
-    title: "UX Researcher",
-    match: 78,
-    description:
-      "Study user behaviors and needs to inform product design decisions.",
-    skills: [
-      "User Interviews",
-      "Usability Testing",
-      "Data Analysis",
-      "Empathy",
-      "Communication",
-    ],
-    growth: "High",
-    salary: "$90,000 - $130,000",
-  },
-  {
-    id: "ml-engineer",
-    title: "Machine Learning Engineer",
-    match: 73,
-    description:
-      "Design and implement machine learning models for production environments.",
-    skills: [
-      "Python",
-      "Deep Learning",
-      "MLOps",
-      "Software Engineering",
-      "Data Structures",
-    ],
-    growth: "Very High",
-    salary: "$110,000 - $170,000",
-  },
-];
+import { toast } from "sonner";
 
 const CareerPivot = () => {
-  const [selectedPath, setSelectedPath] = useState(null);
+  const [careerPaths, setCareerPaths] = useState([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchCareerRecommendations = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/career-recommendations");
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        // Format data for rendering
+        const formattedRecommendations = data.recommendations.map((rec) => ({
+          id: rec.id,
+          title: rec.title,
+          match: rec.matchPercentage,
+          description: rec.description,
+          skills: rec.skills,
+          growth: rec.growthOutlook,
+          salary: rec.salaryRange,
+        }));
+
+        setCareerPaths(formattedRecommendations);
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch career recommendations:", error);
+        toast.error("Failed to fetch career recommendations");
+        setLoading(false);
+      }
+    };
+
+    fetchCareerRecommendations();
+  }, []);
 
   const handleExplore = (pathId) => {
     router.push(`/career_pivot/test/${pathId}`);
@@ -177,117 +131,147 @@ const CareerPivot = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {careerPaths.map((path) => (
-            <Card
-              key={path.id}
-              className="bg-white border border-gray-200 shadow-sm rounded-lg overflow-hidden hover:shadow-md transition-all duration-300"
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="h-10 w-10 text-gray-400 animate-spin mb-4" />
+            <p className="text-gray-500 text-lg">
+              Generating personalized career recommendations...
+            </p>
+            <p className="text-gray-400 mt-2">
+              This may take a moment as we analyze your profile
+            </p>
+          </div>
+        ) : careerPaths.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 border border-dashed rounded-lg border-gray-300">
+            <Info className="h-10 w-10 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-600">
+              No recommendations found
+            </h3>
+            <p className="text-gray-500 mt-1">
+              Please complete your onboarding profile to receive personalized
+              career recommendations.
+            </p>
+            <Button
+              onClick={() => router.push("/onboarding")}
+              className="mt-6 bg-black hover:bg-gray-800 text-white"
             >
-              <CardHeader className="pb-3 border-b border-gray-100">
-                <div className="flex justify-between items-start mb-2">
-                  <CardTitle className="text-xl font-bold text-gray-800">
-                    {path.title}
-                  </CardTitle>
-                  <Badge
-                    className={cn("ml-2 border", getMatchColor(path.match))}
-                  >
-                    <Award className="h-3 w-3 mr-1" />
-                    {path.match}% Match
-                  </Badge>
-                </div>
-                <CardDescription className="text-gray-600">
-                  {path.description}
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent className="pt-5 space-y-5">
-                <div>
-                  <h4 className="text-sm font-medium mb-2 text-gray-700 flex items-center">
-                    <Briefcase className="h-4 w-4 mr-1 text-gray-500" />
-                    Key Skills
-                  </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {path.skills.map((skill, index) => (
-                      <Badge
-                        key={index}
-                        className="bg-gray-100 text-gray-800 border border-gray-200 font-normal"
-                      >
-                        {skill}
-                      </Badge>
-                    ))}
+              Complete Onboarding
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {careerPaths.map((path) => (
+              <Card
+                key={path.id}
+                className="bg-white border border-gray-200 shadow-sm rounded-lg overflow-hidden hover:shadow-md transition-all duration-300"
+              >
+                <CardHeader className="pb-3 border-b border-gray-100">
+                  <div className="flex justify-between items-start mb-2">
+                    <CardTitle className="text-xl font-bold text-gray-800">
+                      {path.title}
+                    </CardTitle>
+                    <Badge
+                      className={cn("ml-2 border", getMatchColor(path.match))}
+                    >
+                      <Award className="h-3 w-3 mr-1" />
+                      {path.match}% Match
+                    </Badge>
                   </div>
-                </div>
+                  <CardDescription className="text-gray-600">
+                    {path.description}
+                  </CardDescription>
+                </CardHeader>
 
-                <div className="grid grid-cols-2 gap-4 p-3 bg-gray-50 rounded-md">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 text-gray-700">
-                      <LineChart className="w-4 h-4 text-gray-500" />
-                      <h4 className="text-sm font-medium">Growth</h4>
-                    </div>
-                    <div>{getGrowthBadge(path.growth)}</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 text-gray-700">
-                      <DollarSign className="w-4 h-4 text-gray-500" />
-                      <h4 className="text-sm font-medium">Salary</h4>
-                    </div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {path.salary}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-
-              <CardFooter className="pt-3 pb-5 border-t border-gray-100">
-                <Button
-                  className="w-full bg-black hover:bg-gray-800 text-white transition-all duration-300 group"
-                  onClick={() => handleExplore(path.id)}
-                  tabIndex="0"
-                  aria-label={`Explore ${path.title} career path`}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleExplore(path.id);
-                    }
-                  }}
-                >
-                  Explore Path
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </CardFooter>
-
-              <HoverCard openDelay={200} closeDelay={100}>
-                <HoverCardTrigger asChild>
-                  <button
-                    className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                    tabIndex="0"
-                    aria-label={`More information about ${path.title}`}
-                  >
-                    <Info className="h-3.5 w-3.5 text-gray-500" />
-                  </button>
-                </HoverCardTrigger>
-                <HoverCardContent className="w-80 bg-white border border-gray-200 p-4 shadow-lg">
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-semibold text-black">
-                      About {path.title}
+                <CardContent className="pt-5 space-y-5">
+                  <div>
+                    <h4 className="text-sm font-medium mb-2 text-gray-700 flex items-center">
+                      <Briefcase className="h-4 w-4 mr-1 text-gray-500" />
+                      Key Skills
                     </h4>
-                    <p className="text-sm text-gray-600">
-                      {path.description} This career path has a {path.match}%
-                      match with your profile based on your skills and
-                      experiences.
-                    </p>
-                    <div className="pt-2 border-t border-gray-100 mt-2">
-                      <p className="text-xs text-gray-500">
-                        Salary data based on national averages. Growth
-                        projections based on Bureau of Labor Statistics.
+                    <div className="flex flex-wrap gap-1.5">
+                      {path.skills.map((skill, index) => (
+                        <Badge
+                          key={index}
+                          className="bg-gray-100 text-gray-800 border border-gray-200 font-normal"
+                        >
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 p-3 bg-gray-50 rounded-md">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1 text-gray-700">
+                        <LineChart className="w-4 h-4 text-gray-500" />
+                        <h4 className="text-sm font-medium">Growth</h4>
+                      </div>
+                      <div>{getGrowthBadge(path.growth)}</div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1 text-gray-700">
+                        <DollarSign className="w-4 h-4 text-gray-500" />
+                        <h4 className="text-sm font-medium">Salary</h4>
+                      </div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {path.salary}
                       </p>
                     </div>
                   </div>
-                </HoverCardContent>
-              </HoverCard>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+
+                <CardFooter className="pt-3 pb-5 border-t border-gray-100">
+                  <Button
+                    className="w-full bg-black hover:bg-gray-800 text-white transition-all duration-300 group"
+                    onClick={() => handleExplore(path.id)}
+                    tabIndex="0"
+                    aria-label={`Explore ${path.title} career path`}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleExplore(path.id);
+                      }
+                    }}
+                  >
+                    Explore Path
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </CardFooter>
+
+                <HoverCard openDelay={200} closeDelay={100}>
+                  <HoverCardTrigger asChild>
+                    <button
+                      className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                      tabIndex="0"
+                      aria-label={`More information about ${path.title}`}
+                    >
+                      <Info className="h-3.5 w-3.5 text-gray-500" />
+                    </button>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-80 bg-white border border-gray-200 p-4 shadow-lg">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-semibold text-black">
+                        About {path.title}
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        {path.description} This career path has a {path.match}%
+                        match with your profile based on your skills and
+                        experiences.
+                      </p>
+                      <div className="pt-2 border-t border-gray-100 mt-2">
+                        <p className="text-xs text-gray-500">
+                          Salary data based on national averages. Growth
+                          projections based on Bureau of Labor Statistics.
+                        </p>
+                      </div>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );

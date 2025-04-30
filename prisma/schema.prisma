@@ -85,3 +85,18 @@ model PromptSuggestion {
   @@index([status])
   @@index([createdAt])
 }
+
+model CareerRecommendation {
+  id              String   @id @default(cuid())
+  userId          String
+  title           String
+  matchPercentage Int
+  description     String   @db.Text
+  skills          String[]
+  growthOutlook   String
+  salaryRange     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+}
