@@ -23,6 +23,8 @@ import {
   Search,
   Filter,
 } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -157,10 +159,22 @@ const Counseling = () => {
     setMessage("");
 
     try {
+      // Get authenticated session to include auth in the request
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          // Include authentication if available
+          ...(session?.access_token
+            ? {
+                Authorization: `Bearer ${session.access_token}`,
+              }
+            : {}),
         },
         body: JSON.stringify({
           message: messageToSend,

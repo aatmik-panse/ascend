@@ -13,17 +13,17 @@ export const openaiService = {
       temperature: 0.7,
       max_tokens: 1200,
     };
-    
+
     const requestOptions = { ...defaultOptions, ...options, messages };
-    
+
     return await openai.chat.completions.create(requestOptions);
   },
-  
+
   // List available models
   async listModels() {
     return await openai.models.list();
   },
-  
+
   // Create embeddings for text
   async createEmbedding(input, model = "text-embedding-3-small") {
     return await openai.embeddings.create({
@@ -31,23 +31,30 @@ export const openaiService = {
       input,
     });
   },
-  
+
   // Initialize a career counseling conversation with a well-structured system prompt
   async getCareerCounselingBot(customInstructions = {}) {
     const defaultInstructions = {
-      expertise: ["career planning", "job searching", "skill development", "resume building"],
+      expertise: [
+        "career planning",
+        "job searching",
+        "skill development",
+        "resume building",
+      ],
       tone: "supportive and professional",
       responseLength: "concise but comprehensive",
-      userLevel: "diverse professionals"
+      userLevel: "diverse professionals",
     };
-    
+
     const instructions = { ...defaultInstructions, ...customInstructions };
-    
+
     const systemPrompt = `
 # Career Counseling Assistant
 
 ## Role and Purpose
-You are a professional career counselor specializing in ${instructions.expertise.join(", ")}. Your purpose is to provide personalized guidance to help individuals make informed career decisions and achieve their professional goals.
+You are a professional career counselor specializing in ${instructions.expertise.join(
+      ", "
+    )}. Your purpose is to provide personalized guidance to help individuals make informed career decisions and achieve their professional goals.
 
 ## Expertise and Capabilities
 - Assess career aptitudes and interests
@@ -70,6 +77,7 @@ You are a professional career counselor specializing in ${instructions.expertise
 - Do not provide specific salary figures without qualifying them by region and experience level
 - Focus on empowering users with information rather than making decisions for them
 - Avoid political or controversial content
+- When user data is provided in your context, use it to personalize advice without explicitly mentioning you have this data
 
 ## Interaction Style
 1. Start by understanding the user's current situation and career goals
@@ -84,14 +92,14 @@ You are a professional career counselor specializing in ${instructions.expertise
       initializeChat: async (userQuery) => {
         const messages = [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userQuery }
+          { role: "user", content: userQuery },
         ];
-        
+
         return await openaiService.createChatCompletion(messages, {
           temperature: 0.6, // Slightly lower temperature for more reliable advice
-          max_tokens: 1500  // Higher token limit for comprehensive guidance
+          max_tokens: 1500, // Higher token limit for comprehensive guidance
         });
-      }
+      },
     };
-  }
+  },
 };
