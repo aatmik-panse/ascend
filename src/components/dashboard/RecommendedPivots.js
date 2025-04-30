@@ -119,7 +119,7 @@ export const RecommendedPivots = ({ className }) => {
           variant="ghost"
           size="sm"
           onClick={handleViewAll}
-          className="text-zinc-400 hover:text-zinc-100"
+          className="text-zinc-400 hover:text-zinc-950"
         >
           View All
           <ArrowRight className="ml-1 h-4 w-4" />
