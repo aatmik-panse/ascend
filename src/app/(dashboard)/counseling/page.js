@@ -22,6 +22,8 @@ import {
   ChevronRight,
   Search,
   Filter,
+  RefreshCw,
+  AlertCircle,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
@@ -33,6 +35,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import {
@@ -42,6 +45,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { FloatingDock } from "@/components/ui/floating-dock";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import Markdown from "react-markdown";
 
 const Counseling = () => {
@@ -58,7 +72,49 @@ const Counseling = () => {
   const [activeTab, setActiveTab] = useState("chat");
   const [activePromptCategory, setActivePromptCategory] = useState("all");
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(true);
+  const [isLoadingNotes, setIsLoadingNotes] = useState(false);
+  const [notesError, setNotesError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [noteToDelete, setNoteToDelete] = useState(null);
   const chatContainerRef = useRef(null);
+
+  // Fetch saved notes on component mount and when active tab changes to notes
+  useEffect(() => {
+    if (activeTab === "notes") {
+      fetchSavedNotes();
+    }
+  }, [activeTab]);
+
+  // Function to fetch saved notes from the API
+  const fetchSavedNotes = async () => {
+    try {
+      setIsLoadingNotes(true);
+      setNotesError(null);
+
+      const response = await fetch("/api/notes");
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch notes: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Transform the notes to match our front-end format
+      const formattedNotes = data.notes.map((note) => ({
+        id: note.id,
+        text: note.text,
+        date: new Date(note.createdAt).toLocaleString(),
+        conversationId: note.conversationId,
+      }));
+
+      setSavedNotes(formattedNotes);
+    } catch (error) {
+      console.error("Error fetching notes:", error);
+      setNotesError("Failed to load your saved notes. Please try again later.");
+    } finally {
+      setIsLoadingNotes(false);
+    }
+  };
 
   const promptCategories = [
     { id: "all", name: "All" },
@@ -226,26 +282,72 @@ const Counseling = () => {
     handleSendMessage(prompt);
   };
 
-  const handleSaveToNotes = (messageText) => {
-    const newNote = {
-      id: Date.now(),
-      text: messageText,
-      date: new Date().toLocaleString(),
-    };
-    setSavedNotes((prev) => [newNote, ...prev]);
+  const handleSaveToNotes = async (messageText) => {
+    try {
+      const response = await fetch("/api/notes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: messageText,
+          conversationId: conversationId,
+        }),
+      });
 
-    setChatMessages((prev) => [
-      ...prev,
-      {
-        sender: "system",
-        text: "✅ Saved to your notes!",
-        id: Date.now(),
-      },
-    ]);
+      if (!response.ok) {
+        throw new Error("Failed to save note");
+      }
+
+      const { note } = await response.json();
+
+      const newNote = {
+        id: note.id,
+        text: note.text,
+        date: new Date(note.createdAt).toLocaleString(),
+        conversationId: note.conversationId,
+      };
+
+      setSavedNotes((prev) => [newNote, ...prev]);
+
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          sender: "system",
+          text: "✅ Saved to your notes!",
+          id: Date.now(),
+        },
+      ]);
+    } catch (error) {
+      console.error("Error saving note:", error);
+
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          sender: "system",
+          text: "❌ Failed to save note. Please try again.",
+          id: Date.now(),
+        },
+      ]);
+    }
   };
 
-  const handleDeleteNote = (noteId) => {
-    setSavedNotes(savedNotes.filter((note) => note.id !== noteId));
+  const handleDeleteNote = async (noteId) => {
+    try {
+      const response = await fetch(`/api/notes?id=${noteId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete note");
+      }
+
+      setSavedNotes(savedNotes.filter((note) => note.id !== noteId));
+      setNoteToDelete(null); // Reset after deletion
+    } catch (error) {
+      console.error("Error deleting note:", error);
+      alert("Failed to delete note. Please try again.");
+    }
   };
 
   const handleScheduleSession = (mentor) => {
@@ -279,6 +381,13 @@ const Counseling = () => {
     },
   ];
 
+  // Filter notes based on search query
+  const filteredNotes = searchQuery
+    ? savedNotes.filter((note) =>
+        note.text.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : savedNotes;
+
   // Custom handler for dock item clicks
   const handleDockItemClick = (event, onClick) => {
     if (!onClick) return;
@@ -289,25 +398,6 @@ const Counseling = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-black bg-white relative rounded-2xl">
-      {/* Welcome Header */}
-      {/* <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-3">Counseling</h1>
-        <p className="text-gray-700 max-w-2xl mx-auto">
-          Get personalized career guidance, clarity, and motivational support
-        </p>
-      </div> */}
-
-      {/* Current tab indicator */}
-      {/* <div className="flex justify-center mb-6">
-        <div className="px-4 py-2 bg-gray-100 rounded-md border border-gray-200 text-center">
-          <span className="text-sm font-medium">
-            {activeTab === "chat" && "AI Coach"}
-            {activeTab === "notes" && "Saved Notes"}
-            {activeTab === "mentors" && "Premium Mentors"}
-          </span>
-        </div>
-      </div> */}
-
       {/* Tab Contents */}
       {activeTab === "chat" && (
         <div className="animate-in fade-in-50 duration-300">
@@ -319,7 +409,7 @@ const Counseling = () => {
                 </div>
                 <div>
                   <CardTitle className="text-black text-xl">
-                    AI Career Coach
+                    Compass Coach
                   </CardTitle>
                   <CardDescription className="text-gray-600 text-sm">
                     Ask anything about your career journey
@@ -327,44 +417,6 @@ const Counseling = () => {
                 </div>
               </CardHeader>
               <CardContent className="pt-6 pb-6">
-                {/* {showWelcomeMessage && (
-                  <div className="mb-5 bg-gray-50 rounded-md p-4 border border-gray-200 relative animate-in slide-in-from-top-4 duration-300">
-                    <button
-                      onClick={() => setShowWelcomeMessage(false)}
-                      className="absolute top-2 right-2 text-gray-500 hover:text-black"
-                      aria-label="Dismiss welcome message"
-                    >
-                      ×
-                    </button>
-                    <h3 className="text-lg font-medium text-black mb-2 flex items-center">
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Welcome to your AI Career Coach
-                    </h3>
-                    <p className="text-gray-700 text-sm mb-2">
-                      I can help with resume reviews, interview preparation,
-                      career transitions, and more. Just ask me anything!
-                    </p>
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      <Badge
-                        className="bg-gray-200 text-gray-800 cursor-pointer hover:bg-gray-300"
-                        onClick={() =>
-                          handlePromptClick("What can you help me with?")
-                        }
-                      >
-                        Get Started
-                      </Badge>
-                      <Badge
-                        className="bg-gray-200 text-gray-800 cursor-pointer hover:bg-gray-300"
-                        onClick={() =>
-                          handlePromptClick("How do I use this tool?")
-                        }
-                      >
-                        How it works
-                      </Badge>
-                    </div>
-                  </div>
-                )} */}
-
                 <div
                   ref={chatContainerRef}
                   className="h-[560px] mb-5 overflow-y-auto rounded-md bg-gray-50 p-5 shadow-inner border border-gray-200"
@@ -383,12 +435,6 @@ const Counseling = () => {
                             : "slide-in-from-left-5"
                         } duration-200`}
                       >
-                        {/* {msg.sender === "bot" && (
-                          <div className="p-2 rounded-md bg-black flex-shrink-0">
-                            <Bot className="h-5 w-5 text-white" />
-                          </div>
-                        )} */}
-
                         <div
                           className={`max-w-[95%] sm:max-w-[75%] md:max-w-[85%] lg:max-w-[90%] relative group ${
                             msg.sender === "system"
@@ -511,7 +557,6 @@ const Counseling = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-4">
-                  {/* Category tabs */}
                   <div className="flex overflow-x-auto pb-2 mb-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                     {promptCategories.map((category) => (
                       <button
@@ -541,7 +586,7 @@ const Counseling = () => {
                             h-fit
                           "
                         onClick={() => handlePromptClick(prompt)}
-                        title={prompt} /* optional tooltip on hover */
+                        title={prompt}
                       >
                         <ChevronRight className="h-3.5 w-3.5 shrink-0 self-center" />
                         <span className="flex-1 whitespace-normal break-words">
@@ -643,7 +688,31 @@ const Counseling = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
-              {savedNotes.length === 0 ? (
+              {isLoadingNotes ? (
+                <div className="flex items-center justify-center py-12">
+                  <RefreshCw className="h-8 w-8 text-gray-400 animate-spin" />
+                  <span className="ml-3 text-gray-600">
+                    Loading your notes...
+                  </span>
+                </div>
+              ) : notesError ? (
+                <div className="text-center py-12 bg-red-50 rounded-md border border-red-200">
+                  <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-red-800 mb-1">
+                    Error Loading Notes
+                  </h3>
+                  <p className="text-red-600 max-w-md mx-auto mb-4">
+                    {notesError}
+                  </p>
+                  <Button
+                    className="mt-2 bg-red-600 hover:bg-red-700 text-white"
+                    onClick={fetchSavedNotes}
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Try Again
+                  </Button>
+                </div>
+              ) : savedNotes.length === 0 ? (
                 <div className="text-center py-12 bg-gray-50 rounded-md border border-gray-200">
                   <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-800 mb-1">
@@ -670,229 +739,102 @@ const Counseling = () => {
                         type="text"
                         placeholder="Search your notes..."
                         className="w-full bg-white border border-gray-300 rounded-md pl-10 pr-4 py-2 text-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black/50"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                       />
                     </div>
                     <Button
                       variant="outline"
                       className="ml-2 bg-white border-gray-300 text-gray-800"
+                      onClick={fetchSavedNotes}
+                      title="Refresh notes"
                     >
-                      <Filter className="h-4 w-4 mr-2" />
-                      Filter
+                      <RefreshCw className="h-4 w-4" />
                     </Button>
                   </div>
 
-                  <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-                    {savedNotes.map((note) => (
-                      <div
-                        key={note.id}
-                        className="bg-white rounded-md p-4 border border-gray-200 relative group hover:shadow-sm transition-all duration-200"
+                  {filteredNotes.length === 0 && searchQuery ? (
+                    <div className="text-center py-8 bg-gray-50 rounded-md">
+                      <p className="text-gray-600">
+                        No notes matching "{searchQuery}"
+                      </p>
+                      <Button
+                        variant="link"
+                        className="mt-2"
+                        onClick={() => setSearchQuery("")}
                       >
-                        <div className="text-gray-500 text-xs mb-2 flex items-center">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {note.date}
-                        </div>
-                        <p className="text-gray-800 whitespace-pre-wrap">
-                          {note.text}
-                        </p>
-                        <div className="absolute top-2 right-2 flex space-x-1">
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
+                        Clear search
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                      {filteredNotes.map((note) => (
+                        <div
+                          key={note.id}
+                          className="bg-white rounded-md p-4 border border-gray-200 relative group hover:shadow-sm transition-all duration-200"
+                        >
+                          <div className="text-gray-500 text-xs mb-2 flex items-center">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {note.date}
+                          </div>
+                          <div className="text-gray-800 whitespace-pre-wrap">
+                            <Markdown>{note.text}</Markdown>
+                          </div>
+                          <div className="absolute top-2 right-2 flex space-x-1">
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
                                 <button
-                                  onClick={() => handleDeleteNote(note.id)}
                                   className="p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-gray-800 hover:bg-gray-100"
                                   aria-label="Delete note"
+                                  onClick={() => setNoteToDelete(note.id)}
                                 >
                                   ×
                                 </button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p className="text-xs">Delete note</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Delete Note
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete this note?
+                                    This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-red-600 hover:bg-red-700 text-white focus:ring-red-600"
+                                    onClick={() =>
+                                      handleDeleteNote(noteToDelete)
+                                    }
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {activeTab === "mentors" && (
-        <div className="animate-in fade-in-50 duration-300">
-          <Card className="bg-white border border-gray-200 shadow-sm rounded-md">
-            <CardHeader className="border-b border-gray-200 pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center">
-                    <Star className="h-5 w-5 mr-2" />
-                    Premium Human Mentors
-                  </CardTitle>
-                  <CardDescription className="text-gray-600 text-sm mt-1">
-                    Connect with industry experts for personalized guidance
-                  </CardDescription>
-                </div>
-                <Badge className="bg-black text-white border-0">
-                  Premium Feature
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="mb-6 bg-gray-50 rounded-md p-5 border border-gray-200">
-                <div className="flex flex-col md:flex-row md:items-center gap-4">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-medium text-gray-900 mb-2 flex items-center">
-                      <VideoIcon className="h-5 w-5 mr-2" />
-                      Book a 15-minute mentor session
-                    </h3>
-                    <p className="text-gray-700 mb-3">
-                      Get personalized guidance from industry experts in quick,
-                      focused sessions tailored to your career goals.
-                    </p>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge className="bg-gray-200 text-gray-800 border border-gray-300">
-                        Premium
-                      </Badge>
-                      <Badge className="bg-gray-200 text-gray-800 border border-gray-300">
-                        2 sessions/month
-                      </Badge>
-                      <Badge className="bg-gray-200 text-gray-800 border border-gray-300">
-                        15-min calls
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="md:w-auto flex-shrink-0">
-                    <Button className="w-full md:w-auto bg-black hover:bg-gray-800 text-white">
-                      Upgrade to Pro
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {availableMentors.map((mentor, index) => (
-                  <div
-                    key={index}
-                    className="bg-white rounded-md overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 group"
-                  >
-                    <div className="aspect-[4/3] relative overflow-hidden">
-                      <div
-                        className="absolute inset-0 bg-cover bg-center transform group-hover:scale-105 transition-transform duration-500"
-                        style={{ backgroundImage: `url(${mentor.image})` }}
-                      ></div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent"></div>
-
-                      <div className="absolute bottom-3 left-3 flex flex-col space-y-2">
-                        <div className="flex items-center bg-black/60 rounded-full px-2.5 py-1">
-                          <Star className="h-3.5 w-3.5 text-yellow-400 mr-1.5" />
-                          <span className="text-xs font-medium text-white">
-                            {mentor.rating} ({mentor.reviews})
-                          </span>
-                        </div>
-                      </div>
-
-                      {mentor.verified && (
-                        <div className="absolute top-3 right-3">
-                          <Badge className="bg-black text-white border-0">
-                            Verified
-                          </Badge>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="p-4">
-                      <h3 className="text-lg font-medium text-gray-900 mb-1">
-                        {mentor.name}
-                      </h3>
-                      <p className="text-gray-600 text-sm mb-2">
-                        {mentor.role}, {mentor.company}
-                      </p>
-
-                      <p className="text-gray-700 text-sm mb-3 line-clamp-2">
-                        {mentor.bio}
-                      </p>
-
-                      <div className="mt-3 flex flex-wrap gap-1.5 mb-4">
-                        {mentor.specialties.map((specialty, idx) => (
-                          <Badge
-                            key={idx}
-                            variant="outline"
-                            className="bg-gray-100 text-gray-800 border-gray-200"
-                          >
-                            {specialty}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      <div className="mb-4 bg-gray-50 rounded-md p-2 border border-gray-200">
-                        <p className="text-xs text-gray-600 mb-1.5">
-                          Available slots:
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {mentor.availability.map((slot, idx) => (
-                            <Badge
-                              key={idx}
-                              className="bg-gray-200 text-gray-800 cursor-pointer hover:bg-gray-300"
-                            >
-                              {slot}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-
-                      <Button
-                        className="w-full bg-black hover:bg-gray-800 text-white flex items-center justify-center"
-                        onClick={() => handleScheduleSession(mentor)}
-                      >
-                        <CalendarIcon className="h-4 w-4 mr-1.5" />
-                        <span>Schedule Session</span>
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-8 p-4 bg-gray-50 rounded-md border border-gray-200 text-center">
-                <h4 className="text-gray-900 mb-2 font-medium">How it works</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div className="p-3 bg-white rounded-md border border-gray-200">
-                    <div className="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2">
-                      <Calendar className="h-4 w-4 text-gray-800" />
-                    </div>
-                    <p className="text-gray-700 text-sm">
-                      Schedule a session with your preferred mentor
-                    </p>
-                  </div>
-                  <div className="p-3 bg-white rounded-md border border-gray-200">
-                    <div className="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2">
-                      <VideoIcon className="h-4 w-4 text-gray-800" />
-                    </div>
-                    <p className="text-gray-700 text-sm">
-                      Connect via video call at your scheduled time
-                    </p>
-                  </div>
-                  <div className="p-3 bg-white rounded-md border border-gray-200">
-                    <div className="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2">
-                      <ThumbsUp className="h-4 w-4 text-gray-800" />
-                    </div>
-                    <p className="text-gray-700 text-sm">
-                      Provide feedback to help improve our service
-                    </p>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  Your ratings help us improve mentor suggestions and match you
-                  with the best experts
+            {filteredNotes.length > 0 && !isLoadingNotes && !notesError && (
+              <CardFooter className="border-t border-gray-200 py-3 px-6">
+                <p className="text-xs text-gray-500">
+                  Notes are automatically saved to your account and can be
+                  accessed from any device
                 </p>
-              </div>
-            </CardContent>
+              </CardFooter>
+            )}
           </Card>
         </div>
       )}
+
+      {activeTab === "mentors" && <></>}
 
       {/* Enhanced Floating Dock Navigation */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">

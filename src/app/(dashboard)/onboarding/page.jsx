@@ -374,7 +374,7 @@ export default function CareerOnboarding() {
     // Phase 2: Skills & Motivators
     {
       id: "topSkills",
-      title: "List your top 3 skills:",
+      title: "Which core skills set you apart?",
       field: "topSkills",
       type: "skills",
       description: "Press Enter or tap 'Add skill' to list at least three.",
@@ -413,9 +413,13 @@ export default function CareerOnboarding() {
         { value: "15+", label: "15+ hrs/week" },
       ],
     },
+    // {
+    //   id: "pivotMonth",
+    //   title: "When do you plan to start your pivot?",
+    // },
     {
       id: "linkedinUrl",
-      title: "What's your LinkedIn URL? (optional)",
+      title: "What's your LinkedIn URL? ",
       subtitle: "This helps us analyze your professional network",
       field: "linkedinUrl",
       placeholder: "https://linkedin.com/in/yourprofile",
@@ -431,7 +435,7 @@ export default function CareerOnboarding() {
     },
     {
       id: "biggestChallenge",
-      title: "What's your biggest roadblock right now? (optional)",
+      title: "What's your biggest roadblock right now? ",
       field: "biggestConcern",
       type: "textarea",
       optional: true,
@@ -849,6 +853,7 @@ export default function CareerOnboarding() {
                 <h1 className="text-3xl md:text-4xl font-medium mb-2">
                   {currentQuestion.title}
                 </h1>
+                <span>{currentQuestion.optional ? "(Optional)" : ""}</span>
 
                 {currentQuestion.subtitle && (
                   <p className="text-lg text-gray-400 mb-1">

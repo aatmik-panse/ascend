@@ -98,7 +98,7 @@ export default function Tools() {
 
           <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.3 }}>
             <Card className={cardStyle}>
-              <div className="absolute top-4 right-4">
+              <div className="relative left-4 top-4 right-4">
                 <Badge className="bg-yellow-500 text-black border-none font-medium px-3">
                   Coming Soon
                 </Badge>
@@ -142,7 +142,7 @@ export default function Tools() {
                   tabIndex="-1"
                   aria-label="Join Waitlist - Coming Soon"
                 >
-                  <Lock className="h-4 w-4 mr-2" /> Join Waitlist
+                  <Lock className="h-4 w-4 mr-2" />
                 </Button>
               </CardFooter>
             </Card>

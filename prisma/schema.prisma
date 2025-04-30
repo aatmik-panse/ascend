@@ -28,17 +28,18 @@ model User {
   role            String?          @default("user")
   refresh_token   String?
   onboardingData  OnboardingData[]
+  Note            Note[]
 }
 
 model OnboardingData {
   id               String   @id @default(cuid())
   userId           String?
   jobTitle         String
-  company          String?  // Made optional since it's not always applicable
+  company          String? // Made optional since it's not always applicable
   experience       String
   topSkills        String[]
   enjoyDislike     String?
-  motivators       String
+  motivators       String // TODO : multi select bana do ise 
   timeForGrowth    String
   linkedinUrl      String?
   industryInterest String
@@ -54,4 +55,18 @@ model Waitlist {
   id         Int      @id @default(autoincrement())
   email      String   @unique
   created_at DateTime @default(now())
+}
+
+model Note {
+  id             String   @id @default(cuid())
+  text           String   @db.Text
+  userId         String
+  conversationId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  User User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([conversationId])
 }

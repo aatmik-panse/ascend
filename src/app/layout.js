@@ -79,6 +79,9 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${dm_serif_display.variable} ${space_grotesk.variable}`}
     >
+      <head>
+        <meta name="google-adsense-account" content="ca-pub-7539077179218248" />
+      </head>
       <body>
         <Analytics />
         {children}
