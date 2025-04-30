@@ -79,6 +79,8 @@ const Counseling = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [noteToDelete, setNoteToDelete] = useState(null);
   const chatContainerRef = useRef(null);
+  const [showSuggestPromptDialog, setShowSuggestPromptDialog] = useState(false);
+  const [suggestedPrompt, setSuggestedPrompt] = useState("");
 
   // Fetch saved notes on component mount and when active tab changes to notes
   useEffect(() => {
@@ -395,6 +397,39 @@ const Counseling = () => {
     );
   };
 
+  const handleSuggestPrompt = async () => {
+    if (!suggestedPrompt.trim()) return;
+
+    try {
+      // Send the prompt suggestion to the API
+      const response = await fetch("/api/prompt-suggestions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: suggestedPrompt.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit prompt suggestion");
+      }
+
+      // Show success message
+      toast.success("Thank you! Your prompt suggestion has been received.", {
+        duration: 3000,
+      });
+
+      // Reset and close dialog
+      setSuggestedPrompt("");
+      setShowSuggestPromptDialog(false);
+    } catch (error) {
+      console.error("Error submitting prompt suggestion:", error);
+      toast.error("Failed to submit your suggestion. Please try again.");
+    }
+  };
+
   // Define dock items for navigation
   const dockItems = [
     {
@@ -438,6 +473,43 @@ const Counseling = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-black bg-white relative rounded-2xl">
       <Toaster position="top-center" />
+
+      {/* Suggest Prompt Dialog */}
+      <AlertDialog
+        open={showSuggestPromptDialog}
+        onOpenChange={setShowSuggestPromptDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Suggest a Prompt</AlertDialogTitle>
+            <AlertDialogDescription>
+              Suggest a topic or question you'd like to see in our prompt
+              library
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <textarea
+              value={suggestedPrompt}
+              onChange={(e) => setSuggestedPrompt(e.target.value)}
+              placeholder="Your prompt suggestion..."
+              className="w-full bg-white border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black/50 resize-none h-32 text-black placeholder-gray-500"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setSuggestedPrompt("")}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleSuggestPrompt}
+              className="bg-black hover:bg-gray-800 text-white"
+              disabled={!suggestedPrompt.trim()}
+            >
+              Submit Suggestion
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Tab Contents */}
       {activeTab === "chat" && (
         <div className="animate-in fade-in-50 duration-300">
@@ -649,6 +721,13 @@ const Counseling = () => {
                       variant="ghost"
                       className="text-sm w-full justify-start text-gray-700 hover:text-black hover:bg-gray-100 group"
                       aria-label="Submit prompt request"
+                      onClick={() => setShowSuggestPromptDialog(true)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setShowSuggestPromptDialog(true);
+                        }
+                      }}
                     >
                       <PlusCircle className="h-3.5 w-3.5 mr-2 group-hover:rotate-90 transition-transform duration-200" />
                       Suggest a prompt
