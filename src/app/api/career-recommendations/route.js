@@ -152,12 +152,13 @@ export async function GET(req) {
       );
     }
 
-    // Save recommendations to the database
+    // Save recommendations to the database with auto-generated IDs
     const savedRecommendations = await Promise.all(
       careerPaths.map(async (path) => {
+        // Let Prisma auto-generate the ID using cuid()
         return await prisma.careerRecommendation.create({
           data: {
-            id: path.id,
+            // Omit id field - Prisma will generate it automatically
             userId: user.id,
             title: path.title,
             matchPercentage: parseInt(path.match.toString().replace("%", "")),
