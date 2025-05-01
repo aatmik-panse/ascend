@@ -9,7 +9,7 @@ export const openaiService = {
   // Generate chat completion
   async createChatCompletion(messages, options = {}) {
     const defaultOptions = {
-      model: "gpt-4o",
+      model: "gpt-4.1-mini-2025-04-14",
       temperature: 0.7,
       max_tokens: 1200,
     };

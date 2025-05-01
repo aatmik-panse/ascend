@@ -201,28 +201,28 @@ export async function POST(request) {
     console.log(`Successfully created onboarding record:`, result);
 
     // Optionally, also store in Supabase if needed
-    if (supabaseUser) {
-      // Insert the same data into Supabase using snake_case field names
-      const { error } = await supabase.from("onboarding_data").insert({
-        user_id: supabaseUser.id,
-        job_title: jobTitle,
-        experience,
-        top_skills: topSkills,
-        enjoy_dislike: enjoyDislike,
-        motivators,
-        time_for_growth: timeForGrowth,
-        linkedin_url: linkedinUrl,
-        industry_interest: industryInterest,
-        biggest_concern: biggestConcern,
-      });
+    // if (supabaseUser) {
+    //   // Insert the same data into Supabase using snake_case field names
+    //   const { error } = await supabase.from("onboarding_data").insert({
+    //     user_id: supabaseUser.id,
+    //     job_title: jobTitle,
+    //     experience,
+    //     top_skills: topSkills,
+    //     enjoy_dislike: enjoyDislike,
+    //     motivators,
+    //     time_for_growth: timeForGrowth,
+    //     linkedin_url: linkedinUrl,
+    //     industry_interest: industryInterest,
+    //     biggest_concern: biggestConcern,
+    //   });
 
-      if (error) {
-        console.error("Supabase insertion error:", error);
-        // Continue anyway since Prisma insertion succeeded
-      } else {
-        console.log("Successfully stored in Supabase as well");
-      }
-    }
+    //   if (error) {
+    //     console.error("Supabase insertion error:", error);
+    //     // Continue anyway since Prisma insertion succeeded
+    //   } else {
+    //     console.log("Successfully stored in Supabase as well");
+    //   }
+    // }
 
     // Return success response with the created data
     return NextResponse.json(

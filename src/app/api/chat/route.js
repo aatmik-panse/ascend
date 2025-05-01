@@ -56,14 +56,14 @@ async function getUserOnboardingData(userId) {
     }
 
     // Fallback to Supabase only if needed
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("onboarding_data")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .single();
+    // const supabase = await createClient();
+    // const { data, error } = await supabase
+    //   .from("onboarding_data")
+    //   .select("*")
+    //   .eq("user_id", userId)
+    //   .order("created_at", { ascending: false })
+    //   .limit(1)
+    //   .single();
 
     if (!error && data) {
       console.log(`Found onboarding data in Supabase for user: ${userId}`);

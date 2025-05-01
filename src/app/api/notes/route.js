@@ -1,12 +1,23 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { PrismaClient } from "@prisma/client";
 import { createClient } from "@/utils/supabase/server";
-import { getUser } from "@/queries/user";
+import { ensureUserExists } from "../utils/userSync";
 
-// GET handler for retrieving user's notes
-export async function GET(request) {
+const prisma = new PrismaClient();
+
+// POST handler for creating a new note
+export async function POST(request) {
   try {
-    // Get authenticated user from Supabase - fix by properly awaiting createClient()
+    const { text, conversationId } = await request.json();
+
+    if (!text?.trim()) {
+      return NextResponse.json(
+        { error: "Note text is required" },
+        { status: 400 }
+      );
+    }
+
+    // Get authenticated user
     const supabase = await createClient();
     const {
       data: { user },
@@ -20,66 +31,58 @@ export async function GET(request) {
       );
     }
 
-    // Get notes from Prisma DB
-    const notes = await prisma.note.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: {
-        createdAt: "desc",
+    // Ensure user exists in our database
+    const dbUser = await ensureUserExists(user);
+
+    // Create note in database
+    const note = await prisma.note.create({
+      data: {
+        text,
+        userId: dbUser.id,
+        conversationId,
       },
     });
 
-    return NextResponse.json({ notes });
+    return NextResponse.json({ note });
   } catch (error) {
-    console.error("Error fetching notes:", error);
+    console.error("Error creating note:", error);
     return NextResponse.json(
-      { error: "Failed to fetch notes", message: error.message },
+      { error: "Failed to create note", message: error.message },
       { status: 500 }
     );
   }
 }
 
-// POST handler for creating a new note
-export async function POST(request) {
+// GET handler for retrieving notes
+export async function GET(request) {
   try {
-    const body = await request.json();
-    const { text } = body;
+    // Get authenticated user
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-    if (!text || typeof text !== "string") {
-      return NextResponse.json(
-        { error: "Note text is required" },
-        { status: 400 }
-      );
-    }
-
-    // Get authenticated user directly - getUser() already handles the await for createClient()
-    const user = await getUser();
-
-    if (!user) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: "Authentication required" },
         { status: 401 }
       );
     }
 
-    // Create note in database
-    const note = await prisma.note.create({
-      data: {
-        text,
-        userId: user.id,
-        conversationId: body.conversationId || null,
-      },
+    // Ensure user exists in our database
+    await ensureUserExists(user);
+
+    const notes = await prisma.note.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(
-      { message: "Note saved successfully", note },
-      { status: 201 }
-    );
+    return NextResponse.json({ notes });
   } catch (error) {
-    console.error("Error saving note:", error);
+    console.error("Error retrieving notes:", error);
     return NextResponse.json(
-      { error: "Failed to save note", message: error.message },
+      { error: "Failed to retrieve notes", message: error.message },
       { status: 500 }
     );
   }
@@ -98,7 +101,7 @@ export async function DELETE(request) {
       );
     }
 
-    // Get authenticated user - fix by properly awaiting createClient()
+    // Get authenticated user
     const supabase = await createClient();
     const {
       data: { user },
@@ -112,7 +115,10 @@ export async function DELETE(request) {
       );
     }
 
-    // First check if the note belongs to this user
+    // Ensure user exists in our database
+    await ensureUserExists(user);
+
+    // Find the note to delete
     const noteToDelete = await prisma.note.findUnique({
       where: { id: noteId },
     });
