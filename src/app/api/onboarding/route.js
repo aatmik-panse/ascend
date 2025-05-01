@@ -87,6 +87,34 @@ export async function POST(request) {
         userId = newUser.id;
         console.log(`Created new user with ID: ${userId}`);
       }
+
+      // Check if user already has onboarding data
+      if (userId) {
+        const existingOnboardingData = await prisma.onboardingData.findFirst({
+          where: {
+            OR: [
+              { userId },
+              { User: { id: userId } },
+              { User: { user_id: supabaseUser.id } },
+            ],
+          },
+        });
+
+        if (existingOnboardingData) {
+          console.log(
+            `User ${userId} already has onboarding data (ID: ${existingOnboardingData.id})`
+          );
+          return NextResponse.json(
+            {
+              error: "Onboarding data already exists for this user",
+              message:
+                "You have already completed onboarding. To update your profile, please use the profile edit feature.",
+              existingDataId: existingOnboardingData.id,
+            },
+            { status: 409 }
+          );
+        }
+      }
     }
 
     // Extract and log all fields that match our schema
@@ -237,7 +265,11 @@ export async function GET(request) {
       // Get data from Prisma - using the correct relation field
       let data = await prisma.onboardingData.findFirst({
         where: {
-          OR: [{ User: { id: userId } }, { User: { user_id: userId } }],
+          OR: [
+            { userId },
+            { User: { id: userId } },
+            { User: { user_id: userId } },
+          ],
         },
         orderBy: {
           createdAt: "desc",
