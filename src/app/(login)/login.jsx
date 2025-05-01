@@ -69,21 +69,21 @@ export function Login({ mode = "signin" }) {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-br from-blue-950 via-zinc-900 to-indigo-950 flex items-center justify-center px-4 py-10 sm:py-16">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-zinc-950 via-zinc-900 to-black flex items-center justify-center px-4 py-10 sm:py-16">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
-          className="absolute top-1/3 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full mix-blend-overlay blur-3xl animate-pulse"
+          className="absolute top-1/3 left-1/4 w-96 h-96 bg-white/5 rounded-full mix-blend-overlay blur-3xl animate-pulse"
           style={{ animationDuration: "15s" }}
         ></div>
         <div
-          className="absolute bottom-1/4 right-1/3 w-64 h-64 bg-indigo-600/10 rounded-full mix-blend-overlay blur-3xl animate-pulse"
+          className="absolute bottom-1/4 right-1/3 w-64 h-64 bg-zinc-700/5 rounded-full mix-blend-overlay blur-3xl animate-pulse"
           style={{ animationDuration: "10s" }}
         ></div>
         <div
-          className="absolute top-1/2 right-1/4 w-80 h-80 bg-purple-600/10 rounded-full mix-blend-overlay blur-3xl animate-pulse"
+          className="absolute top-1/2 right-1/4 w-80 h-80 bg-zinc-800/5 rounded-full mix-blend-overlay blur-3xl animate-pulse"
           style={{ animationDuration: "20s" }}
         ></div>
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.015] mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-[url('/noise.webp')] opacity-[0.015] mix-blend-overlay"></div>
       </div>
 
       <motion.div
@@ -94,27 +94,28 @@ export function Login({ mode = "signin" }) {
       >
         <div className="flex justify-center mb-6">
           <div className="relative w-16 h-16">
-            <div className="absolute inset-0 flex items-center justify-center rounded-2xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-black rounded-xl shadow-lg rotate-6"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
               <Image
                 src="/logo.png"
                 alt="Certcy Logo"
                 width={50}
                 height={50}
-                className="relative z-10 rounded-xl"
+                className="relative z-10 rounded-md"
               />
             </div>
           </div>
         </div>
 
-        <div className="relative bg-zinc-900/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-zinc-800/70 p-8 overflow-hidden">
-          <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 -mb-12 -ml-12 w-40 h-40 bg-gradient-to-br from-indigo-600/20 to-blue-600/20 rounded-full blur-3xl"></div>
+        <div className="relative bg-white border border-gray-200 shadow-md rounded-xl p-8 overflow-hidden">
+          <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-gradient-to-br from-gray-200/30 to-gray-100/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 -mb-12 -ml-12 w-40 h-40 bg-gradient-to-br from-gray-300/20 to-gray-200/20 rounded-full blur-3xl"></div>
 
           <motion.h1
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-3xl font-bold text-center text-white mb-1"
+            className="text-3xl font-bold text-center text-gray-800 mb-1"
           >
             {mode === "signin" ? "Welcome Back" : "Create Account"}
           </motion.h1>
@@ -122,7 +123,7 @@ export function Login({ mode = "signin" }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="text-sm text-center text-zinc-400 mb-8"
+            className="text-sm text-center text-gray-600 mb-8"
           >
             {mode === "signin"
               ? "Sign in to continue to your dashboard"
@@ -134,31 +135,31 @@ export function Login({ mode = "signin" }) {
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="p-6 text-center bg-emerald-900/30 border border-emerald-700/50 rounded-xl backdrop-blur-sm"
+                className="p-6 text-center bg-emerald-50 border border-emerald-200 rounded-xl"
               >
                 <div className="flex justify-center mb-4">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-emerald-400" />
+                  <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <Mail className="w-6 h-6 text-emerald-600" />
                   </div>
                 </div>
-                <h3 className="text-lg font-medium text-emerald-300">
+                <h3 className="text-lg font-medium text-emerald-800">
                   Check your email
                 </h3>
-                <p className="mt-2 text-sm text-emerald-200/80">
+                <p className="mt-2 text-sm text-emerald-600">
                   {magicLinkState?.success || signUpState?.success}
                 </p>
               </motion.div>
             ) : (
               <>
-                <div className="bg-zinc-800/70 rounded-xl p-1 shadow-inner">
+                <div className="bg-gray-100 rounded-xl p-1 shadow-inner">
                   <div className="grid grid-cols-2 gap-1">
                     <button
                       type="button"
                       onClick={() => setAuthMethod("password")}
                       className={`py-3 rounded-lg transition-all duration-300 ${
                         authMethod === "password"
-                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium shadow-lg shadow-blue-600/20"
-                          : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700/50"
+                          ? "bg-black text-white font-medium shadow-lg"
+                          : "text-gray-600 hover:text-gray-800 hover:bg-gray-200"
                       }`}
                     >
                       Password
@@ -168,8 +169,8 @@ export function Login({ mode = "signin" }) {
                       onClick={() => setAuthMethod("magic")}
                       className={`py-3 rounded-lg transition-all duration-300 ${
                         authMethod === "magic"
-                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium shadow-lg shadow-blue-600/20"
-                          : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700/50"
+                          ? "bg-black text-white font-medium shadow-lg"
+                          : "text-gray-600 hover:text-gray-800 hover:bg-gray-200"
                       }`}
                     >
                       Magic Link
@@ -191,7 +192,7 @@ export function Login({ mode = "signin" }) {
                       <div className="space-y-1">
                         <label
                           htmlFor="email"
-                          className="text-sm font-medium text-zinc-300"
+                          className="text-sm font-medium text-gray-700"
                         >
                           Email
                         </label>
@@ -202,23 +203,23 @@ export function Login({ mode = "signin" }) {
                             type="email"
                             placeholder="name@example.com"
                             required
-                            className="pl-11 h-12 bg-zinc-800/70 text-zinc-100 rounded-xl border border-zinc-700/80 shadow-inner transition-all duration-300 focus:border-blue-500/70 focus:ring-2 focus:ring-blue-500/30"
+                            className="pl-11 h-12 bg-white text-gray-800 rounded-xl border border-gray-300 shadow-inner transition-all duration-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-300"
                           />
-                          <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
+                          <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                         </div>
                       </div>
                       <div className="space-y-1">
                         <div className="flex justify-between">
                           <label
                             htmlFor="password"
-                            className="text-sm font-medium text-zinc-300"
+                            className="text-sm font-medium text-gray-700"
                           >
                             Password
                           </label>
                           {mode === "signin" && (
                             <Link
                               href="/forgot-password"
-                              className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
                             >
                               Forgot password?
                             </Link>
@@ -231,9 +232,9 @@ export function Login({ mode = "signin" }) {
                             type="password"
                             placeholder="••••••••"
                             required
-                            className="pl-11 h-12 bg-zinc-800/70 text-zinc-100 rounded-xl border border-zinc-700/80 shadow-inner transition-all duration-300 focus:border-blue-500/70 focus:ring-2 focus:ring-blue-500/30"
+                            className="pl-11 h-12 bg-white text-gray-800 rounded-xl border border-gray-300 shadow-inner transition-all duration-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-300"
                           />
-                          <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
+                          <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                         </div>
                       </div>
                       <input
@@ -243,7 +244,7 @@ export function Login({ mode = "signin" }) {
                       />
                       <button
                         type="submit"
-                        className="w-full h-12 font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl transition-all duration-300 hover:from-blue-500 hover:to-indigo-500 hover:shadow-lg hover:shadow-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:ring-offset-2 focus:ring-offset-zinc-900 flex items-center justify-center"
+                        className="w-full h-12 font-medium text-white bg-black rounded-xl transition-all duration-300 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-white flex items-center justify-center"
                       >
                         {mode === "signin" ? (
                           passwordPending ? (
@@ -268,7 +269,7 @@ export function Login({ mode = "signin" }) {
                       <div className="space-y-1">
                         <label
                           htmlFor="magic-email"
-                          className="text-sm font-medium text-zinc-300"
+                          className="text-sm font-medium text-gray-700"
                         >
                           Email
                         </label>
@@ -279,9 +280,9 @@ export function Login({ mode = "signin" }) {
                             type="email"
                             placeholder="name@example.com"
                             required
-                            className="pl-11 h-12 bg-zinc-800/70 text-zinc-100 rounded-xl border border-zinc-700/80 shadow-inner transition-all duration-300 focus:border-blue-500/70 focus:ring-2 focus:ring-blue-500/30"
+                            className="pl-11 h-12 bg-white text-gray-800 rounded-xl border border-gray-300 shadow-inner transition-all duration-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-300"
                           />
-                          <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
+                          <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                         </div>
                       </div>
                       <input
@@ -306,7 +307,7 @@ export function Login({ mode = "signin" }) {
                       />
                       <button
                         type="submit"
-                        className="w-full h-12 font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl transition-all duration-300 hover:from-blue-500 hover:to-indigo-500 hover:shadow-lg hover:shadow-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:ring-offset-2 focus:ring-offset-zinc-900 flex items-center justify-center"
+                        className="w-full h-12 font-medium text-white bg-black rounded-xl transition-all duration-300 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-white flex items-center justify-center"
                       >
                         {pending ? (
                           <Loader2 className="w-5 h-5 animate-spin" />
@@ -325,16 +326,16 @@ export function Login({ mode = "signin" }) {
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: 1 }}
                       transition={{ delay: 0.4, duration: 0.5 }}
-                      className="flex-1 h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent"
+                      className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"
                     ></motion.div>
-                    <div className="px-4 text-sm text-zinc-400">
+                    <div className="px-4 text-sm text-gray-500">
                       or continue with
                     </div>
                     <motion.div
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: 1 }}
                       transition={{ delay: 0.4, duration: 0.5 }}
-                      className="flex-1 h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent"
+                      className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"
                     ></motion.div>
                   </div>
 
@@ -343,7 +344,7 @@ export function Login({ mode = "signin" }) {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
                     onClick={handleGoogleSignIn}
-                    className="w-full h-12 font-medium text-zinc-200 bg-white/10 rounded-xl border border-zinc-700/70 backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:border-zinc-600/70 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:ring-offset-2 focus:ring-offset-zinc-900 flex items-center justify-center group"
+                    className="w-full h-12 font-medium text-gray-700 bg-white rounded-xl border border-gray-300 transition-all duration-300 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 flex items-center justify-center group"
                   >
                     {loading ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
@@ -384,10 +385,10 @@ export function Login({ mode = "signin" }) {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-6 p-4 rounded-xl bg-red-950/40 border border-red-800/40 backdrop-blur-sm"
+                className="mt-6 p-4 rounded-xl bg-red-50 border border-red-200"
               >
                 <div className="flex items-center">
-                  <div className="flex-shrink-0 text-red-400">
+                  <div className="flex-shrink-0 text-red-500">
                     <svg
                       width="20"
                       height="20"
@@ -404,7 +405,7 @@ export function Login({ mode = "signin" }) {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm text-red-300">
+                    <p className="text-sm text-red-600">
                       {magicLinkState?.error ||
                         passwordState?.error ||
                         signUpState?.error}
@@ -418,7 +419,7 @@ export function Login({ mode = "signin" }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="mt-8 text-sm text-center text-zinc-400"
+              className="mt-8 text-sm text-center text-gray-600"
             >
               {mode === "signin"
                 ? "New to our platform? "
@@ -427,7 +428,7 @@ export function Login({ mode = "signin" }) {
                 href={`${mode === "signin" ? "/sign-up" : "/sign-in"}${
                   redirect ? `?redirect=${redirect}` : ""
                 }${priceId ? `&priceId=${priceId}` : ""}`}
-                className="font-medium text-blue-400 hover:text-blue-300 transition-colors hover:underline underline-offset-2"
+                className="font-medium text-gray-800 hover:text-black transition-colors hover:underline underline-offset-2"
               >
                 {mode === "signin" ? "Create an account" : "Sign in"}
               </Link>
@@ -436,7 +437,7 @@ export function Login({ mode = "signin" }) {
         </div>
 
         {process.env.NODE_ENV === "development" && (
-          <div className="mt-4 text-xs text-zinc-500 text-center">
+          <div className="mt-4 text-xs text-gray-500 text-center">
             {callbackUrl ? `Using URL: ${callbackUrl}` : "URL not set yet"}
           </div>
         )}
