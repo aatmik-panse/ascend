@@ -378,7 +378,8 @@ const Counseling = () => {
                   Notification Set!
                 </p>
                 <p className="mt-1 text-sm text-gray-500">
-                  We'll let you know when mentor matching becomes available.
+                  We&apos;ll let you know when mentor matching becomes
+                  available.
                 </p>
               </div>
             </div>
@@ -483,7 +484,7 @@ const Counseling = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Suggest a Prompt</AlertDialogTitle>
             <AlertDialogDescription>
-              Suggest a topic or question you'd like to see in our prompt
+              Suggest a topic or question you&apos;d like to see in our prompt
               library
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -964,9 +965,9 @@ const Counseling = () => {
                 Mentor Matching Coming Soon
               </h2>
               <p className="text-gray-600 max-w-lg mb-8">
-                We're working on connecting you with industry professionals for
-                personalized career guidance. Get matched with mentors who've
-                walked the path you're pursuing.
+                We&apos;re working on connecting you with industry professionals
+                for personalized career guidance. Get matched with mentors
+                who&apos;ve walked the path you&apos;re pursuing.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl w-full mb-8">
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col items-center">

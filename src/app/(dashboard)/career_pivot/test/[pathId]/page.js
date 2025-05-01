@@ -191,7 +191,8 @@ const CareerPathTest = () => {
           <CardHeader>
             <CardTitle className="text-gray-900">Test Not Available</CardTitle>
             <CardDescription className="text-gray-600">
-              We couldn't prepare a test for this career path. Please try again.
+              We couldn&apos;t prepare a test for this career path. Please try
+              again.
             </CardDescription>
           </CardHeader>
           <CardFooter>

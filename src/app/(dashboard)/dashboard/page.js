@@ -13,20 +13,26 @@ const Dashboard = () => {
   const cardStyle =
     "rounded-xl border border-zinc-800/60 bg-gradient-to-b from-zinc-900/95 to-zinc-900/90 backdrop-blur-sm shadow-lg hover:shadow-xl hover:border-zinc-700/60 transition-all duration-300 p-6 overflow-hidden";
 
+  // Minimum height classes to prevent CLS (Cumulative Layout Shift)
+  const minHeightCard = "min-h-[320px]";
+  const minHeightFirstRow = "min-h-[360px]";
+
   return (
     <main className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto bg-zinc-950 text-zinc-100 rounded-2xl animate-fade-in">
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-        {/* First Row */}
-        <RecommendedPivots className={`${cardStyle} hover-scale`} />
+        {/* First Row - Keep consistent heights with minHeight classes */}
+        <RecommendedPivots
+          className={`${cardStyle} ${minHeightFirstRow} hover-scale`}
+        />
         <LayoffTracker
-          className={`${cardStyle} hover-scale md:col-span-1 lg:col-span-2`}
+          className={`${cardStyle} ${minHeightFirstRow} hover-scale md:col-span-1 lg:col-span-2`}
         />
 
-        {/* Second Row */}
-        <Shortcuts className={`${cardStyle} hover-scale`} />
+        {/* Second Row - Apply consistent min-height to all cards */}
+        <Shortcuts className={`${cardStyle} ${minHeightCard} hover-scale`} />
 
         {/* TodaysAction with Coming Soon overlay */}
-        <div className="relative">
+        <div className={`relative ${minHeightCard}`}>
           <div className="absolute inset-0 z-10 bg-zinc-900/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl border border-zinc-700">
             <Clock className="h-10 w-10 text-zinc-500 mb-3" />
             <h3 className="text-xl font-bold text-zinc-300">Coming Soon</h3>
@@ -35,12 +41,12 @@ const Dashboard = () => {
             </p>
           </div>
           <TodaysAction
-            className={`${cardStyle} filter blur-[2px] opacity-60`}
+            className={`${cardStyle} ${minHeightCard} filter blur-[2px] opacity-60`}
           />
         </div>
 
         {/* ProgressSummary with Coming Soon overlay */}
-        <div className="relative">
+        <div className={`relative ${minHeightCard}`}>
           <div className="absolute inset-0 z-10 bg-zinc-900/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl border border-zinc-700">
             <ChartBar className="h-10 w-10 text-zinc-500 mb-3" />
             <h3 className="text-xl font-bold text-zinc-300">Coming Soon</h3>
@@ -49,7 +55,7 @@ const Dashboard = () => {
             </p>
           </div>
           <ProgressSummary
-            className={`${cardStyle} filter blur-[2px] opacity-60`}
+            className={`${cardStyle} ${minHeightCard} filter blur-[2px] opacity-60`}
           />
         </div>
       </section>
