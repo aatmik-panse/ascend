@@ -117,87 +117,67 @@ export async function GET(req) {
   }
 }
 
-// Helper function to get onboarding data efficiently
+// Helper function to get onboarding data efficiently with caching
 async function getOnboardingData(userId) {
   try {
-    // 1. Simply try direct lookup first - most common case
+    // Use an in-memory cache for frequently requested data
+    const cacheKey = `onboarding-data-${userId}`;
+    const cachedData = global[cacheKey];
+
+    if (cachedData && Date.now() - cachedData.timestamp < 3600000) {
+      // 1 hour cache
+      console.log("Returning cached onboarding data");
+      return cachedData.data;
+    }
+
+    // Direct lookup - most efficient query
     console.log(`Attempting direct lookup with userId: ${userId}`);
     let data = await prisma.onboardingData.findFirst({
       where: { userId },
       orderBy: { createdAt: "desc" },
     });
 
-    // If found, return immediately
     if (data) {
       console.log("Onboarding data found via direct userId lookup");
+      // Cache the result
+      global[cacheKey] = { data, timestamp: Date.now() };
       return data;
     }
 
-    console.log("Direct lookup failed, trying alternative methods");
+    // If direct lookup fails, try a simplified email-based approach
+    console.log("Direct lookup failed, trying email-based approach");
+    try {
+      const supabase = await createClient();
+      const { data: userData } = await supabase.auth.getUser();
 
-    // 2. Try to find the user record first
-    const userRecord = await prisma.user.findFirst({
-      where: {
-        OR: [{ id: userId }, { user_id: userId }],
-      },
-      select: { id: true, email: true },
-    });
-
-    if (!userRecord) {
-      console.log("User record not found with ID or user_id");
-
-      // 3. Try to get the user's email from Supabase and use it for lookup
-      try {
-        const supabase = await createClient();
-        const { data: supabaseData } = await supabase.auth.getUser();
-        if (supabaseData?.user?.email) {
-          console.log(
-            `Found user email from Supabase: ${supabaseData.user.email}`
-          );
-
-          // Try to find user with this email
-          const userByEmail = await prisma.user.findFirst({
-            where: { email: supabaseData.user.email },
-            select: { id: true },
-          });
-
-          if (userByEmail) {
-            console.log(
-              `Found user in database by email with ID: ${userByEmail.id}`
-            );
-
-            // Try looking up onboarding data with this user ID
-            data = await prisma.onboardingData.findFirst({
-              where: { userId: userByEmail.id },
+      if (userData?.user?.email) {
+        // Find user by email and get their onboarding data in a single query
+        // This avoids multiple roundtrips to the database
+        const userWithData = await prisma.user.findFirst({
+          where: { email: userData.user.email },
+          select: {
+            id: true,
+            email: true,
+            onboardingData: {
               orderBy: { createdAt: "desc" },
-            });
+              take: 1,
+            },
+          },
+        });
 
-            if (data) {
-              console.log("Found onboarding data via email lookup");
-              return data;
-            }
-          }
+        if (userWithData?.onboardingData?.[0]) {
+          data = userWithData.onboardingData[0];
+          console.log(
+            `Found onboarding data via email lookup for user ${userWithData.email}`
+          );
+          // Cache the result
+          global[cacheKey] = { data, timestamp: Date.now() };
+          return data;
         }
-      } catch (supabaseError) {
-        console.error("Error fetching user from Supabase:", supabaseError);
       }
-
-      console.log("User not found in database by any method");
-      return null;
-    }
-
-    // 4. If we found the user, try to find their onboarding data
-    console.log(`Found user in database with ID: ${userRecord.id}`);
-
-    // Try lookup by user ID from database
-    data = await prisma.onboardingData.findFirst({
-      where: { userId: userRecord.id },
-      orderBy: { createdAt: "desc" },
-    });
-
-    if (data) {
-      console.log("Found onboarding data via user record ID");
-      return data;
+    } catch (error) {
+      console.error("Email lookup failed:", error.message);
+      // Continue with execution if this approach fails
     }
 
     console.log("No onboarding data found for this user");
