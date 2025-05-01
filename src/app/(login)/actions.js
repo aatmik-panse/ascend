@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import bcrypt from "bcrypt";
 import { getCallbackUrl } from "@/utils/getCallbackUrl";
+import prisma from "@/lib/prisma";
 
 const signInSchema = z.object({
   email: z.string().email().min(3).max(255),
@@ -36,24 +37,28 @@ export const signIn = validatedAction(signInSchema, async (data) => {
 
     console.log(`User signed in: ${signInData.user.email}`);
 
-    // Check if user exists in the users table
-    const { data: userData, error: userDataError } = await supabase
-      .from("users")
-      .select("*")
-      .eq("user_id", signInData.user.id)
-      .single();
+    // Check if user exists in Prisma database
+    let userRecord = await prisma.user.findFirst({
+      where: {
+        OR: [{ user_id: signInData.user.id }, { email: signInData.user.email }],
+      },
+    });
 
-    // If user doesn't exist in users table, create the profile
-    if (userDataError && userDataError.code === "PGRST116") {
+    // If user doesn't exist in Prisma, create the profile
+    if (!userRecord) {
       console.log(`Creating profile for user: ${signInData.user.id}`);
-      const { error: insertError } = await supabase.from("users").insert({
-        user_id: signInData.user.id,
-        email: signInData.user.email,
-        created_at: new Date().toISOString(),
-      });
-
-      if (insertError) {
-        console.error("Error creating user profile:", insertError);
+      try {
+        userRecord = await prisma.user.create({
+          data: {
+            user_id: signInData.user.id,
+            email: signInData.user.email,
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
+        });
+        console.log("User profile created in Prisma");
+      } catch (createError) {
+        console.error("Error creating user profile in Prisma:", createError);
         // Continue with redirect even if profile creation fails
       }
     }
@@ -109,28 +114,30 @@ export const signUp = validatedAction(signUpSchema, async (data) => {
       return { error: signUpError.message };
     }
 
-    // Check if user profile already exists
+    // Check if user profile already exists in Prisma
     console.log("Checking if user profile already exists");
-    const { data: existingProfile, error: profileError } = await supabase
-      .from("users")
-      .select("user_id")
-      .eq("email", email)
-      .single();
+    const existingProfile = await prisma.user.findUnique({
+      where: { email },
+    });
 
     const passwordHash = await hashPassword(password);
 
-    // Only create users entry if it doesn't exist
+    // Only create user entry if it doesn't exist
     if (signUpData?.user && !existingProfile) {
-      console.log("Creating user profile in database");
-      const { error: insertError } = await supabase.from("users").insert({
-        user_id: signUpData.user.id,
-        email: signUpData.user.email,
-        created_at: new Date().toISOString(),
-        passwordHash: passwordHash,
-      });
-
-      if (insertError) {
-        console.error("Error creating users entry:", insertError);
+      console.log("Creating user profile in Prisma database");
+      try {
+        await prisma.user.create({
+          data: {
+            user_id: signUpData.user.id,
+            email: signUpData.user.email,
+            created_at: new Date(),
+            updated_at: new Date(),
+            passwordHash: passwordHash,
+          },
+        });
+        console.log("User profile created in Prisma");
+      } catch (prismaError) {
+        console.error("Error creating user in Prisma:", prismaError);
       }
     }
 
