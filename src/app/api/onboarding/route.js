@@ -12,6 +12,7 @@ export async function POST(request) {
     // Get user from Supabase auth
     const authHeader = request.headers.get("Authorization");
     let supabaseUser = null;
+    let prismaUser = null;
 
     if (authHeader && authHeader.startsWith("Bearer ")) {
       const token = authHeader.substring(7);
@@ -19,6 +20,13 @@ export async function POST(request) {
 
       if (!error && data?.user) {
         supabaseUser = data.user;
+
+        // Now fetch user data from Prisma as well
+        prismaUser = await prisma.user.findFirst({
+          where: {
+            OR: [{ user_id: supabaseUser.id }, { email: supabaseUser.email }],
+          },
+        });
       }
     }
 
@@ -36,6 +44,12 @@ export async function POST(request) {
       supabaseUser
         ? `ID: ${supabaseUser.id}, Email: ${supabaseUser.email}`
         : "Not authenticated"
+    );
+    console.log(
+      "Prisma user:",
+      prismaUser
+        ? `ID: ${prismaUser.id}, Email: ${prismaUser.email}`
+        : "Not found in database"
     );
 
     // Validate required fields
@@ -282,22 +296,6 @@ export async function GET(request) {
       if (data) {
         console.log("Found onboarding data in Prisma");
         return NextResponse.json({ data });
-      }
-
-      // If not found in Prisma but we have a Supabase user, try Supabase
-      if (supabaseUser) {
-        const { data: supabaseData, error } = await supabase
-          .from("onboarding_data")
-          .select("*")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .single();
-
-        if (!error && supabaseData) {
-          console.log("Found onboarding data in Supabase");
-          return NextResponse.json({ data: supabaseData });
-        }
       }
 
       return NextResponse.json(

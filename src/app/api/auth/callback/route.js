@@ -76,11 +76,12 @@ export async function GET(request) {
       email: session.user.email,
     });
 
-    // Get the user data
+    // Get the authenticated user from Supabase Auth
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser();
+
     if (userError || !user) {
       authLogger("callback", "Error getting user", userError, "error");
       return NextResponse.redirect(
@@ -99,60 +100,65 @@ export async function GET(request) {
       user.user_metadata.full_name = displayName;
     }
 
-    // Check if user exists in the users table
-    const { data: existingProfile, error: profileError } = await supabase
-      .from("users")
-      .select("*")
-      .eq("user_id", user.id)
-      .single();
-    authLogger("callback", "User data fetched from Supabase", { user });
-
-    // Create user profile if it doesn't exist
-    if (!existingProfile) {
-      const { error: insertError } = await supabase.from("users").insert({
-        user_id: user.id,
-        email: user.email,
-        full_name: displayName,
-        avatar_url:
-          user.user_metadata?.avatar_url || user.user_metadata?.picture,
-        auth_provider: user.app_metadata?.provider || "email",
-        email_verified: user.email_confirmed_at ? true : false,
-        phone: user.phone || null,
-        created_at: user.created_at
-          ? new Date(user.created_at).toISOString()
-          : new Date().toISOString(),
-        provider_sub: user.user_metadata?.iss || null,
-        is_anonymous: user.is_anonymous || false,
-        role: user.role || "user",
-      });
-
-      await prisma.user.create({
-        data: {
-          user_id: user.id,
-          email: user.email,
-          full_name: user.user_metadata?.full_name || user.user_metadata?.name,
-          avatar_url:
-            user.user_metadata?.avatar_url || user.user_metadata?.picture,
-          auth_provider: user.app_metadata?.provider || "email",
-          email_verified: user.email_confirmed_at ? true : false,
-          phone: user.phone || null,
-          created_at: user.created_at
-            ? new Date(user.created_at).toISOString()
-            : new Date().toISOString(),
-          last_sign_in_at: user.last_sign_in_at
-            ? new Date(user.last_sign_in_at).toISOString()
-            : new Date().toISOString(),
-          updated_at: user.updated_at
-            ? new Date(user.updated_at).toISOString()
-            : new Date().toISOString(),
-          provider_id: user.user_metadata?.provider_id || null,
-          provider_sub: user.user_metadata?.sub || null,
-          is_anonymous: user.is_anonymous || false,
-          role: user.role || "user",
+    // Get complete user data from Prisma database
+    let userData = null;
+    try {
+      userData = await prisma.user.findFirst({
+        where: {
+          OR: [{ user_id: user.id }, { email: user.email }],
         },
       });
 
-      if (insertError) {
+      authLogger("callback", "User data fetched from database", {
+        prismaUserFound: !!userData,
+        prismaUserId: userData?.id,
+      });
+    } catch (dbError) {
+      authLogger(
+        "callback",
+        "Error fetching user data from database",
+        dbError,
+        "error"
+      );
+      // Continue with authentication flow even if we can't fetch user data
+    }
+
+    // Check if user exists in Prisma database
+    const existingProfile = userData; // Use the userData we fetched above
+
+    authLogger("callback", "User data checked in database", {
+      exists: !!existingProfile,
+      id: existingProfile?.id,
+    });
+
+    // Create user profile if it doesn't exist
+    if (!existingProfile) {
+      authLogger("callback", "Creating new user profile in database");
+
+      try {
+        // Create user in Prisma
+        await prisma.user.create({
+          data: {
+            user_id: user.id,
+            email: user.email,
+            full_name: displayName,
+            avatar_url:
+              user.user_metadata?.avatar_url || user.user_metadata?.picture,
+            auth_provider: user.app_metadata?.provider || "email",
+            email_verified: user.email_confirmed_at ? true : false,
+            phone: user.phone || null,
+            created_at: new Date(user.created_at || Date.now()),
+            last_sign_in_at: new Date(user.last_sign_in_at || Date.now()),
+            updated_at: new Date(),
+            provider_id: user.user_metadata?.provider_id || null,
+            provider_sub: user.user_metadata?.sub || null,
+            is_anonymous: user.is_anonymous || false,
+            role: user.role || "user",
+          },
+        });
+
+        authLogger("callback", "User profile created successfully");
+      } catch (insertError) {
         authLogger(
           "callback",
           "Error creating user profile",
