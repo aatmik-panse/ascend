@@ -198,7 +198,7 @@ const CareerPathTest = () => {
           <CardFooter>
             <Button
               onClick={handleBackToCareerPaths}
-              className="bg-black hover:bg-gray-800 text-white"
+              className="bg-black hover:bg-gray-800 text-white "
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Career Paths
