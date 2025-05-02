@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation"; // Add router import
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ const RecommendationCard = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showRoadmap, setShowRoadmap] = useState(false);
+  const router = useRouter();
 
   const handleRedirect = () => {
     if (recommendation.courseUrl && recommendation.courseUrl !== "#") {
@@ -36,7 +38,11 @@ const RecommendationCard = ({
   };
 
   const handleSelectRoadmap = async () => {
-    if (isSelected) return; // Already selected
+    if (isSelected) {
+      // If already selected, navigate directly to roadmap
+      router.push(`/roadmap/${testId}`);
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -60,6 +66,9 @@ const RecommendationCard = ({
 
       toast.success("Roadmap selected successfully!");
       onRoadmapSelect(index);
+
+      // Navigate to roadmap page after successful selection
+      router.push(`/roadmap/${testId}`);
     } catch (error) {
       console.error("Error selecting roadmap:", error);
       toast.error("Could not select this roadmap. Please try again.");
@@ -146,12 +155,12 @@ const RecommendationCard = ({
 
           {isSelected ? (
             <Button
-              disabled
-              className="flex-1 bg-green-600 text-white"
-              tabIndex="-1"
-              aria-label="Selected roadmap"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              onClick={handleSelectRoadmap}
+              tabIndex="0"
+              aria-label="View selected roadmap"
             >
-              <Check className="h-4 w-4 mr-1.5" /> Selected
+              <BookOpen className="h-4 w-4 mr-1.5" /> View
             </Button>
           ) : (
             <Button

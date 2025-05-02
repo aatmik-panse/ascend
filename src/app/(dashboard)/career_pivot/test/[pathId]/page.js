@@ -195,6 +195,16 @@ const CareerPathTest = () => {
     router.push("/career_pivot");
   };
 
+  const handleViewRoadmap = () => {
+    if (!test?.id) {
+      toast.error("Unable to access roadmap at this time");
+      return;
+    }
+
+    // Navigate to the roadmap page with test ID, not requiring a selection
+    router.push(`/roadmap/${test.id}`);
+  };
+
   if (loading) {
     return (
       <div className="p-8 flex justify-center items-center min-h-[60vh]">
@@ -371,7 +381,7 @@ const CareerPathTest = () => {
                   <BookOpen className="h-5 w-5 mr-2" />
                   Recommended Learning Resources
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   {results?.recommendations &&
                     test?.recommendations &&
                     test.recommendations.map((recommendation, index) => (
@@ -391,6 +401,21 @@ const CareerPathTest = () => {
                   test.recommendations.length === 0) && (
                   <div className="text-center p-8 bg-gray-50 rounded-lg border border-gray-200">
                     <p>No recommendations available for this career path.</p>
+                  </div>
+                )}
+
+                {/* Add View Roadmap button */}
+                {test?.recommendations && test.recommendations.length > 0 && (
+                  <div className="mt-8 flex justify-center">
+                    <Button
+                      onClick={handleViewRoadmap}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      tabIndex="0"
+                      aria-label="View your personalized learning roadmap"
+                    >
+                      <BookOpen className="h-5 w-5 mr-2" />
+                      View My Learning Roadmap
+                    </Button>
                   </div>
                 )}
               </div>

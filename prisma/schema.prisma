@@ -101,6 +101,24 @@ model CareerRecommendation {
   @@index([userId])
 }
 
+model LearningRoadmap {
+  id             String   @id @default(cuid())
+  userId         String
+  testId         String?
+  title          String
+  description    String?  @db.Text
+  weeks          Json[] // Array of week objects with learning activities
+  totalWeeks     Int      @default(8)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  completedSteps Json[]   @default([]) // Track user progress
+  careerPathId   String?
+
+  @@index([userId])
+  @@index([testId])
+  @@index([careerPathId])
+}
+
 model CareerPathTest {
   id                   String         @id @default(cuid())
   userId               String
