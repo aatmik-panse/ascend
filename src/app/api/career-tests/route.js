@@ -88,12 +88,15 @@ export async function POST(req) {
       Additionally, provide 3 learning resource recommendations for this career path, each with:
       - Title
       - Provider (platform/institution)
+      - Description (short description of what they'll learn)
       - Duration estimate
       - Difficulty level
+      - CourseURL (a URL where they can access this course, e.g. "https://www.coursera.org/course-name")
+      - RoadmapSteps (a short comma-separated list of 3-5 steps to master this skill area)
       
       Format the response as a valid JSON object with:
       1. A "questions" array with objects containing: "questionText", "options" (array of 4 strings), and "correctAnswer" (integer 0-3)
-      2. A "recommendations" array with objects containing: "title", "provider", "duration", and "level"
+      2. A "recommendations" array with objects containing: "title", "provider", "description", "duration", "level", "courseUrl", and "roadmapSteps"
     `;
 
     const completion = await openai.chat.completions.create({
@@ -158,9 +161,19 @@ export async function POST(req) {
       data: {
         userId: user.id,
         careerPathId: careerPathId,
-        recommendations: recommendations.map(
-          (rec) => `${rec.title} by ${rec.provider}`
-        ),
+        recommendations: recommendations.map((rec) => ({
+          title: rec.title,
+          provider: rec.provider,
+          description: rec.description || "",
+          duration: rec.duration,
+          level: rec.level,
+          courseUrl: rec.courseUrl || "#",
+          roadmapSteps: Array.isArray(rec.roadmapSteps)
+            ? rec.roadmapSteps
+            : typeof rec.roadmapSteps === "string"
+            ? rec.roadmapSteps.split(",").map((step) => step.trim())
+            : [],
+        })),
         questions: {
           create: questions.map((q, index) => ({
             questionText: q.questionText,

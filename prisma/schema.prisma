@@ -102,16 +102,17 @@ model CareerRecommendation {
 }
 
 model CareerPathTest {
-  id              String         @id @default(cuid())
-  userId          String
-  careerPathId    String
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  questions       TestQuestion[]
-  userResponses   TestResponse[]
-  completedAt     DateTime?
-  score           Int?
-  recommendations String[]
+  id                   String         @id @default(cuid())
+  userId               String
+  careerPathId         String
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  questions            TestQuestion[]
+  userResponses        TestResponse[]
+  completedAt          DateTime?
+  score                Int?
+  recommendations      Json[] // Changed from String[] to Json[] to store structured data
+  selectedRoadmapIndex Int? // Added to track the selected roadmap
 
   @@index([userId])
   @@index([careerPathId])

@@ -16,10 +16,12 @@ import {
   CheckCircle,
   Circle,
   Loader2,
+  BookOpen,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import RecommendationCard from "@/components/learning/RecommendationCard";
 
 const CareerPathTest = () => {
   const params = useParams();
@@ -34,6 +36,7 @@ const CareerPathTest = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [results, setResults] = useState(null);
+  const [selectedRoadmapIndex, setSelectedRoadmapIndex] = useState(0);
 
   useEffect(() => {
     const fetchTestData = async () => {
@@ -102,6 +105,27 @@ const CareerPathTest = () => {
 
     fetchTestData();
   }, [pathId]);
+
+  useEffect(() => {
+    if (results) {
+      // Fetch the selected roadmap index when results are available
+      const fetchSelectedRoadmap = async () => {
+        try {
+          const response = await fetch(
+            `/api/career-roadmaps?testId=${test.id}`
+          );
+          if (response.ok) {
+            const data = await response.json();
+            setSelectedRoadmapIndex(data.selectedRoadmapIndex || 0);
+          }
+        } catch (error) {
+          console.error("Error fetching selected roadmap:", error);
+        }
+      };
+
+      fetchSelectedRoadmap();
+    }
+  }, [results, test?.id]);
 
   const handleAnswerSelect = (questionId, answerIndex) => {
     setAnswers({
@@ -343,19 +367,32 @@ const CareerPathTest = () => {
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                  Recommended Resources
+                <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                  <BookOpen className="h-5 w-5 mr-2" />
+                  Recommended Learning Resources
                 </h3>
-                <div className="space-y-4">
-                  {results?.recommendations.map((resource, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-50 p-4 rounded-lg shadow-sm hover:bg-gray-100 transition-colors"
-                    >
-                      <h4 className="font-medium text-gray-900">{resource}</h4>
-                    </div>
-                  ))}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {results?.recommendations &&
+                    test?.recommendations &&
+                    test.recommendations.map((recommendation, index) => (
+                      <RecommendationCard
+                        key={index}
+                        recommendation={recommendation}
+                        index={index}
+                        testId={test.id}
+                        isSelected={index === selectedRoadmapIndex}
+                        onRoadmapSelect={setSelectedRoadmapIndex}
+                      />
+                    ))}
                 </div>
+
+                {(!results?.recommendations ||
+                  !test?.recommendations ||
+                  test.recommendations.length === 0) && (
+                  <div className="text-center p-8 bg-gray-50 rounded-lg border border-gray-200">
+                    <p>No recommendations available for this career path.</p>
+                  </div>
+                )}
               </div>
             </CardContent>
             <CardFooter>
