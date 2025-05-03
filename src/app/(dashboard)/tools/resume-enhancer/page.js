@@ -12,7 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
-  Upload,
   FileText,
   Zap,
   Check,
@@ -26,9 +25,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "motion/react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function ResumeEnhancer() {
   const router = useRouter();
@@ -37,9 +36,11 @@ export default function ResumeEnhancer() {
   const [resumeText, setResumeText] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [targetRole, setTargetRole] = useState("");
-  const [uploadMethod, setUploadMethod] = useState("paste");
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [fileUploaded, setFileUploaded] = useState(false);
+  const [progressValue, setProgressValue] = useState(0);
+  const [progressStage, setProgressStage] = useState(
+    "Initializing analysis..."
+  );
 
   // Common styling for consistency
   const cardStyle =
@@ -53,82 +54,83 @@ export default function ResumeEnhancer() {
     }
   };
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setResumeText(event.target.result);
-      setFileUploaded(true);
-    };
-    reader.readAsText(file);
-  };
-
-  const handlePaste = (e) => {
+  const handlePaste = () => {
     navigator.clipboard
       .readText()
       .then((text) => {
         setResumeText(text);
-        setFileUploaded(true);
       })
       .catch((err) => {
         console.error("Failed to read clipboard contents: ", err);
+        toast.error("Failed to access clipboard");
       });
+  };
+
+  const analyzeResume = async () => {
+    try {
+      setLoading(true);
+      setProgressValue(10);
+      setProgressStage("Preparing documents...");
+
+      // Simulate progress for better UX
+      const simulateProgress = () => {
+        setProgressValue((prev) => {
+          if (prev < 90) {
+            const increment = Math.floor(Math.random() * 15) + 5;
+            return Math.min(prev + increment, 90);
+          }
+          return prev;
+        });
+
+        const stages = [
+          "Extracting keywords...",
+          "Analyzing skills match...",
+          "Evaluating ATS compatibility...",
+          "Generating recommendations...",
+        ];
+
+        const stageIndex = Math.floor((progressValue / 90) * stages.length);
+        setProgressStage(stages[Math.min(stageIndex, stages.length - 1)]);
+      };
+
+      const progressInterval = setInterval(simulateProgress, 800);
+
+      // Call OpenAI API to analyze the resume
+      const response = await fetch("/api/analyze-resume", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          resumeText,
+          jobDescription,
+          targetRole,
+        }),
+      });
+
+      clearInterval(progressInterval);
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to analyze resume");
+      }
+
+      const data = await response.json();
+      setProgressValue(100);
+      setProgressStage("Analysis complete!");
+      setAnalysisResult(data);
+      setStep(4);
+    } catch (error) {
+      console.error("Resume analysis error:", error);
+      toast.error(
+        error.message || "Failed to analyze resume. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleContinue = () => {
     if (step === 3) {
-      setLoading(true);
-      // Simulate API call for resume analysis
-      setTimeout(() => {
-        setAnalysisResult({
-          score: 72,
-          matchPercentage: 68,
-          missingKeywords: [
-            "data pipeline",
-            "machine learning",
-            "cloud infrastructure",
-            "Python",
-            "SQL",
-          ],
-          suggestions: [
-            {
-              section: "Skills",
-              suggestion:
-                "Add specific technical skills like Python, SQL, and data pipeline experience which are mentioned in the job description.",
-            },
-            {
-              section: "Experience",
-              suggestion:
-                "Highlight your experience with machine learning models and cloud infrastructure more prominently.",
-            },
-            {
-              section: "Projects",
-              suggestion:
-                "Include quantifiable results from your data analysis projects.",
-            },
-          ],
-          keywords: {
-            present: ["data analysis", "visualization", "statistics", "Excel"],
-            missing: [
-              "data pipeline",
-              "machine learning",
-              "cloud infrastructure",
-              "Python",
-              "SQL",
-            ],
-          },
-          skillGaps: [
-            { skill: "Python programming", importance: "High" },
-            { skill: "SQL database queries", importance: "High" },
-            { skill: "Cloud infrastructure (AWS/Azure)", importance: "Medium" },
-            { skill: "Machine Learning", importance: "Medium" },
-          ],
-        });
-        setLoading(false);
-        setStep(4);
-      }, 3000);
+      analyzeResume();
     } else {
       setStep(step + 1);
     }
@@ -141,101 +143,53 @@ export default function ResumeEnhancer() {
           <Card className={cardStyle}>
             <CardHeader>
               <CardTitle className="text-xl text-white">
-                Upload Your Resume
+                Enter Your Resume
               </CardTitle>
               <CardDescription className="text-zinc-400">
-                We&apos;ll analyze your resume against your target job
-                description
+                We&apos;ll analyze your resume with OpenAI against your target
+                job description
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <Tabs
-                value={uploadMethod}
-                onValueChange={setUploadMethod}
-                className="w-full"
-              >
-                <TabsList className="grid w-full grid-cols-2 bg-zinc-800">
-                  <TabsTrigger
-                    value="paste"
-                    className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              <div className="space-y-4">
+                <Textarea
+                  placeholder="Paste your resume text here..."
+                  className="min-h-[300px] bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500"
+                  value={resumeText}
+                  onChange={(e) => {
+                    setResumeText(e.target.value);
+                  }}
+                  tabIndex="0"
+                  aria-label="Paste your resume text"
+                />
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={handlePaste}
+                    className="text-zinc-300 border-zinc-700 hover:bg-zinc-800 hover:text-white"
+                    tabIndex="0"
                   >
-                    Paste Text
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="upload"
-                    className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
-                  >
-                    Upload File
-                  </TabsTrigger>
-                </TabsList>
+                    <Clipboard className="h-4 w-4 mr-2" /> Paste from Clipboard
+                  </Button>
+                </div>
+              </div>
 
-                <TabsContent value="paste" className="pt-4">
-                  <div className="space-y-4">
-                    <Textarea
-                      placeholder="Paste your resume text here..."
-                      className="min-h-[300px] bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500"
-                      value={resumeText}
-                      onChange={(e) => {
-                        setResumeText(e.target.value);
-                        setFileUploaded(!!e.target.value);
-                      }}
-                      tabIndex="0"
-                      aria-label="Paste your resume text"
-                    />
-                    <div className="flex justify-end">
-                      <Button
-                        variant="outline"
-                        onClick={handlePaste}
-                        className="text-zinc-300 border-zinc-700 hover:bg-zinc-800 hover:text-white"
-                        tabIndex="0"
-                      >
-                        <Clipboard className="h-4 w-4 mr-2" /> Paste from
-                        Clipboard
-                      </Button>
-                    </div>
+              <div className="rounded-lg bg-blue-900/20 border border-blue-800/40 p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="h-5 w-5 text-blue-400 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-blue-400">
+                      AI-Powered Analysis
+                    </h4>
+                    <p className="text-sm text-zinc-300 mt-1">
+                      Our integration with OpenAI&apos;s language models will
+                      analyze your resume, identify key skills, and provide
+                      targeted recommendations for your specific job
+                      application.
+                    </p>
                   </div>
-                </TabsContent>
-
-                <TabsContent value="upload" className="pt-4">
-                  <div className="border-2 border-dashed border-zinc-700 rounded-lg p-10 text-center">
-                    <Input
-                      type="file"
-                      accept=".txt,.pdf,.docx,.doc"
-                      className="hidden"
-                      id="resume-file"
-                      onChange={handleFileUpload}
-                      tabIndex="-1"
-                      aria-label="Upload your resume file"
-                    />
-                    <Label
-                      htmlFor="resume-file"
-                      className="flex flex-col items-center justify-center gap-4 cursor-pointer"
-                      tabIndex="0"
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          document.getElementById("resume-file").click();
-                        }
-                      }}
-                    >
-                      <Upload className="h-10 w-10 text-blue-400" />
-                      <div className="space-y-2">
-                        <h3 className="font-medium text-white">
-                          Upload Resume
-                        </h3>
-                        <p className="text-zinc-400 text-sm">
-                          Drag & drop or click to browse (.pdf, .docx, .txt)
-                        </p>
-                      </div>
-                      {fileUploaded && (
-                        <Badge className="bg-blue-600/30 text-blue-300 border-blue-700/50">
-                          <Check className="h-3 w-3 mr-1" /> File uploaded
-                        </Badge>
-                      )}
-                    </Label>
-                  </div>
-                </TabsContent>
-              </Tabs>
+                </div>
+              </div>
             </CardContent>
             <CardFooter className="border-t border-zinc-800/50 pt-4 flex justify-between">
               <Button
@@ -255,14 +209,14 @@ export default function ResumeEnhancer() {
               </Button>
               <Button
                 onClick={handleContinue}
-                disabled={!fileUploaded}
+                disabled={!resumeText.trim()}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
                 tabIndex="0"
                 aria-label="Continue to next step"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    if (fileUploaded) handleContinue();
+                    if (resumeText.trim()) handleContinue();
                   }
                 }}
               >
@@ -323,16 +277,17 @@ export default function ResumeEnhancer() {
                         Why this matters
                       </h4>
                       <p className="text-sm text-zinc-300 mt-1">
-                        Pasting the actual job description helps our AI identify
-                        specific keywords, skills, and requirements to tailor
-                        your resume for better matching and applicant tracking
-                        system (ATS) optimization.
+                        OpenAI&apos;s algorithms will identify specific
+                        keywords, skills, and requirements from the job
+                        description to tailor your resume for better matching
+                        and applicant tracking system (ATS) optimization.
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
             </CardContent>
+
             <CardFooter className="border-t border-zinc-800/50 pt-4 flex justify-between">
               <Button
                 variant="ghost"
@@ -442,7 +397,7 @@ export default function ResumeEnhancer() {
                         What happens next?
                       </h4>
                       <p className="text-sm text-zinc-300 mt-1">
-                        Our AI will analyze your resume against the job
+                        Our model will analyze your resume against the job
                         description to identify gaps, suggest improvements, and
                         optimize for ATS compatibility.
                       </p>
@@ -509,7 +464,7 @@ export default function ResumeEnhancer() {
                   </div>
                   <div className="w-20 h-20 rounded-full flex items-center justify-center bg-blue-600/20 border-4 border-blue-600">
                     <span className="text-2xl font-bold text-white">
-                      {analysisResult.score}%
+                      {analysisResult?.score || 0}%
                     </span>
                   </div>
                 </div>
@@ -519,13 +474,15 @@ export default function ResumeEnhancer() {
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-medium text-white">Job Match</h3>
                     <Badge className="bg-blue-600/30 text-blue-300 border-blue-700/50">
-                      {analysisResult.matchPercentage}%
+                      {analysisResult?.matchPercentage || 0}%
                     </Badge>
                   </div>
                   <div className="h-2 w-full bg-zinc-800 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-blue-500 rounded-full"
-                      style={{ width: `${analysisResult.matchPercentage}%` }}
+                      style={{
+                        width: `${analysisResult?.matchPercentage || 0}%`,
+                      }}
                     ></div>
                   </div>
                   <p className="text-xs text-zinc-500 mt-1">
@@ -541,14 +498,20 @@ export default function ResumeEnhancer() {
                       Missing Keywords
                     </h4>
                     <div className="flex flex-wrap gap-2">
-                      {analysisResult.missingKeywords.map((keyword, index) => (
-                        <Badge
-                          key={index}
-                          className="bg-red-900/30 text-red-300 border-red-800/50"
-                        >
-                          {keyword}
-                        </Badge>
-                      ))}
+                      {analysisResult?.missingKeywords?.map(
+                        (keyword, index) => (
+                          <Badge
+                            key={index}
+                            className="bg-red-900/30 text-red-300 border-red-800/50"
+                          >
+                            {keyword}
+                          </Badge>
+                        )
+                      ) || (
+                        <p className="text-zinc-400">
+                          No missing keywords found
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -557,14 +520,18 @@ export default function ResumeEnhancer() {
                       Present Keywords
                     </h4>
                     <div className="flex flex-wrap gap-2">
-                      {analysisResult.keywords.present.map((keyword, index) => (
-                        <Badge
-                          key={index}
-                          className="bg-green-900/30 text-green-300 border-green-800/50"
-                        >
-                          {keyword}
-                        </Badge>
-                      ))}
+                      {analysisResult?.keywords?.present?.map(
+                        (keyword, index) => (
+                          <Badge
+                            key={index}
+                            className="bg-green-900/30 text-green-300 border-green-800/50"
+                          >
+                            {keyword}
+                          </Badge>
+                        )
+                      ) || (
+                        <p className="text-zinc-400">No keywords detected</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -582,23 +549,34 @@ export default function ResumeEnhancer() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  {analysisResult.suggestions.map((suggestion, index) => (
-                    <div key={index} className="rounded-lg bg-zinc-800/80 p-4">
-                      <div className="flex items-start gap-3">
-                        <div className="bg-blue-900/30 text-blue-400 p-1.5 rounded">
-                          <FileText className="h-4 w-4" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-white">
-                            {suggestion.section}
-                          </h4>
-                          <p className="text-zinc-300 text-sm mt-1">
-                            {suggestion.suggestion}
-                          </p>
+                  {analysisResult?.suggestions?.length > 0 ? (
+                    analysisResult.suggestions.map((suggestion, index) => (
+                      <div
+                        key={index}
+                        className="rounded-lg bg-zinc-800/80 p-4"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="bg-blue-900/30 text-blue-400 p-1.5 rounded">
+                            <FileText className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-white">
+                              {suggestion.section}
+                            </h4>
+                            <p className="text-zinc-300 text-sm mt-1">
+                              {suggestion.suggestion}
+                            </p>
+                          </div>
                         </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="rounded-lg bg-zinc-800/80 p-4">
+                      <p className="text-zinc-300">
+                        No specific suggestions available.
+                      </p>
                     </div>
-                  ))}
+                  )}
                 </div>
 
                 <div className="space-y-3">
@@ -606,24 +584,34 @@ export default function ResumeEnhancer() {
                     Skills to Add or Emphasize
                   </h3>
                   <div className="space-y-2">
-                    {analysisResult.skillGaps.map((skill, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-2 border-b border-zinc-800 last:border-0"
-                      >
-                        <span className="text-zinc-300">{skill.skill}</span>
-                        <Badge
-                          className={cn(
-                            "border-none font-medium",
-                            skill.importance === "High"
-                              ? "bg-red-900/30 text-red-300"
-                              : "bg-yellow-900/30 text-yellow-300"
-                          )}
+                    {analysisResult?.skillGaps?.length > 0 ? (
+                      analysisResult.skillGaps.map((skill, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-2 border-b border-zinc-800 last:border-0"
                         >
-                          {skill.importance}
-                        </Badge>
+                          <span className="text-zinc-300">{skill.skill}</span>
+                          <Badge
+                            className={cn(
+                              "border-none font-medium",
+                              skill.importance === "High"
+                                ? "bg-red-900/30 text-red-300"
+                                : skill.importance === "Medium"
+                                ? "bg-yellow-900/30 text-yellow-300"
+                                : "bg-blue-900/30 text-blue-300"
+                            )}
+                          >
+                            {skill.importance}
+                          </Badge>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-2">
+                        <p className="text-zinc-300">
+                          No skill gaps identified.
+                        </p>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
 
@@ -689,7 +677,7 @@ export default function ResumeEnhancer() {
         <Card className={cardStyle}>
           <CardHeader>
             <CardTitle className="text-xl text-white">
-              Analyzing Your Resume
+              Analyzing Your Resume with OpenAI
             </CardTitle>
             <CardDescription className="text-zinc-400">
               Our AI is comparing your resume against the job description
@@ -702,7 +690,7 @@ export default function ResumeEnhancer() {
                 <Zap className="h-6 w-6 text-blue-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
               </div>
               <div className="text-center">
-                <h3 className="text-white font-medium">Processing...</h3>
+                <h3 className="text-white font-medium">{progressStage}</h3>
                 <p className="text-zinc-400 text-sm mt-2">
                   This may take a few moments
                 </p>
@@ -710,7 +698,7 @@ export default function ResumeEnhancer() {
 
               <div className="w-full max-w-xs space-y-2">
                 <Progress
-                  value={loading ? 45 : 0}
+                  value={progressValue}
                   className="h-1 bg-zinc-800 w-full"
                 />
                 <div className="flex justify-between text-xs text-zinc-500">
@@ -756,10 +744,12 @@ export default function ResumeEnhancer() {
               <span className="text-zinc-400">Tools</span>
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white">Resume Enhancer</h1>
+          <h1 className="text-3xl font-bold text-white">
+            OpenAI Resume Enhancer
+          </h1>
           <p className="text-zinc-400 mt-2">
-            Optimize your resume for your target role and improve your chances
-            of getting interviews
+            AI-powered resume optimization with GPT-4.1-mini to improve your
+            chances of getting interviews
           </p>
         </div>
 
@@ -779,7 +769,7 @@ export default function ResumeEnhancer() {
               >
                 {step > 1 ? <Check className="h-4 w-4" /> : "1"}
               </div>
-              <span className="ml-2 text-sm font-medium">Upload</span>
+              <span className="ml-2 text-sm font-medium">Resume</span>
             </div>
 
             <div
