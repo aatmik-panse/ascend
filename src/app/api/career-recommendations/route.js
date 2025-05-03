@@ -9,7 +9,7 @@ const openai = new OpenAI({
 });
 
 // Define constants
-const OPENAI_TIMEOUT = 20000; // 20 seconds timeout for OpenAI API calls
+const OPENAI_TIMEOUT = 30000; // 30 seconds timeout for OpenAI API calls
 const RECOMMENDATION_CACHE_KEY = "career-recommendations-";
 
 export async function GET(req) {

@@ -203,11 +203,13 @@ function FinalCta() {
           >
             {/* <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg blur-md opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div> */}
             <button
-              onClick={redirectToWaitlist}
+              onClick={() => {
+                router.push("/sign-up");
+              }}
               className="relative px-8 py-4 bg-white rounded-lg font-medium text-lg text-blue-500 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center space-x-2"
             >
               <span className={`text-blue-500 ${kaushan_script.className}`}>
-                Get Early Access
+                Get Started
               </span>
               <ArrowRight className="ml-2 w-5 h-5" />
             </button>

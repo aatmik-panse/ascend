@@ -97,7 +97,7 @@ You are a professional career counselor specializing in ${instructions.expertise
 
         return await openaiService.createChatCompletion(messages, {
           temperature: 0.6, // Slightly lower temperature for more reliable advice
-          max_tokens: 1500, // Higher token limit for comprehensive guidance
+          max_tokens: 1600, // Higher token limit for comprehensive guidance
         });
       },
     };

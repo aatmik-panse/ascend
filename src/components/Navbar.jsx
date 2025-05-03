@@ -92,11 +92,11 @@ export function NewNavbar() {
               ) : (
                 <NavbarButton
                   variant="primary"
-                  onClick={() => handleNavigation("/waitlist")}
+                  onClick={() => handleNavigation("/sign-up")}
                   aria-label="Get started"
                   tabIndex="0"
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") handleNavigation("/waitlist");
+                    if (e.key === "Enter") handleNavigation("/sign-up");
                   }}
                 >
                   Get Started
@@ -141,7 +141,7 @@ export function NewNavbar() {
                   </NavbarButton>
                 ) : (
                   <NavbarButton
-                    onClick={() => handleNavigation("/waitlist")}
+                    onClick={() => handleNavigation("/sign-up")}
                     variant="primary"
                     className="w-full"
                   >

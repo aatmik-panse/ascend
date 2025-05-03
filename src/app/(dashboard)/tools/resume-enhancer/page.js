@@ -146,8 +146,8 @@ export default function ResumeEnhancer() {
                 Enter Your Resume
               </CardTitle>
               <CardDescription className="text-gray-600">
-                We'll analyze your resume with OpenAI against your target job
-                description
+                We&apos;ll analyze your resume with OpenAI against your target
+                job description
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -182,9 +182,9 @@ export default function ResumeEnhancer() {
                       AI-Powered Analysis
                     </h4>
                     <p className="text-sm text-blue-700 mt-1">
-                      Our integration with OpenAI's language models will analyze
-                      your resume, identify key skills, and provide targeted
-                      recommendations for your specific job application.
+                      Our advanced language models will analyze your resume,
+                      identify key skills, and provide targeted recommendations
+                      for your specific job application.
                     </p>
                   </div>
                 </div>
@@ -233,7 +233,7 @@ export default function ResumeEnhancer() {
                 Target Role Information
               </CardTitle>
               <CardDescription className="text-gray-600">
-                Tell us about the job you're applying for
+                Tell us about the job you&apos;re applying for
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -276,10 +276,10 @@ export default function ResumeEnhancer() {
                         Why this matters
                       </h4>
                       <p className="text-sm text-blue-700 mt-1">
-                        OpenAI's algorithms will identify specific keywords,
-                        skills, and requirements from the job description to
-                        tailor your resume for better matching and applicant
-                        tracking system (ATS) optimization.
+                        Our state-of-the-art language algorithms will identify
+                        specific keywords, skills, and requirements from the job
+                        description to tailor your resume for better matching
+                        and applicant tracking system (ATS) optimization.
                       </p>
                     </div>
                   </div>
