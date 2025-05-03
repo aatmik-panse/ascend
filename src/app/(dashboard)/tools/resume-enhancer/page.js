@@ -146,7 +146,7 @@ export default function ResumeEnhancer() {
                 Enter Your Resume
               </CardTitle>
               <CardDescription className="text-gray-600">
-                We&apos;ll analyze your resume with OpenAI against your target
+                We&apos;ll analyze your resume with Our AI against your target
                 job description
               </CardDescription>
             </CardHeader>
@@ -678,7 +678,7 @@ export default function ResumeEnhancer() {
         <Card className="bg-white border border-gray-200 shadow-sm rounded-md overflow-hidden">
           <CardHeader>
             <CardTitle className="text-xl text-gray-900">
-              Analyzing Your Resume with OpenAI
+              Analyzing Your Resume with Advance AI
             </CardTitle>
             <CardDescription className="text-gray-600">
               Our AI is comparing your resume against the job description
@@ -746,7 +746,7 @@ export default function ResumeEnhancer() {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900">
-            OpenAI Resume Enhancer
+            Advance AI Resume Enhancer
           </h1>
           <p className="text-gray-600 mt-2">
             AI-powered resume optimization with GPT-4.1-mini to improve your
