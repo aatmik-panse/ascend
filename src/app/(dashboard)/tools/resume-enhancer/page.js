@@ -42,9 +42,9 @@ export default function ResumeEnhancer() {
     "Initializing analysis..."
   );
 
-  // Common styling for consistency
+  // Updated styling for consistency with other pages
   const cardStyle =
-    "bg-gradient-to-b from-zinc-900/95 to-zinc-900/90 border-zinc-800/60 text-white hover:shadow-lg transition-all duration-300";
+    "bg-white border border-gray-200 shadow-sm rounded-md overflow-hidden";
 
   const handleBack = () => {
     if (step > 1) {
@@ -142,19 +142,19 @@ export default function ResumeEnhancer() {
         return (
           <Card className={cardStyle}>
             <CardHeader>
-              <CardTitle className="text-xl text-white">
+              <CardTitle className="text-xl text-gray-900">
                 Enter Your Resume
               </CardTitle>
-              <CardDescription className="text-zinc-400">
-                We&apos;ll analyze your resume with OpenAI against your target
-                job description
+              <CardDescription className="text-gray-600">
+                We'll analyze your resume with OpenAI against your target job
+                description
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <Textarea
                   placeholder="Paste your resume text here..."
-                  className="min-h-[300px] bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500"
+                  className="min-h-[300px] border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-blue-500"
                   value={resumeText}
                   onChange={(e) => {
                     setResumeText(e.target.value);
@@ -166,7 +166,7 @@ export default function ResumeEnhancer() {
                   <Button
                     variant="outline"
                     onClick={handlePaste}
-                    className="text-zinc-300 border-zinc-700 hover:bg-zinc-800 hover:text-white"
+                    className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                     tabIndex="0"
                   >
                     <Clipboard className="h-4 w-4 mr-2" /> Paste from Clipboard
@@ -174,28 +174,27 @@ export default function ResumeEnhancer() {
                 </div>
               </div>
 
-              <div className="rounded-lg bg-blue-900/20 border border-blue-800/40 p-4">
+              <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="h-5 w-5 text-blue-400 mt-0.5" />
+                  <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
                   <div>
-                    <h4 className="font-medium text-blue-400">
+                    <h4 className="font-medium text-blue-800">
                       AI-Powered Analysis
                     </h4>
-                    <p className="text-sm text-zinc-300 mt-1">
-                      Our integration with OpenAI&apos;s language models will
-                      analyze your resume, identify key skills, and provide
-                      targeted recommendations for your specific job
-                      application.
+                    <p className="text-sm text-blue-700 mt-1">
+                      Our integration with OpenAI's language models will analyze
+                      your resume, identify key skills, and provide targeted
+                      recommendations for your specific job application.
                     </p>
                   </div>
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="border-t border-zinc-800/50 pt-4 flex justify-between">
+            <CardFooter className="border-t border-gray-200 pt-4 flex justify-between">
               <Button
                 variant="ghost"
                 onClick={handleBack}
-                className="text-zinc-400 hover:text-white"
+                className="text-gray-700 hover:text-gray-900"
                 tabIndex="0"
                 aria-label="Go back to tools page"
                 onKeyDown={(e) => {
@@ -230,23 +229,23 @@ export default function ResumeEnhancer() {
         return (
           <Card className={cardStyle}>
             <CardHeader>
-              <CardTitle className="text-xl text-white">
+              <CardTitle className="text-xl text-gray-900">
                 Target Role Information
               </CardTitle>
-              <CardDescription className="text-zinc-400">
-                Tell us about the job you&apos;re applying for
+              <CardDescription className="text-gray-600">
+                Tell us about the job you're applying for
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="targetRole" className="text-white">
+                  <Label htmlFor="targetRole" className="text-gray-800">
                     Target Role/Position
                   </Label>
                   <Input
                     id="targetRole"
                     placeholder="e.g. Data Analyst, Product Manager, UX Designer"
-                    className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500"
+                    className="border-gray-300 text-gray-900 placeholder:text-gray-500"
                     value={targetRole}
                     onChange={(e) => setTargetRole(e.target.value)}
                     tabIndex="0"
@@ -255,13 +254,13 @@ export default function ResumeEnhancer() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="jobDescription" className="text-white">
+                  <Label htmlFor="jobDescription" className="text-gray-800">
                     Job Description
                   </Label>
                   <Textarea
                     id="jobDescription"
                     placeholder="Paste the job description here..."
-                    className="min-h-[250px] bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500"
+                    className="min-h-[250px] border-gray-300 text-gray-900 placeholder:text-gray-500"
                     value={jobDescription}
                     onChange={(e) => setJobDescription(e.target.value)}
                     tabIndex="0"
@@ -269,18 +268,18 @@ export default function ResumeEnhancer() {
                   />
                 </div>
 
-                <div className="rounded-lg bg-blue-900/20 border border-blue-800/40 p-4">
+                <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-blue-400 mt-0.5" />
+                    <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-blue-400">
+                      <h4 className="font-medium text-blue-800">
                         Why this matters
                       </h4>
-                      <p className="text-sm text-zinc-300 mt-1">
-                        OpenAI&apos;s algorithms will identify specific
-                        keywords, skills, and requirements from the job
-                        description to tailor your resume for better matching
-                        and applicant tracking system (ATS) optimization.
+                      <p className="text-sm text-blue-700 mt-1">
+                        OpenAI's algorithms will identify specific keywords,
+                        skills, and requirements from the job description to
+                        tailor your resume for better matching and applicant
+                        tracking system (ATS) optimization.
                       </p>
                     </div>
                   </div>
@@ -288,11 +287,11 @@ export default function ResumeEnhancer() {
               </div>
             </CardContent>
 
-            <CardFooter className="border-t border-zinc-800/50 pt-4 flex justify-between">
+            <CardFooter className="border-t border-gray-200 pt-4 flex justify-between">
               <Button
                 variant="ghost"
                 onClick={handleBack}
-                className="text-zinc-400 hover:text-white"
+                className="text-gray-700 hover:text-gray-900"
                 tabIndex="0"
                 aria-label="Go back to previous step"
                 onKeyDown={(e) => {
@@ -327,30 +326,32 @@ export default function ResumeEnhancer() {
         return (
           <Card className={cardStyle}>
             <CardHeader>
-              <CardTitle className="text-xl text-white">
+              <CardTitle className="text-xl text-gray-900">
                 Review and Confirm
               </CardTitle>
-              <CardDescription className="text-zinc-400">
+              <CardDescription className="text-gray-600">
                 Please confirm the information below before analysis
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                <div className="rounded-lg bg-zinc-800/80 p-4">
-                  <h3 className="font-medium text-white mb-2">Target Role</h3>
-                  <p className="text-zinc-300">{targetRole}</p>
+                <div className="rounded-lg bg-gray-50 p-4 border border-gray-200">
+                  <h3 className="font-medium text-gray-900 mb-2">
+                    Target Role
+                  </h3>
+                  <p className="text-gray-800">{targetRole}</p>
                 </div>
 
-                <div className="rounded-lg bg-zinc-800/80 p-4">
-                  <h3 className="font-medium text-white mb-2">
+                <div className="rounded-lg bg-gray-50 p-4 border border-gray-200">
+                  <h3 className="font-medium text-gray-900 mb-2">
                     Resume Preview
                   </h3>
-                  <p className="text-zinc-300 text-sm line-clamp-4">
+                  <p className="text-gray-800 text-sm line-clamp-4">
                     {resumeText}
                   </p>
                   <Button
                     variant="link"
-                    className="text-blue-400 p-0 h-auto mt-2"
+                    className="text-blue-600 p-0 h-auto mt-2"
                     onClick={() => setStep(1)}
                     tabIndex="0"
                     aria-label="Edit resume"
@@ -365,16 +366,16 @@ export default function ResumeEnhancer() {
                   </Button>
                 </div>
 
-                <div className="rounded-lg bg-zinc-800/80 p-4">
-                  <h3 className="font-medium text-white mb-2">
+                <div className="rounded-lg bg-gray-50 p-4 border border-gray-200">
+                  <h3 className="font-medium text-gray-900 mb-2">
                     Job Description Preview
                   </h3>
-                  <p className="text-zinc-300 text-sm line-clamp-4">
+                  <p className="text-gray-800 text-sm line-clamp-4">
                     {jobDescription}
                   </p>
                   <Button
                     variant="link"
-                    className="text-blue-400 p-0 h-auto mt-2"
+                    className="text-blue-600 p-0 h-auto mt-2"
                     onClick={() => setStep(2)}
                     tabIndex="0"
                     aria-label="Edit job description"
@@ -389,14 +390,14 @@ export default function ResumeEnhancer() {
                   </Button>
                 </div>
 
-                <div className="rounded-lg bg-blue-900/20 border border-blue-800/40 p-4">
+                <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-blue-400 mt-0.5" />
+                    <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-blue-400">
+                      <h4 className="font-medium text-blue-800">
                         What happens next?
                       </h4>
-                      <p className="text-sm text-zinc-300 mt-1">
+                      <p className="text-sm text-blue-700 mt-1">
                         Our model will analyze your resume against the job
                         description to identify gaps, suggest improvements, and
                         optimize for ATS compatibility.
@@ -406,11 +407,11 @@ export default function ResumeEnhancer() {
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="border-t border-zinc-800/50 pt-4 flex justify-between">
+            <CardFooter className="border-t border-gray-200 pt-4 flex justify-between">
               <Button
                 variant="ghost"
                 onClick={handleBack}
-                className="text-zinc-400 hover:text-white"
+                className="text-gray-700 hover:text-gray-900"
                 tabIndex="0"
                 aria-label="Go back to previous step"
                 onKeyDown={(e) => {
@@ -455,15 +456,15 @@ export default function ResumeEnhancer() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl text-white">
+                    <CardTitle className="text-xl text-gray-900">
                       Analysis Results
                     </CardTitle>
-                    <CardDescription className="text-zinc-400">
+                    <CardDescription className="text-gray-600">
                       Resume analysis for {targetRole}
                     </CardDescription>
                   </div>
-                  <div className="w-20 h-20 rounded-full flex items-center justify-center bg-blue-600/20 border-4 border-blue-600">
-                    <span className="text-2xl font-bold text-white">
+                  <div className="w-24 h-24 rounded-full flex items-center justify-center bg-blue-100 border-4 border-blue-500">
+                    <span className="text-2xl font-bold text-blue-700">
                       {analysisResult?.score || 0}%
                     </span>
                   </div>
@@ -472,12 +473,12 @@ export default function ResumeEnhancer() {
               <CardContent className="space-y-6">
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-medium text-white">Job Match</h3>
-                    <Badge className="bg-blue-600/30 text-blue-300 border-blue-700/50">
+                    <h3 className="font-medium text-gray-900">Job Match</h3>
+                    <Badge className="bg-blue-100 text-blue-700 border border-blue-200">
                       {analysisResult?.matchPercentage || 0}%
                     </Badge>
                   </div>
-                  <div className="h-2 w-full bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-blue-500 rounded-full"
                       style={{
@@ -485,16 +486,16 @@ export default function ResumeEnhancer() {
                       }}
                     ></div>
                   </div>
-                  <p className="text-xs text-zinc-500 mt-1">
+                  <p className="text-xs text-gray-500 mt-1">
                     How well your resume matches the job requirements
                   </p>
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="font-medium text-white">Key Findings</h3>
+                  <h3 className="font-medium text-gray-900">Key Findings</h3>
 
-                  <div className="rounded-lg bg-zinc-800/80 p-4">
-                    <h4 className="font-medium text-zinc-300 mb-3">
+                  <div className="rounded-lg bg-gray-50 p-4 border border-gray-200">
+                    <h4 className="font-medium text-gray-800 mb-3">
                       Missing Keywords
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -502,21 +503,21 @@ export default function ResumeEnhancer() {
                         (keyword, index) => (
                           <Badge
                             key={index}
-                            className="bg-red-900/30 text-red-300 border-red-800/50"
+                            className="bg-red-100 text-red-700 border border-red-200"
                           >
                             {keyword}
                           </Badge>
                         )
                       ) || (
-                        <p className="text-zinc-400">
+                        <p className="text-gray-600">
                           No missing keywords found
                         </p>
                       )}
                     </div>
                   </div>
 
-                  <div className="rounded-lg bg-zinc-800/80 p-4">
-                    <h4 className="font-medium text-zinc-300 mb-3">
+                  <div className="rounded-lg bg-gray-50 p-4 border border-gray-200">
+                    <h4 className="font-medium text-gray-800 mb-3">
                       Present Keywords
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -524,13 +525,13 @@ export default function ResumeEnhancer() {
                         (keyword, index) => (
                           <Badge
                             key={index}
-                            className="bg-green-900/30 text-green-300 border-green-800/50"
+                            className="bg-green-100 text-green-700 border border-green-200"
                           >
                             {keyword}
                           </Badge>
                         )
                       ) || (
-                        <p className="text-zinc-400">No keywords detected</p>
+                        <p className="text-gray-600">No keywords detected</p>
                       )}
                     </div>
                   </div>
@@ -540,10 +541,10 @@ export default function ResumeEnhancer() {
 
             <Card className={cardStyle}>
               <CardHeader>
-                <CardTitle className="text-xl text-white">
+                <CardTitle className="text-xl text-gray-900">
                   Improvement Suggestions
                 </CardTitle>
-                <CardDescription className="text-zinc-400">
+                <CardDescription className="text-gray-600">
                   Tailored recommendations to improve your resume
                 </CardDescription>
               </CardHeader>
@@ -553,17 +554,17 @@ export default function ResumeEnhancer() {
                     analysisResult.suggestions.map((suggestion, index) => (
                       <div
                         key={index}
-                        className="rounded-lg bg-zinc-800/80 p-4"
+                        className="rounded-lg bg-gray-50 p-4 border border-gray-200"
                       >
                         <div className="flex items-start gap-3">
-                          <div className="bg-blue-900/30 text-blue-400 p-1.5 rounded">
+                          <div className="bg-blue-100 text-blue-700 p-1.5 rounded">
                             <FileText className="h-4 w-4" />
                           </div>
                           <div>
-                            <h4 className="font-medium text-white">
+                            <h4 className="font-medium text-gray-900">
                               {suggestion.section}
                             </h4>
-                            <p className="text-zinc-300 text-sm mt-1">
+                            <p className="text-gray-800 text-sm mt-1">
                               {suggestion.suggestion}
                             </p>
                           </div>
@@ -571,8 +572,8 @@ export default function ResumeEnhancer() {
                       </div>
                     ))
                   ) : (
-                    <div className="rounded-lg bg-zinc-800/80 p-4">
-                      <p className="text-zinc-300">
+                    <div className="rounded-lg bg-gray-50 p-4 border border-gray-200">
+                      <p className="text-gray-800">
                         No specific suggestions available.
                       </p>
                     </div>
@@ -580,7 +581,7 @@ export default function ResumeEnhancer() {
                 </div>
 
                 <div className="space-y-3">
-                  <h3 className="font-medium text-white">
+                  <h3 className="font-medium text-gray-900">
                     Skills to Add or Emphasize
                   </h3>
                   <div className="space-y-2">
@@ -588,17 +589,17 @@ export default function ResumeEnhancer() {
                       analysisResult.skillGaps.map((skill, index) => (
                         <div
                           key={index}
-                          className="flex items-center justify-between p-2 border-b border-zinc-800 last:border-0"
+                          className="flex items-center justify-between p-2 border-b border-gray-200 last:border-0"
                         >
-                          <span className="text-zinc-300">{skill.skill}</span>
+                          <span className="text-gray-800">{skill.skill}</span>
                           <Badge
                             className={cn(
-                              "border-none font-medium",
+                              "font-medium",
                               skill.importance === "High"
-                                ? "bg-red-900/30 text-red-300"
+                                ? "bg-red-100 text-red-700 border border-red-200"
                                 : skill.importance === "Medium"
-                                ? "bg-yellow-900/30 text-yellow-300"
-                                : "bg-blue-900/30 text-blue-300"
+                                ? "bg-yellow-100 text-yellow-700 border border-yellow-200"
+                                : "bg-blue-100 text-blue-700 border border-blue-200"
                             )}
                           >
                             {skill.importance}
@@ -607,7 +608,7 @@ export default function ResumeEnhancer() {
                       ))
                     ) : (
                       <div className="p-2">
-                        <p className="text-zinc-300">
+                        <p className="text-gray-800">
                           No skill gaps identified.
                         </p>
                       </div>
@@ -615,12 +616,12 @@ export default function ResumeEnhancer() {
                   </div>
                 </div>
 
-                <div className="rounded-lg bg-blue-900/20 border border-blue-800/40 p-4">
+                <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-blue-400 mt-0.5" />
+                    <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-blue-400">Next Steps</h4>
-                      <p className="text-sm text-zinc-300 mt-1">
+                      <h4 className="font-medium text-blue-800">Next Steps</h4>
+                      <p className="text-sm text-blue-700 mt-1">
                         Update your resume with these suggestions and run the
                         analysis again to see your improved score. Focus on
                         incorporating the missing keywords and highlighted
@@ -630,11 +631,11 @@ export default function ResumeEnhancer() {
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="border-t border-zinc-800/50 pt-4 flex justify-between">
+              <CardFooter className="border-t border-gray-200 pt-4 flex justify-between">
                 <Button
                   variant="ghost"
                   onClick={() => router.push("/tools")}
-                  className="text-zinc-400 hover:text-white"
+                  className="text-gray-700 hover:text-gray-900"
                   tabIndex="0"
                   aria-label="Go back to tools page"
                   onKeyDown={(e) => {
@@ -674,24 +675,24 @@ export default function ResumeEnhancer() {
   if (step === 3 && loading) {
     return (
       <main className="p-8 max-w-3xl mx-auto animate-fade-in">
-        <Card className={cardStyle}>
+        <Card className="bg-white border border-gray-200 shadow-sm rounded-md overflow-hidden">
           <CardHeader>
-            <CardTitle className="text-xl text-white">
+            <CardTitle className="text-xl text-gray-900">
               Analyzing Your Resume with OpenAI
             </CardTitle>
-            <CardDescription className="text-zinc-400">
+            <CardDescription className="text-gray-600">
               Our AI is comparing your resume against the job description
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <div className="flex flex-col items-center space-y-6">
               <div className="relative">
-                <div className="w-20 h-20 rounded-full border-4 border-t-blue-500 border-blue-500/30 animate-spin"></div>
+                <div className="w-20 h-20 rounded-full border-4 border-t-blue-500 border-blue-100 animate-spin"></div>
                 <Zap className="h-6 w-6 text-blue-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
               </div>
               <div className="text-center">
-                <h3 className="text-white font-medium">{progressStage}</h3>
-                <p className="text-zinc-400 text-sm mt-2">
+                <h3 className="text-gray-900 font-medium">{progressStage}</h3>
+                <p className="text-gray-600 text-sm mt-2">
                   This may take a few moments
                 </p>
               </div>
@@ -699,9 +700,9 @@ export default function ResumeEnhancer() {
               <div className="w-full max-w-xs space-y-2">
                 <Progress
                   value={progressValue}
-                  className="h-1 bg-zinc-800 w-full"
+                  className="h-1 bg-gray-200 w-full"
                 />
-                <div className="flex justify-between text-xs text-zinc-500">
+                <div className="flex justify-between text-xs text-gray-500">
                   <span>Keyword matching</span>
                   <span>Skills assessment</span>
                   <span>ATS compatibility</span>
@@ -715,7 +716,7 @@ export default function ResumeEnhancer() {
   }
 
   return (
-    <main className="p-8 max-w-3xl mx-auto animate-fade-in">
+    <main className="p-8 max-w-3xl mx-auto bg-white text-black rounded-2xl animate-fade-in">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -728,7 +729,7 @@ export default function ResumeEnhancer() {
                 variant="ghost"
                 size="sm"
                 onClick={() => router.push("/tools")}
-                className="text-zinc-400 hover:text-white p-2"
+                className="text-gray-500 hover:text-gray-900 p-2"
                 tabIndex="0"
                 aria-label="Return to tools page"
                 onKeyDown={(e) => {
@@ -740,14 +741,14 @@ export default function ResumeEnhancer() {
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <span className="text-zinc-400 mx-2">/</span>
-              <span className="text-zinc-400">Tools</span>
+              <span className="text-gray-500 mx-2">/</span>
+              <span className="text-gray-500">Tools</span>
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-3xl font-bold text-gray-900">
             OpenAI Resume Enhancer
           </h1>
-          <p className="text-zinc-400 mt-2">
+          <p className="text-gray-600 mt-2">
             AI-powered resume optimization with GPT-4.1-mini to improve your
             chances of getting interviews
           </p>
@@ -757,14 +758,14 @@ export default function ResumeEnhancer() {
           <div className="flex items-center">
             <div
               className={`flex items-center ${
-                step >= 1 ? "text-blue-500" : "text-zinc-500"
+                step >= 1 ? "text-blue-600" : "text-gray-400"
               }`}
             >
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center ${
                   step >= 1
-                    ? "bg-blue-500/20 text-blue-400"
-                    : "bg-zinc-800 text-zinc-500"
+                    ? "bg-blue-100 text-blue-600"
+                    : "bg-gray-200 text-gray-400"
                 }`}
               >
                 {step > 1 ? <Check className="h-4 w-4" /> : "1"}
@@ -774,20 +775,20 @@ export default function ResumeEnhancer() {
 
             <div
               className={`w-12 h-0.5 mx-1 ${
-                step > 1 ? "bg-blue-500/50" : "bg-zinc-800"
+                step > 1 ? "bg-blue-500" : "bg-gray-300"
               }`}
             ></div>
 
             <div
               className={`flex items-center ${
-                step >= 2 ? "text-blue-500" : "text-zinc-500"
+                step >= 2 ? "text-blue-600" : "text-gray-400"
               }`}
             >
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center ${
                   step >= 2
-                    ? "bg-blue-500/20 text-blue-400"
-                    : "bg-zinc-800 text-zinc-500"
+                    ? "bg-blue-100 text-blue-600"
+                    : "bg-gray-200 text-gray-400"
                 }`}
               >
                 {step > 2 ? <Check className="h-4 w-4" /> : "2"}
@@ -797,20 +798,20 @@ export default function ResumeEnhancer() {
 
             <div
               className={`w-12 h-0.5 mx-1 ${
-                step > 2 ? "bg-blue-500/50" : "bg-zinc-800"
+                step > 2 ? "bg-blue-500" : "bg-gray-300"
               }`}
             ></div>
 
             <div
               className={`flex items-center ${
-                step >= 3 ? "text-blue-500" : "text-zinc-500"
+                step >= 3 ? "text-blue-600" : "text-gray-400"
               }`}
             >
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center ${
                   step >= 3
-                    ? "bg-blue-500/20 text-blue-400"
-                    : "bg-zinc-800 text-zinc-500"
+                    ? "bg-blue-100 text-blue-600"
+                    : "bg-gray-200 text-gray-400"
                 }`}
               >
                 {step > 3 ? <Check className="h-4 w-4" /> : "3"}
@@ -820,20 +821,20 @@ export default function ResumeEnhancer() {
 
             <div
               className={`w-12 h-0.5 mx-1 ${
-                step > 3 ? "bg-blue-500/50" : "bg-zinc-800"
+                step > 3 ? "bg-blue-500" : "bg-gray-300"
               }`}
             ></div>
 
             <div
               className={`flex items-center ${
-                step >= 4 ? "text-blue-500" : "text-zinc-500"
+                step >= 4 ? "text-blue-600" : "text-gray-400"
               }`}
             >
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center ${
                   step >= 4
-                    ? "bg-blue-500/20 text-blue-400"
-                    : "bg-zinc-800 text-zinc-500"
+                    ? "bg-blue-100 text-blue-600"
+                    : "bg-gray-200 text-gray-400"
                 }`}
               >
                 {step > 4 ? <Check className="h-4 w-4" /> : "4"}
