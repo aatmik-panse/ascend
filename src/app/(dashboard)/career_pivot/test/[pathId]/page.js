@@ -315,7 +315,7 @@ const CareerPathTest = () => {
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   return (
-    <main className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto bg-white border border-gray-200 shadow-sm rounded-md">
+    <main className="p-2 sm:p-6 lg:p-8 max-w-4xl mx-auto bg-white border border-gray-200 shadow-sm rounded-md">
       {dataSource === "cache" && !loading && (
         <Badge className="mb-4 bg-green-50 text-green-700 border border-green-200">
           Loaded from cache
@@ -323,10 +323,10 @@ const CareerPathTest = () => {
       )}
 
       {loading ? (
-        <div className="p-8 flex justify-center items-center min-h-[60vh]">
+        <div className="p-4 sm:p-8 flex justify-center items-center min-h-[60vh]">
           <div className="flex flex-col items-center">
             <Loader2 className="h-10 w-10 text-blue-500 animate-spin mb-4" />
-            <p className="text-gray-600">
+            <p className="text-gray-600 text-center">
               Loading your personalized assessment...
             </p>
           </div>
@@ -345,7 +345,7 @@ const CareerPathTest = () => {
           <CardFooter>
             <Button
               onClick={handleBackToCareerPaths}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Career Paths
@@ -354,20 +354,20 @@ const CareerPathTest = () => {
         </Card>
       ) : currentStep === "test" ? (
         <Card className="bg-white border border-gray-200 shadow-sm">
-          <CardHeader>
-            <div className="flex justify-between items-center mb-4">
+          <CardHeader className="px-3 sm:px-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handlePrevious}
                 tabIndex="0"
                 aria-label="Previous question or go back"
-                className="text-gray-700 hover:text-black"
+                className="text-gray-700 hover:text-black self-start"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 {currentQuestionIndex === 0 ? "Back" : "Previous"}
               </Button>
-              <Badge className="bg-blue-100 text-blue-700 border border-blue-200">
+              <Badge className="bg-blue-100 text-blue-700 border border-blue-200 self-end sm:self-center">
                 Question {currentQuestionIndex + 1} of {questions.length}
               </Badge>
             </div>
@@ -379,8 +379,8 @@ const CareerPathTest = () => {
               Test your knowledge and aptitude for this career path.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <CardContent className="space-y-6 px-3 sm:px-6">
+            <div className="bg-gray-50 p-3 sm:p-4 rounded-lg shadow-sm">
               <h3 className="font-medium text-gray-900 mb-4">
                 {currentQuestion?.questionText}
               </h3>
@@ -400,7 +400,7 @@ const CareerPathTest = () => {
                     }`}
                   >
                     <div
-                      className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 ${
+                      className={`min-w-[1.25rem] h-5 rounded-full flex items-center justify-center mr-3 ${
                         answers[currentQuestion.id] === index
                           ? "bg-blue-500 text-white"
                           : "bg-gray-200 text-gray-500"
@@ -418,14 +418,14 @@ const CareerPathTest = () => {
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <div></div>
+          <CardFooter className="flex justify-between px-3 sm:px-6 flex-col sm:flex-row gap-3">
+            <div className="hidden sm:block"></div>
             <Button
               disabled={
                 answers[currentQuestion?.id] === undefined || submitting
               }
               onClick={handleNext}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
               tabIndex="0"
               aria-label="Next question or see results"
             >
@@ -451,8 +451,8 @@ const CareerPathTest = () => {
       ) : (
         <div className="space-y-8">
           <Card className="bg-white border border-gray-200 shadow-md">
-            <CardHeader>
-              <CardTitle className="text-2xl text-gray-900">
+            <CardHeader className="px-3 sm:px-6">
+              <CardTitle className="text-xl sm:text-2xl text-gray-900">
                 Your {careerPath?.title} Assessment Results
               </CardTitle>
               <CardDescription className="text-gray-600">
@@ -460,19 +460,19 @@ const CareerPathTest = () => {
                 recommendations for you.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex justify-between items-center">
-                <div>
+            <CardContent className="space-y-6 px-3 sm:px-6">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="text-center sm:text-left order-2 sm:order-1">
                   <h3 className="text-lg font-medium text-gray-900">
                     Your Score
                   </h3>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 mt-2">
                     {results?.score >= 70
                       ? "Great job! You have a strong foundation for this career path."
                       : "You're on the right track. These resources will help you build your skills."}
                   </p>
                 </div>
-                <div className="w-24 h-24 rounded-full flex items-center justify-center bg-blue-100 border-4 border-blue-500">
+                <div className="w-24 h-24 rounded-full flex items-center justify-center bg-blue-100 border-4 border-blue-500 order-1 sm:order-2">
                   <span className="text-2xl font-bold text-blue-700">
                     {results?.score}%
                   </span>
@@ -502,16 +502,16 @@ const CareerPathTest = () => {
                 {(!results?.recommendations ||
                   !test?.recommendations ||
                   test.recommendations.length === 0) && (
-                  <div className="text-center p-8 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="text-center p-4 sm:p-8 bg-gray-50 rounded-lg border border-gray-200">
                     <p>No recommendations available for this career path.</p>
                   </div>
                 )}
 
                 {test?.recommendations && test.recommendations.length > 0 && (
-                  <div className="mt-8 flex justify-center">
+                  <div className="mt-6 sm:mt-8 flex justify-center">
                     <Button
                       onClick={handleViewRoadmap}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
                       tabIndex="0"
                       aria-label="View your personalized learning roadmap"
                     >
@@ -522,10 +522,10 @@ const CareerPathTest = () => {
                 )}
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="px-3 sm:px-6">
               <Button
                 onClick={handleBackToCareerPaths}
-                className="bg-gray-800 hover:bg-gray-700 text-white"
+                className="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-white"
                 tabIndex="0"
                 aria-label="Explore more career paths"
               >
