@@ -37,13 +37,67 @@ const CareerPathTest = () => {
   const [answers, setAnswers] = useState({});
   const [results, setResults] = useState(null);
   const [selectedRoadmapIndex, setSelectedRoadmapIndex] = useState(0);
+  const [dataSource, setDataSource] = useState("api"); // 'api' or 'cache'
 
   useEffect(() => {
     const fetchTestData = async () => {
       try {
         setLoading(true);
 
-        // Fetch career path info
+        // First try to load data from localStorage
+        const cachedCareerPath = localStorage.getItem(`career-path-${pathId}`);
+        const cachedTest = localStorage.getItem(`test-${pathId}`);
+        const cachedResults = localStorage.getItem(`results-${pathId}`);
+
+        let selectedPath = null;
+        let testData = null;
+        let resultsData = null;
+
+        // Check if we have valid cached data
+        if (cachedCareerPath && cachedTest) {
+          try {
+            selectedPath = JSON.parse(cachedCareerPath);
+            testData = JSON.parse(cachedTest);
+
+            // Set data from cache
+            setCareerPath(selectedPath);
+            setTest(testData);
+            setDataSource("cache");
+
+            if (cachedResults) {
+              resultsData = JSON.parse(cachedResults);
+              setResults(resultsData);
+              setCurrentStep(testData.completedAt ? "results" : "test");
+            }
+
+            console.log("Loaded test data from cache");
+
+            // Load answers from localStorage if available
+            const savedAnswers = localStorage.getItem(`answers-${pathId}`);
+            if (savedAnswers) {
+              setAnswers(JSON.parse(savedAnswers));
+            }
+
+            // If test is fresh or recently fetched (within last 24 hours), use cached data
+            const cacheTimestamp = localStorage.getItem(
+              `cache-timestamp-${pathId}`
+            );
+            const isCacheFresh =
+              cacheTimestamp &&
+              Date.now() - parseInt(cacheTimestamp) < 24 * 60 * 60 * 1000;
+
+            if (isCacheFresh) {
+              setLoading(false);
+              return; // Use cached data and skip API calls
+            }
+            // Otherwise, continue with API calls to refresh data
+          } catch (e) {
+            console.error("Error parsing cached data:", e);
+            // Continue with API calls if parsing fails
+          }
+        }
+
+        // Fetch career path info from API
         const pathResponse = await fetch(
           `/api/career-recommendations?pathId=${pathId}`
         );
@@ -51,15 +105,19 @@ const CareerPathTest = () => {
           throw new Error("Failed to load career path");
         }
         const pathData = await pathResponse.json();
-        const selectedPath = pathData.recommendations?.find(
+        selectedPath = pathData.recommendations?.find(
           (path) => path.id === pathId
         );
         if (!selectedPath) {
           throw new Error("Career path not found");
         }
         setCareerPath(selectedPath);
+        localStorage.setItem(
+          `career-path-${pathId}`,
+          JSON.stringify(selectedPath)
+        );
 
-        // Fetch or create test
+        // Fetch or create test from API
         const testResponse = await fetch(
           `/api/career-tests?careerPathId=${pathId}`
         );
@@ -67,10 +125,10 @@ const CareerPathTest = () => {
           throw new Error("Failed to load test");
         }
 
-        const testData = await testResponse.json();
+        const apiTestData = await testResponse.json();
 
         // Create test if it doesn't exist
-        if (!testData.test) {
+        if (!apiTestData.test) {
           const createResponse = await fetch("/api/career-tests", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -82,19 +140,34 @@ const CareerPathTest = () => {
           }
 
           const newTestData = await createResponse.json();
-          setTest(newTestData.test);
+          testData = newTestData.test;
+          setTest(testData);
         } else {
-          setTest(testData.test);
+          testData = apiTestData.test;
+          setTest(testData);
 
           // If test is already completed, show results
-          if (testData.test.completedAt) {
+          if (testData.completedAt) {
             setCurrentStep("results");
-            setResults({
-              score: testData.test.score,
-              recommendations: testData.test.recommendations,
-            });
+            resultsData = {
+              score: testData.score,
+              recommendations: testData.recommendations,
+            };
+            setResults(resultsData);
+            localStorage.setItem(
+              `results-${pathId}`,
+              JSON.stringify(resultsData)
+            );
           }
         }
+
+        // Save test data to localStorage
+        localStorage.setItem(`test-${pathId}`, JSON.stringify(testData));
+        localStorage.setItem(
+          `cache-timestamp-${pathId}`,
+          Date.now().toString()
+        );
+        setDataSource("api");
       } catch (error) {
         console.error("Error loading test data:", error);
         toast.error(error.message || "Failed to load test");
@@ -111,12 +184,24 @@ const CareerPathTest = () => {
       // Fetch the selected roadmap index when results are available
       const fetchSelectedRoadmap = async () => {
         try {
+          // First check localStorage
+          const cachedRoadmapIndex = localStorage.getItem(
+            `roadmap-index-${test.id}`
+          );
+          if (cachedRoadmapIndex !== null) {
+            setSelectedRoadmapIndex(parseInt(cachedRoadmapIndex, 10) || 0);
+            return;
+          }
+
+          // Fall back to API
           const response = await fetch(
             `/api/career-roadmaps?testId=${test.id}`
           );
           if (response.ok) {
             const data = await response.json();
-            setSelectedRoadmapIndex(data.selectedRoadmapIndex || 0);
+            const index = data.selectedRoadmapIndex || 0;
+            setSelectedRoadmapIndex(index);
+            localStorage.setItem(`roadmap-index-${test.id}`, index.toString());
           }
         } catch (error) {
           console.error("Error fetching selected roadmap:", error);
@@ -126,6 +211,13 @@ const CareerPathTest = () => {
       fetchSelectedRoadmap();
     }
   }, [results, test?.id]);
+
+  // Save answers to localStorage whenever they change
+  useEffect(() => {
+    if (Object.keys(answers).length > 0 && pathId) {
+      localStorage.setItem(`answers-${pathId}`, JSON.stringify(answers));
+    }
+  }, [answers, pathId]);
 
   const handleAnswerSelect = (questionId, answerIndex) => {
     setAnswers({
@@ -169,11 +261,24 @@ const CareerPathTest = () => {
         }
 
         const data = await response.json();
-        setResults({
+        const newResults = {
           score: data.score,
           recommendations: data.test.recommendations,
-        });
+        };
+
+        setResults(newResults);
         setCurrentStep("results");
+
+        // Update localStorage with new results and completed test
+        localStorage.setItem(`results-${pathId}`, JSON.stringify(newResults));
+
+        const updatedTest = {
+          ...test,
+          completedAt: new Date().toISOString(),
+          score: data.score,
+        };
+        localStorage.setItem(`test-${pathId}`, JSON.stringify(updatedTest));
+        setTest(updatedTest);
       } catch (error) {
         console.error("Error submitting answers:", error);
         toast.error("Failed to submit your answers. Please try again.");
@@ -205,25 +310,33 @@ const CareerPathTest = () => {
     router.push(`/roadmap/${test.id}`);
   };
 
-  if (loading) {
-    return (
-      <div className="p-8 flex justify-center items-center min-h-[60vh]">
-        <div className="flex flex-col items-center">
-          <Loader2 className="h-10 w-10 text-gray-400 animate-spin mb-4" />
-          <p className="text-gray-600">
-            Loading your personalized assessment...
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const questions = test?.questions || [];
+  const currentQuestion = questions[currentQuestionIndex];
+  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
-  if (!test || !test.questions || test.questions.length === 0) {
-    return (
-      <div className="p-8 flex justify-center items-center">
-        <Card className="bg-white border border-gray-200 w-full max-w-xl shadow-md">
+  return (
+    <main className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto bg-white border border-gray-200 shadow-sm rounded-md">
+      {dataSource === "cache" && !loading && (
+        <Badge className="mb-4 bg-green-50 text-green-700 border border-green-200">
+          Loaded from cache
+        </Badge>
+      )}
+
+      {loading ? (
+        <div className="p-8 flex justify-center items-center min-h-[60vh]">
+          <div className="flex flex-col items-center">
+            <Loader2 className="h-10 w-10 text-blue-500 animate-spin mb-4" />
+            <p className="text-gray-600">
+              Loading your personalized assessment...
+            </p>
+          </div>
+        </div>
+      ) : !test || !test.questions || test.questions.length === 0 ? (
+        <Card className="bg-white border border-gray-200 w-full shadow-sm">
           <CardHeader>
-            <CardTitle className="text-gray-900">Test Not Available</CardTitle>
+            <CardTitle className="text-xl text-gray-900">
+              Test Not Available
+            </CardTitle>
             <CardDescription className="text-gray-600">
               We couldn&apos;t prepare a test for this career path. Please try
               again.
@@ -232,25 +345,15 @@ const CareerPathTest = () => {
           <CardFooter>
             <Button
               onClick={handleBackToCareerPaths}
-              className="bg-black hover:bg-gray-800 text-white "
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Career Paths
             </Button>
           </CardFooter>
         </Card>
-      </div>
-    );
-  }
-
-  const questions = test.questions;
-  const currentQuestion = questions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
-
-  return (
-    <main className="p-8 max-w-4xl mx-auto bg-white text-black rounded-lg shadow-lg">
-      {currentStep === "test" ? (
-        <Card className="bg-white border border-gray-200 shadow-md">
+      ) : currentStep === "test" ? (
+        <Card className="bg-white border border-gray-200 shadow-sm">
           <CardHeader>
             <div className="flex justify-between items-center mb-4">
               <Button
@@ -404,7 +507,6 @@ const CareerPathTest = () => {
                   </div>
                 )}
 
-                {/* Add View Roadmap button */}
                 {test?.recommendations && test.recommendations.length > 0 && (
                   <div className="mt-8 flex justify-center">
                     <Button
