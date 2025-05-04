@@ -76,7 +76,7 @@ export async function POST(req) {
       Top Skills: ${onboardingData?.topSkills?.join(", ") || "Not specified"}
       
       The test should:
-      1. Contain exactly 5 multiple-choice questions
+      1. Contain exactly 20 multiple-choice questions
       2. Each question should have 4 options
       3. Questions should assess knowledge and aptitude for the ${
         careerPath.title
