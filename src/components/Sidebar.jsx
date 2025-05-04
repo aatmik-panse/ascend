@@ -20,6 +20,7 @@ import {
 import { signOut } from "@/app/(login)/actions";
 import { kaushan_script } from "@/app/fonts";
 import Image from "next/image";
+import { IconTools } from "@tabler/icons-react";
 
 export default function SimpleSidebar({ isLoggedIn, userName, user }) {
   const pathname = usePathname();
@@ -32,7 +33,7 @@ export default function SimpleSidebar({ isLoggedIn, userName, user }) {
     { to: "/dashboard", icon: Home, label: "Dashboard" },
     // { to: "/layoff_risk", icon: Shield, label: "Layoff Risk" },
     { to: "/career_pivot", icon: Brain, label: "Career Pivot" },
-    { to: "/tools", icon: Network, label: "Tools" },
+    { to: "/tools", icon: IconTools, label: "Tools" },
     { to: "/counseling", icon: MessageSquare, label: "Counseling" },
   ];
 
