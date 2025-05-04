@@ -161,11 +161,11 @@ export default function DashboardLayout({ children }) {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col md:ml-16">
-        {/* Breadcrumb & Page Header */}
-        <header className="sticky top-0 z-30 bg-zinc-900/80 backdrop-blur-sm border-b border-white/5 px-4 md:px-6 py-3">
+        {/* Breadcrumb & Page Header - Hidden on mobile */}
+        <header className="hidden md:block sticky top-0 z-40 bg-zinc-900/80 backdrop-blur-sm border-b border-white/5 px-4 md:px-6 py-3">
           <div className="max-w-7xl mx-auto w-full">
             {/* Current Identifier Badge - displayed when available */}
-            {/* {currentIdentifier && (
+            {currentIdentifier && (
               <div className="mb-2 flex items-center">
                 <div className="px-3 py-1 bg-blue-950/50 border border-blue-800/30 rounded-full text-blue-400 text-xs flex items-center max-w-full overflow-hidden">
                   {identifierTitle ? (
@@ -195,7 +195,7 @@ export default function DashboardLayout({ children }) {
                   </div>
                 )}
               </div>
-            )} */}
+            )}
 
             <div className="flex items-center justify-between gap-2">
               <div>
@@ -229,6 +229,8 @@ export default function DashboardLayout({ children }) {
                   <button
                     onClick={() => router.push("/sign-in")}
                     className="text-sm font-medium px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                    aria-label="Sign In"
+                    tabIndex="0"
                   >
                     Sign In
                   </button>
@@ -238,7 +240,7 @@ export default function DashboardLayout({ children }) {
           </div>
         </header>
 
-        {/* Page Content */}
+        {/* Page Content - Ensure it starts below the header */}
         <AnimatePresence mode="wait">
           <motion.main
             key={pathname}
@@ -246,10 +248,10 @@ export default function DashboardLayout({ children }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="flex-1 p-4 md:p-6 relative"
+            className="flex-1 p-4 md:p-6 relative pt-6"
           >
             {/* Dot Pattern Background */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-10">
+            <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-10 z-0">
               <div
                 className="absolute inset-0"
                 style={{
@@ -258,13 +260,14 @@ export default function DashboardLayout({ children }) {
                 }}
               />
             </div>
-
+            {/* Spacer to ensure content appears below fixed navbar on mobile */}
+            <div className="md:hidden h-16 w-full"></div>
             {/* Content Container */}
-            <div className="relative max-w-7xl mx-auto">
+            <div className="relative max-w-7xl mx-auto z-10">
               {/* Blur effect if not logged in on protected routes */}
               {isProtectedRoute && !user ? (
                 <div className="relative rounded-xl overflow-hidden">
-                  <div className="absolute inset-0 backdrop-blur-md bg-zinc-900/60 z-10 flex flex-col items-center justify-center p-6">
+                  <div className="absolute inset-0 backdrop-blur-md bg-zinc-900/60 z-20 flex flex-col items-center justify-center p-6">
                     <h3 className="text-xl font-medium text-white mb-4">
                       Sign in to access this feature
                     </h3>
@@ -275,12 +278,16 @@ export default function DashboardLayout({ children }) {
                       <button
                         onClick={() => router.push("/sign-in")}
                         className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
+                        aria-label="Sign In"
+                        tabIndex="0"
                       >
                         Sign In
                       </button>
                       <button
                         onClick={handlePricingClick}
                         className="px-4 py-2 rounded-lg bg-zinc-800 text-white font-medium hover:bg-zinc-700 transition-colors"
+                        aria-label="View Pricing"
+                        tabIndex="0"
                       >
                         View Pricing
                       </button>

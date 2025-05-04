@@ -39,7 +39,7 @@ export const Navbar = ({ children, className }) => {
   return (
     <motion.div
       ref={ref}
-      className={cn("sticky inset-x-0 top-20 z-40 w-full", className)}
+      className={cn("sticky inset-x-0 top-0 z-30 w-full", className)}
       style={{ willChange: "transform" }}
     >
       {React.Children.map(children, (child) =>
@@ -55,7 +55,7 @@ export const NavBody = ({ children, className, visible }) => {
   return (
     <div
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full bg-transparent px-4 py-2 lg:flex transition-all duration-300 ease-out",
+        "relative z-30 mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full bg-transparent px-4 py-2 lg:flex transition-all duration-300 ease-out",
         visible &&
           "bg-white/80 dark:bg-neutral-950/80 transform translate-y-5 scale-95 shadow-sm backdrop-blur-sm",
         !visible && "transform translate-y-0 scale-100",
@@ -107,7 +107,7 @@ export const MobileNav = ({ children, className, visible }) => {
   return (
     <div
       className={cn(
-        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-4 py-2 lg:hidden transition-all duration-300 ease-out",
+        "relative z-30 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-4 py-2 lg:hidden transition-all duration-300 ease-out",
         visible &&
           "bg-white/80 dark:bg-neutral-950/80 transform translate-y-5 scale-95 shadow-sm backdrop-blur-sm rounded-md",
         !visible && "transform translate-y-0 scale-100 rounded-full",
@@ -136,12 +136,18 @@ export const MobileNavMenu = ({ children, className, isOpen, onClose }) => {
   return (
     <div
       className={cn(
-        "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-lg bg-white px-4 py-8 shadow-md dark:bg-neutral-950 transition-opacity duration-300",
+        "fixed left-0 right-0 top-[60px] z-40 flex flex-col items-start justify-start gap-4 bg-white px-4 py-8 shadow-md dark:bg-neutral-950 transition-all duration-300",
+        "max-h-[80vh] overflow-y-auto border-t border-gray-200 dark:border-gray-800",
         isOpen
-          ? "opacity-100 pointer-events-auto"
-          : "opacity-0 pointer-events-none",
+          ? "opacity-100 pointer-events-auto translate-y-0"
+          : "opacity-0 pointer-events-none -translate-y-4",
         className
       )}
+      style={{
+        height: isOpen ? "auto" : 0,
+      }}
+      aria-hidden={!isOpen}
+      role="menu"
     >
       {children}
     </div>
@@ -160,17 +166,17 @@ export const NavbarLogo = () => {
   return (
     <Link
       href="/"
-      className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black"
+      className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal"
     >
       <Image
         src="/logo.png"
         alt="logo"
         width={30}
         height={30}
-        className=" rounded-sm object-cover"
+        className="rounded-sm object-cover"
       />
       <span
-        className={`font-medium text-black dark:text-white ${kaushan_script.className}`}
+        className={`font-medium ${kaushan_script.className} text-black dark:text-white`}
       >
         Certcy
       </span>
