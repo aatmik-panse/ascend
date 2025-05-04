@@ -4,18 +4,90 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import SimpleSidebar from "@/components/Sidebar";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import { Loader2, Hash, Book } from "lucide-react";
 
 export default function DashboardLayout({ children }) {
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentIdentifier, setCurrentIdentifier] = useState(null);
+  const [identifierTitle, setIdentifierTitle] = useState(null);
+  const [isFetchingTitle, setIsFetchingTitle] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
   // Routes accessible without authentication
   const publicPaths = ["/layoff_risk", "/pricing"];
   const isProtectedRoute = !publicPaths.includes(pathname);
+
+  // Extract identifier/slug from the URL pathname
+  useEffect(() => {
+    const extractIdentifier = () => {
+      const pathSegments = pathname.split("/").filter(Boolean);
+
+      // Reset title when path changes
+      setIdentifierTitle(null);
+
+      // Check if we have at least 3 segments and last segment looks like an identifier
+      if (pathSegments.length >= 3) {
+        const lastSegment = pathSegments[pathSegments.length - 1];
+
+        // Check if last segment matches an ID pattern (alphanumeric with potential special chars)
+        if (lastSegment && lastSegment.length > 8) {
+          setCurrentIdentifier(lastSegment);
+          return;
+        }
+      }
+
+      setCurrentIdentifier(null);
+    };
+
+    extractIdentifier();
+  }, [pathname]);
+
+  // Fetch the test/path name when we have an identifier and we're on a test page
+  useEffect(() => {
+    const fetchTestName = async () => {
+      if (!currentIdentifier || !pathname.includes("/test/")) {
+        return;
+      }
+
+      try {
+        setIsFetchingTitle(true);
+
+        // Fetch career path information using the ID
+        const response = await fetch(
+          `/api/career-recommendations?pathId=${encodeURIComponent(
+            currentIdentifier
+          )}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch test information");
+        }
+
+        const data = await response.json();
+
+        // Find the matching career path
+        const matchingPath = data.recommendations?.find(
+          (path) =>
+            path.id === currentIdentifier || path.slug === currentIdentifier
+        );
+
+        if (matchingPath) {
+          setIdentifierTitle(matchingPath.title);
+        }
+      } catch (error) {
+        console.error("Error fetching test name:", error);
+      } finally {
+        setIsFetchingTitle(false);
+      }
+    };
+
+    if (currentIdentifier) {
+      fetchTestName();
+    }
+  }, [currentIdentifier, pathname]);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -92,6 +164,39 @@ export default function DashboardLayout({ children }) {
         {/* Breadcrumb & Page Header */}
         <header className="sticky top-0 z-30 bg-zinc-900/80 backdrop-blur-sm border-b border-white/5 px-4 md:px-6 py-3">
           <div className="max-w-7xl mx-auto w-full">
+            {/* Current Identifier Badge - displayed when available */}
+            {/* {currentIdentifier && (
+              <div className="mb-2 flex items-center">
+                <div className="px-3 py-1 bg-blue-950/50 border border-blue-800/30 rounded-full text-blue-400 text-xs flex items-center max-w-full overflow-hidden">
+                  {identifierTitle ? (
+                    <>
+                      <Book className="h-3 w-3 mr-1 flex-shrink-0" />
+                      <span
+                        className="truncate"
+                        title={`${identifierTitle} (${currentIdentifier})`}
+                      >
+                        Test: {identifierTitle}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Hash className="h-3 w-3 mr-1 flex-shrink-0" />
+                      <span className="truncate" title={currentIdentifier}>
+                        {isFetchingTitle
+                          ? "Loading test info..."
+                          : currentIdentifier}
+                      </span>
+                    </>
+                  )}
+                </div>
+                {identifierTitle && (
+                  <div className="ml-2 px-2 py-0.5 bg-zinc-800/80 rounded-full text-zinc-400 text-xs">
+                    ID: {currentIdentifier.substring(0, 8)}...
+                  </div>
+                )}
+              </div>
+            )} */}
+
             <div className="flex items-center justify-between gap-2">
               <div>
                 <nav className="flex items-center text-sm text-zinc-400">
@@ -105,13 +210,17 @@ export default function DashboardLayout({ children }) {
                     <>
                       <span className="mx-2">/</span>
                       <span className="text-blue-400 font-medium">
-                        {currentPage}
+                        {pathname.includes("/test/") && identifierTitle
+                          ? `Test: ${identifierTitle}`
+                          : currentPage}
                       </span>
                     </>
                   )}
                 </nav>
                 <h1 className="text-xl font-medium text-white mt-1">
-                  {currentPage}
+                  {pathname.includes("/test/") && identifierTitle
+                    ? `Test: ${identifierTitle}`
+                    : currentPage}
                 </h1>
               </div>
 
