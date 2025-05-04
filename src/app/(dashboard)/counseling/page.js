@@ -472,7 +472,7 @@ const Counseling = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-black bg-white relative rounded-2xl">
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 text-black bg-white relative rounded-lg sm:rounded-2xl">
       <Toaster position="top-center" />
 
       {/* Suggest Prompt Dialog */}
@@ -480,29 +480,34 @@ const Counseling = () => {
         open={showSuggestPromptDialog}
         onOpenChange={setShowSuggestPromptDialog}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[95%] sm:max-w-lg w-full p-4 sm:p-6">
           <AlertDialogHeader>
-            <AlertDialogTitle>Suggest a Prompt</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-base sm:text-lg">
+              Suggest a Prompt
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-xs sm:text-sm">
               Suggest a topic or question you&apos;d like to see in our prompt
               library
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="py-4">
+          <div className="py-3 sm:py-4">
             <textarea
               value={suggestedPrompt}
               onChange={(e) => setSuggestedPrompt(e.target.value)}
               placeholder="Your prompt suggestion..."
-              className="w-full bg-white border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black/50 resize-none h-32 text-black placeholder-gray-500"
+              className="w-full bg-white border border-gray-300 rounded-md px-3 sm:px-4 py-2 sm:py-3 focus:outline-none focus:ring-2 focus:ring-black/50 resize-none h-24 sm:h-32 text-sm sm:text-base text-black placeholder-gray-500"
             />
           </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setSuggestedPrompt("")}>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+            <AlertDialogCancel
+              onClick={() => setSuggestedPrompt("")}
+              className="mt-2 sm:mt-0 text-sm"
+            >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleSuggestPrompt}
-              className="bg-black hover:bg-gray-800 text-white"
+              className="bg-black hover:bg-gray-800 text-white text-sm"
               disabled={!suggestedPrompt.trim()}
             >
               Submit Suggestion
@@ -514,27 +519,27 @@ const Counseling = () => {
       {/* Tab Contents */}
       {activeTab === "chat" && (
         <div className="animate-in fade-in-50 duration-300">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             <Card className="lg:col-span-3 bg-white border border-gray-200 shadow-sm rounded-md overflow-hidden">
-              <CardHeader className="border-b border-gray-200 pb-4 flex flex-row items-center bg-gray-50">
-                <div className="p-2 rounded-md bg-black mr-3">
-                  <Bot className="h-5 w-5 text-white" />
+              <CardHeader className="border-b border-gray-200 pb-3 sm:pb-4 flex flex-row items-center bg-gray-50 p-3 sm:p-4">
+                <div className="p-1.5 sm:p-2 rounded-md bg-black mr-2 sm:mr-3">
+                  <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-black text-xl">
+                  <CardTitle className="text-black text-base sm:text-xl">
                     Compass Coach
                   </CardTitle>
-                  <CardDescription className="text-gray-600 text-sm">
+                  <CardDescription className="text-gray-600 text-xs sm:text-sm">
                     Ask anything about your career journey
                   </CardDescription>
                 </div>
               </CardHeader>
-              <CardContent className="pt-6 pb-6">
+              <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6 px-3 sm:px-6">
                 <div
                   ref={chatContainerRef}
-                  className="h-[560px] mb-5 overflow-y-auto rounded-md bg-gray-50 p-5 shadow-inner border border-gray-200"
+                  className="h-[400px] sm:h-[480px] md:h-[560px] mb-3 sm:mb-5 overflow-y-auto rounded-md bg-gray-50 p-3 sm:p-5 shadow-inner border border-gray-200"
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {chatMessages.map((msg, index) => (
                       <div
                         key={index}
@@ -620,15 +625,15 @@ const Counseling = () => {
 
                 <div className="relative">
                   <textarea
-                    rows="3"
+                    rows="2"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyDown={handleKeyPress}
                     placeholder="Ask about career advice, resume tips, interview preparation..."
-                    className="w-full bg-white border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black/50 focus:border-black/50 pr-12 resize-none overflow-auto text-black placeholder-gray-500"
+                    className="w-full bg-white border border-gray-200 rounded-md px-3 sm:px-4 py-2 sm:py-3 focus:outline-none focus:ring-2 focus:ring-black/50 focus:border-black/50 pr-10 sm:pr-12 resize-none overflow-auto text-sm sm:text-base text-black placeholder-gray-500"
                     maxLength={1000}
                   />
-                  <div className="absolute right-14 bottom-3 text-xs text-gray-500">
+                  <div className="absolute right-12 sm:right-14 bottom-2 sm:bottom-3 text-[10px] sm:text-xs text-gray-500">
                     {message.length}/1000
                   </div>
                   <button
@@ -636,7 +641,7 @@ const Counseling = () => {
                     disabled={isLoading || message.trim() === ""}
                     aria-label="Send message"
                     tabIndex="0"
-                    className={`absolute right-3 bottom-3 p-2.5 rounded-full transition-all duration-300 ${
+                    className={`absolute right-2 sm:right-3 bottom-2 sm:bottom-3 p-2 sm:p-2.5 rounded-full transition-all duration-300 ${
                       isLoading || message.trim() === ""
                         ? "bg-gray-300 cursor-not-allowed text-gray-500"
                         : "bg-black text-white hover:bg-gray-800"
@@ -648,34 +653,34 @@ const Counseling = () => {
                       }
                     }}
                   >
-                    <Send className="h-4 w-4" />
+                    <Send className="h-3 w-3 sm:h-4 sm:w-4" />
                   </button>
                 </div>
-                <div className="mt-2 text-xs text-gray-500 flex items-center">
-                  <Info className="h-3 w-3 mr-1" />
+                <div className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-gray-500 flex items-center">
+                  <Info className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" />
                   Press Enter to send, Shift+Enter for new line
                 </div>
               </CardContent>
             </Card>
 
-            <div className="lg:col-span-1 space-y-6">
+            <div className="lg:col-span-1 space-y-3 sm:space-y-6">
               <Card className="bg-white border border-gray-200 shadow-sm rounded-md">
-                <CardHeader className="border-b border-gray-200 pb-3">
-                  <CardTitle className="text-lg text-black flex items-center">
-                    <MessageSquare className="h-4 w-4 mr-2" />
+                <CardHeader className="border-b border-gray-200 pb-2 sm:pb-3 p-3 sm:p-4">
+                  <CardTitle className="text-base sm:text-lg text-black flex items-center">
+                    <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Suggested Prompts
                   </CardTitle>
-                  <CardDescription className="text-gray-600 text-xs mt-1">
+                  <CardDescription className="text-gray-600 text-[10px] sm:text-xs mt-0.5 sm:mt-1">
                     Quick conversation starters
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="pt-4">
-                  <div className="flex overflow-x-auto pb-2 mb-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                <CardContent className="pt-3 sm:pt-4 px-3 sm:px-6">
+                  <div className="flex overflow-x-auto pb-2 mb-2 sm:mb-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                     {promptCategories.map((category) => (
                       <button
                         key={category.id}
                         onClick={() => setActivePromptCategory(category.id)}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap mr-2 transition-all ${
+                        className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium rounded-full whitespace-nowrap mr-1.5 sm:mr-2 transition-all ${
                           activePromptCategory === category.id
                             ? "bg-black text-white"
                             : "bg-gray-200 text-gray-800 hover:bg-gray-300"
@@ -685,14 +690,14 @@ const Counseling = () => {
                       </button>
                     ))}
                   </div>
-                  <div className="grid gap-2 animate-in fade-in-50 duration-200">
+                  <div className="grid gap-1.5 sm:gap-2 animate-in fade-in-50 duration-200">
                     {getFilteredPrompts().map((prompt, index) => (
                       <Button
                         key={index}
                         variant="outline"
                         className="
-                            flex flex-wrap items-start justify-start gap-2
-                            w-full p-2 text-sm font-medium
+                            flex flex-wrap items-start justify-start gap-1.5 sm:gap-2
+                            w-full p-1.5 sm:p-2 text-xs sm:text-sm font-medium
                             bg-gray-50 border-gray-200
                             text-gray-800 hover:bg-gray-100 hover:text-black
                             transition-all duration-200
@@ -701,7 +706,7 @@ const Counseling = () => {
                         onClick={() => handlePromptClick(prompt)}
                         title={prompt}
                       >
-                        <ChevronRight className="h-3.5 w-3.5 shrink-0 self-center" />
+                        <ChevronRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0 self-center" />
                         <span className="flex-1 whitespace-normal break-words">
                           {prompt}
                         </span>
@@ -709,18 +714,18 @@ const Counseling = () => {
                     ))}
                   </div>
 
-                  <div className="mt-5 pt-4 border-t border-gray-200">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs text-gray-600 font-medium">
+                  <div className="mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-gray-200">
+                    <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                      <p className="text-[10px] sm:text-xs text-gray-600 font-medium">
                         Need something specific?
                       </p>
-                      <Badge className="bg-gray-800 text-white text-xs">
+                      <Badge className="bg-gray-800 text-white text-[8px] sm:text-xs px-1 py-0 sm:px-1.5 sm:py-0.5">
                         New
                       </Badge>
                     </div>
                     <Button
                       variant="ghost"
-                      className="text-sm w-full justify-start text-gray-700 hover:text-black hover:bg-gray-100 group"
+                      className="text-xs sm:text-sm w-full justify-start text-gray-700 hover:text-black hover:bg-gray-100 group p-1.5 sm:p-2 h-auto"
                       aria-label="Submit prompt request"
                       onClick={() => setShowSuggestPromptDialog(true)}
                       onKeyDown={(e) => {
@@ -730,7 +735,7 @@ const Counseling = () => {
                         }
                       }}
                     >
-                      <PlusCircle className="h-3.5 w-3.5 mr-2 group-hover:rotate-90 transition-transform duration-200" />
+                      <PlusCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1.5 sm:mr-2 group-hover:rotate-90 transition-transform duration-200" />
                       Suggest a prompt
                     </Button>
                   </div>
@@ -738,31 +743,31 @@ const Counseling = () => {
               </Card>
 
               <Card className="bg-white border border-gray-200 shadow-sm rounded-md">
-                <CardHeader className="border-b border-gray-200 pb-3">
-                  <CardTitle className="text-lg text-black flex items-center">
-                    <Info className="h-4 w-4 mr-2" />
+                <CardHeader className="border-b border-gray-200 pb-2 sm:pb-3 p-3 sm:p-4">
+                  <CardTitle className="text-base sm:text-lg text-black flex items-center">
+                    <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Pro Tips
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-5">
-                  <div className="p-2 space-y-4">
-                    <div className="bg-gray-50 rounded-md p-3 border border-gray-200">
-                      <Badge className="bg-gray-800 text-white mb-2 px-2 py-0.5">
-                        <Save className="h-3 w-3 mr-1" />
+                <CardContent className="pt-3 sm:pt-5 px-3 sm:px-6">
+                  <div className="p-1 sm:p-2 space-y-2 sm:space-y-4">
+                    <div className="bg-gray-50 rounded-md p-2 sm:p-3 border border-gray-200">
+                      <Badge className="bg-gray-800 text-white mb-1.5 sm:mb-2 px-1 sm:px-2 py-0 sm:py-0.5 text-[8px] sm:text-xs">
+                        <Save className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
                         Save Insights
                       </Badge>
-                      <p className="text-gray-700 text-sm">
+                      <p className="text-gray-700 text-[10px] sm:text-sm">
                         Hover over any AI response and click the save icon to
                         keep it for future reference.
                       </p>
                     </div>
 
-                    <div className="bg-gray-50 rounded-md p-3 border border-gray-200">
-                      <Badge className="bg-gray-800 text-white mb-2 px-2 py-0.5">
-                        <MessageSquare className="h-3 w-3 mr-1" />
+                    <div className="bg-gray-50 rounded-md p-2 sm:p-3 border border-gray-200">
+                      <Badge className="bg-gray-800 text-white mb-1.5 sm:mb-2 px-1 sm:px-2 py-0 sm:py-0.5 text-[8px] sm:text-xs">
+                        <MessageSquare className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
                         Be Specific
                       </Badge>
-                      <p className="text-gray-700 text-sm">
+                      <p className="text-gray-700 text-[10px] sm:text-sm">
                         Ask detailed questions for more personalized career
                         guidance.
                       </p>
@@ -770,10 +775,10 @@ const Counseling = () => {
 
                     <Button
                       variant="outline"
-                      className="w-full text-sm bg-white border-gray-300 text-gray-800 hover:bg-gray-100 hover:text-black mt-2"
+                      className="w-full text-xs sm:text-sm bg-white border-gray-300 text-gray-800 hover:bg-gray-100 hover:text-black mt-1 sm:mt-2 h-8 sm:h-10"
                       onClick={() => setActiveTab("notes")}
                     >
-                      <Save className="h-4 w-4 mr-2" />
+                      <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                       View Saved Notes
                     </Button>
                   </div>
@@ -787,27 +792,27 @@ const Counseling = () => {
       {activeTab === "notes" && (
         <div className="animate-in fade-in-50 duration-300">
           <Card className="bg-white border border-gray-200 shadow-sm rounded-md">
-            <CardHeader className="border-b border-gray-200 pb-3">
+            <CardHeader className="border-b border-gray-200 pb-2 sm:pb-3 p-3 sm:p-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center">
-                  <Bookmark className="h-5 w-5 mr-2" />
+                <CardTitle className="flex items-center text-base sm:text-lg">
+                  <Bookmark className="h-3.5 w-3.5 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                   Saved Notes
                 </CardTitle>
 
                 {savedNotes.length > 0 && (
                   <div className="flex items-center">
-                    <Badge className="bg-gray-800 text-white">
+                    <Badge className="bg-gray-800 text-white text-[10px] sm:text-xs">
                       {savedNotes.length}{" "}
                       {savedNotes.length === 1 ? "note" : "notes"}
                     </Badge>
                   </div>
                 )}
               </div>
-              <CardDescription className="text-gray-600 text-sm mt-1">
+              <CardDescription className="text-gray-600 text-[10px] sm:text-sm mt-0.5 sm:mt-1">
                 Your saved insights from AI conversations
               </CardDescription>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
               {isLoadingNotes ? (
                 <div className="flex items-center justify-center py-12">
                   <RefreshCw className="h-8 w-8 text-gray-400 animate-spin" />
@@ -852,24 +857,24 @@ const Counseling = () => {
                 </div>
               ) : (
                 <div>
-                  <div className="mb-4 flex items-center">
+                  <div className="mb-3 sm:mb-4 flex items-center">
                     <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                      <Search className="absolute left-2.5 sm:left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                       <input
                         type="text"
                         placeholder="Search your notes..."
-                        className="w-full bg-white border border-gray-300 rounded-md pl-10 pr-4 py-2 text-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black/50"
+                        className="w-full bg-white border border-gray-300 rounded-md pl-8 sm:pl-10 pr-3 sm:pr-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black/50"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                       />
                     </div>
                     <Button
                       variant="outline"
-                      className="ml-2 bg-white border-gray-300 text-gray-800"
+                      className="ml-1.5 sm:ml-2 bg-white border-gray-300 text-gray-800 h-8 sm:h-auto p-1.5 sm:p-2"
                       onClick={fetchSavedNotes}
                       title="Refresh notes"
                     >
-                      <RefreshCw className="h-4 w-4" />
+                      <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
 
@@ -943,8 +948,8 @@ const Counseling = () => {
               )}
             </CardContent>
             {filteredNotes.length > 0 && !isLoadingNotes && !notesError && (
-              <CardFooter className="border-t border-gray-200 py-3 px-6">
-                <p className="text-xs text-gray-500">
+              <CardFooter className="border-t border-gray-200 py-2 sm:py-3 px-3 sm:px-6">
+                <p className="text-[10px] sm:text-xs text-gray-500">
                   Notes are automatically saved to your account and can be
                   accessed from any device
                 </p>
@@ -957,40 +962,40 @@ const Counseling = () => {
       {activeTab === "mentors" && (
         <div className="animate-in fade-in-50 duration-300">
           <Card className="bg-white border border-gray-200 shadow-sm rounded-md overflow-hidden">
-            <div className="py-16 px-6 flex flex-col items-center text-center">
-              <div className="p-4 rounded-full bg-blue-50 mb-6">
-                <Calendar className="h-12 w-12 text-blue-500" />
+            <div className="py-8 sm:py-12 md:py-16 px-4 sm:px-6 flex flex-col items-center text-center">
+              <div className="p-3 sm:p-4 rounded-full bg-blue-50 mb-4 sm:mb-6">
+                <Calendar className="h-8 w-8 sm:h-12 sm:w-12 text-blue-500" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-3">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2 sm:mb-3">
                 Mentor Matching Coming Soon
               </h2>
-              <p className="text-gray-600 max-w-lg mb-8">
+              <p className="text-gray-600 max-w-lg mb-6 sm:mb-8 text-sm sm:text-base">
                 We&apos;re working on connecting you with industry professionals
                 for personalized career guidance. Get matched with mentors
                 who&apos;ve walked the path you&apos;re pursuing.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl w-full mb-8">
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col items-center">
-                  <VideoIcon className="h-8 w-8 text-gray-600 mb-3" />
-                  <h3 className="font-medium text-gray-800">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 max-w-3xl w-full mb-6 sm:mb-8">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-200 flex flex-col items-center">
+                  <VideoIcon className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600 mb-2 sm:mb-3" />
+                  <h3 className="font-medium text-gray-800 text-sm sm:text-base">
                     1:1 Video Sessions
                   </h3>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col items-center">
-                  <MessageSquare className="h-8 w-8 text-gray-600 mb-3" />
-                  <h3 className="font-medium text-gray-800">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-200 flex flex-col items-center">
+                  <MessageSquare className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600 mb-2 sm:mb-3" />
+                  <h3 className="font-medium text-gray-800 text-sm sm:text-base">
                     Professional Feedback
                   </h3>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col items-center">
-                  <Star className="h-8 w-8 text-gray-600 mb-3" />
-                  <h3 className="font-medium text-gray-800">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-200 flex flex-col items-center">
+                  <Star className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600 mb-2 sm:mb-3" />
+                  <h3 className="font-medium text-gray-800 text-sm sm:text-base">
                     Industry Connections
                   </h3>
                 </div>
               </div>
               <Button
-                className="bg-black hover:bg-gray-800 text-white"
+                className="bg-black hover:bg-gray-800 text-white text-xs sm:text-sm h-9 sm:h-10"
                 tabIndex="0"
                 aria-label="Get notified when mentor matching launches"
                 onClick={handleNotifyMentor}
@@ -1001,7 +1006,7 @@ const Counseling = () => {
                   }
                 }}
               >
-                <Bell className="h-4 w-4 mr-2" />
+                <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                 Notify Me When Available
               </Button>
             </div>
@@ -1010,7 +1015,7 @@ const Counseling = () => {
       )}
 
       {/* Enhanced Floating Dock Navigation */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+      <div className="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-50">
         <FloatingDock
           items={dockItems.map((item) => ({
             ...item,
@@ -1021,7 +1026,7 @@ const Counseling = () => {
             ),
           }))}
           desktopClassName="shadow-lg border border-gray-200"
-          mobileClassName="shadow-lg"
+          mobileClassName="shadow-lg scale-90 sm:scale-100"
           onItemClick={handleDockItemClick}
         />
       </div>
