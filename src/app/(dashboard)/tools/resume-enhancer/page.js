@@ -222,8 +222,8 @@ export default function ResumeEnhancer() {
             Advance AI Resume Enhancer
           </h1>
           <p className="text-gray-600 mt-1 sm:mt-2 text-xs sm:text-base">
-            AI-powered resume optimization with GPT-4.1-mini to improve your
-            chances of getting interviews
+            AI-powered resume optimization to improve your chances of getting
+            interviews
           </p>
         </div>
 

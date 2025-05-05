@@ -229,7 +229,7 @@ async function callOpenAIWithTimeout(prompt) {
         {
           role: "system",
           content:
-            'You are a career counselor AI that provides structured data only as valid JSON. Return JSON that follows this exact structure without any additional text or markdown formatting: { "recommendations": [ { "id": "string", "title": "string", "match": "number", "description": "string", "skills": ["string"], "growth": "string", "salary": "string" } ] }',
+            'You are a career counselor AI that provides structured data only as valid JSON for Indian users. Return JSON that follows this exact structure without any additional text or markdown formatting: { "recommendations": [ { "id": "string", "title": "string", "match": "number", "description": "string", "skills": ["string"], "growth": "string", "salary": "string" } ] }',
         },
         { role: "user", content: prompt },
       ],
