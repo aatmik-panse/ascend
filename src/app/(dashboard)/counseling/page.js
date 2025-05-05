@@ -366,7 +366,7 @@ const Counseling = () => {
         <div
           className={`${
             t.visible ? "animate-enter" : "animate-leave"
-          } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+          } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5 fixed top-20 right-4 z-[100]`}
         >
           <div className="flex-1 w-0 p-4">
             <div className="flex items-start">
@@ -394,7 +394,7 @@ const Counseling = () => {
           </div>
         </div>
       ),
-      { duration: 5000 }
+      { duration: 5000, position: "top-right" }
     );
   };
 
@@ -473,7 +473,17 @@ const Counseling = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 text-black bg-white relative rounded-lg sm:rounded-2xl">
-      <Toaster position="top-center" />
+      {/* Custom Toaster positioning with higher z-index */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          className: "z-[100] relative",
+          style: {
+            zIndex: 100,
+            top: "4rem",
+          },
+        }}
+      />
 
       {/* Suggest Prompt Dialog */}
       <AlertDialog
