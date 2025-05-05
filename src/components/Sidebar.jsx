@@ -242,7 +242,7 @@ export default function SimpleSidebar({ isLoggedIn, userName, user }) {
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-gradient-to-r from-zinc-900 to-zinc-950 border-b border-blue-500/10 flex items-center justify-between px-4 z-40 backdrop-blur-sm">
         <Link href="/" className="flex items-center">
           <span
-            className={`text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 text-transparent bg-clip-text ${kaushan_script.className}`}
+            className={`text-2xl font-bold text-white bg-clip-text ${kaushan_script.className}`}
           >
             Certcy
           </span>

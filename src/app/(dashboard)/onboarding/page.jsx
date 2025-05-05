@@ -8,6 +8,8 @@ import {
   Loader2,
   CheckCircle,
   Plus,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +23,7 @@ export default function CareerOnboarding() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState(null);
   const [validationError, setValidationError] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [formData, setFormData] = useState({
     jobTitle: "",
     experience: "",
@@ -38,6 +41,22 @@ export default function CareerOnboarding() {
 
   const inputRefs = useRef({});
   const totalQuestions = 10;
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Initial check
+    checkIsMobile();
+
+    // Add resize listener
+    window.addEventListener("resize", checkIsMobile);
+
+    // Clean up
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
 
   // Add a new skill input field
   const addSkill = () => {
@@ -413,10 +432,6 @@ export default function CareerOnboarding() {
         { value: "15+", label: "15+ hrs/week" },
       ],
     },
-    // {
-    //   id: "pivotMonth",
-    //   title: "When do you plan to start your pivot?",
-    // },
     {
       id: "linkedinUrl",
       title: "What's your LinkedIn URL? ",
@@ -824,22 +839,22 @@ export default function CareerOnboarding() {
 
       <div className="w-full min-h-screen flex flex-col">
         {currentStep > 0 && currentStep <= totalQuestions && (
-          <div className="flex justify-between py-4 px-6">
+          <div className="flex justify-between py-4 px-4 sm:px-6">
             <button
               onClick={prevStep}
-              className="text-gray-500 hover:text-black transition-colors"
+              className="text-gray-500 hover:text-white transition-colors text-sm sm:text-base"
               aria-label="Go back"
-              tabIndex={0}
+              tabIndex="0"
             >
               Back
             </button>
-            <div className="text-gray-500 text-sm">
+            <div className="text-gray-500 text-xs sm:text-sm">
               {currentStep} of {totalQuestions}
             </div>
           </div>
         )}
 
-        <div className="flex-1 flex flex-col justify-center items-center px-6">
+        <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6">
           <div className="w-full max-w-md">
             <AnimatePresence mode="wait">
               <motion.div
@@ -850,19 +865,21 @@ export default function CareerOnboarding() {
                 transition={{ duration: 0.4 }}
                 className="mb-0"
               >
-                <h1 className="text-3xl md:text-4xl font-medium mb-2">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium mb-2">
                   {currentQuestion.title}
                 </h1>
                 <span>{currentQuestion.optional ? "(Optional)" : ""}</span>
 
                 {currentQuestion.subtitle && (
-                  <p className="text-lg text-gray-400 mb-1">
+                  <p className="text-base sm:text-lg text-gray-400 mb-1">
                     {currentQuestion.subtitle}
                   </p>
                 )}
 
                 {currentQuestion.description && (
-                  <p className="text-gray-500">{currentQuestion.description}</p>
+                  <p className="text-gray-500 text-sm sm:text-base">
+                    {currentQuestion.description}
+                  </p>
                 )}
 
                 {getFormField()}
@@ -870,7 +887,7 @@ export default function CareerOnboarding() {
                 {currentStep === totalQuestions && submissionError && (
                   <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-500 flex items-start">
                     <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>{submissionError}</span>
+                    <span className="text-sm">{submissionError}</span>
                   </div>
                 )}
 
@@ -895,10 +912,10 @@ export default function CareerOnboarding() {
                       }}
                       disabled={isSubmitting}
                       className={cn(
-                        "h-12 px-16 bg-gray-100 hover:bg-white text-black font-black rounded-md  text-lg w-full md:w-auto flex items-center justify-center",
+                        "h-10 sm:h-12 px-6 sm:px-16 bg-gray-100 hover:bg-white text-black font-bold sm:font-black rounded-md text-base sm:text-lg w-full md:w-auto flex items-center justify-center",
                         isSubmitting && "opacity-80"
                       )}
-                      tabIndex={0}
+                      tabIndex="0"
                       aria-label={
                         currentStep === totalQuestions
                           ? "Submit profile information"
@@ -907,7 +924,7 @@ export default function CareerOnboarding() {
                     >
                       {isSubmitting ? (
                         <>
-                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />{" "}
+                          <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />{" "}
                           Generating pivots...
                         </>
                       ) : currentStep === 0 ? (
@@ -918,7 +935,8 @@ export default function CareerOnboarding() {
                         <>Go to Dashboard</>
                       ) : (
                         <>
-                          Continue <ArrowRight className="ml-2 h-5 w-5" />
+                          Continue{" "}
+                          <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                         </>
                       )}
                     </Button>
@@ -929,18 +947,21 @@ export default function CareerOnboarding() {
           </div>
         </div>
 
-        <div className="text-center pb-16 text-sm text-gray-100">
+        <div className="text-center pb-10 sm:pb-16 text-xs sm:text-sm text-gray-100">
           {currentStep !== totalQuestions ? (
             <>
-              Press{" "}
-              <kbd className="px-2 py-1 bg-neutral-600 rounded text-xs mx-1">
-                Enter
-              </kbd>{" "}
-              to continue or{" "}
-              <kbd className="px-2 py-1 bg-neutral-600 rounded text-xs mx-1">
-                ↑
-              </kbd>{" "}
-              to go back
+              <span className="hidden sm:inline">
+                Press{" "}
+                <kbd className="px-2 py-1 bg-neutral-600 rounded text-xs mx-1">
+                  Enter
+                </kbd>{" "}
+                to continue or{" "}
+                <kbd className="px-2 py-1 bg-neutral-600 rounded text-xs mx-1">
+                  ↑
+                </kbd>{" "}
+                to go back
+              </span>
+              <span className="sm:hidden">Swipe or use arrows to navigate</span>
             </>
           ) : (
             // At confirmation step, instruct user to click the button
@@ -950,6 +971,51 @@ export default function CareerOnboarding() {
           )}
         </div>
       </div>
+
+      {/* Mobile Navigation Buttons (Typeform style) */}
+      {isMobile && currentStep > 0 && currentStep <= totalQuestions && (
+        <div className="fixed bottom-6 left-6 flex flex-col space-y-3 z-10">
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2 }}
+            onClick={prevStep}
+            className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center shadow-lg border border-gray-700 hover:bg-gray-700 active:bg-gray-600 transition-colors"
+            aria-label="Go to previous question"
+            tabIndex="0"
+            disabled={currentStep <= 1}
+            style={{ opacity: currentStep <= 1 ? 0.5 : 1 }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (currentStep > 1) prevStep();
+              }
+            }}
+          >
+            <ChevronUp className="h-6 w-6 text-white" />
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2, delay: 0.1 }}
+            onClick={nextStep}
+            className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center shadow-lg border border-gray-700 hover:bg-gray-700 active:bg-gray-600 transition-colors"
+            aria-label="Go to next question"
+            tabIndex="0"
+            disabled={currentStep >= totalQuestions}
+            style={{ opacity: currentStep >= totalQuestions ? 0.5 : 1 }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (currentStep < totalQuestions) nextStep();
+              }
+            }}
+          >
+            <ChevronDown className="h-6 w-6 text-white" />
+          </motion.button>
+        </div>
+      )}
     </div>
   );
 }
