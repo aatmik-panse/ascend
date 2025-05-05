@@ -28,6 +28,9 @@ export default function CareerOnboarding() {
   const [touchStartY, setTouchStartY] = useState(0);
   const formRef = useRef(null);
 
+  // Add a boolean state to track when onboarding is completed
+  const [onboardingCompleted, setOnboardingCompleted] = useState(false);
+
   // Build initial form data for 50 questions
   const initialForm = questions.reduce((acc, q) => {
     if (q.type === "checkbox") acc[q.field] = [];
@@ -113,6 +116,24 @@ export default function CareerOnboarding() {
       setTimeout(() => inputRefs.current[cur.field].focus(), 400);
     }
   }, [currentStep]);
+
+  // Add a useEffect to redirect to dashboard after showing completion message
+  useEffect(() => {
+    // Check if we're on the complete step
+    if (currentStep === questions.length - 1) {
+      // Mark onboarding as completed
+      setOnboardingCompleted(true);
+
+      // Set a timeout to redirect to dashboard after showing completion message
+      const redirectTimer = setTimeout(() => {
+        console.log("Redirecting to dashboard...");
+        router.push("/dashboard");
+      }, 3000); // 3 second delay
+
+      // Clear the timeout if the component unmounts
+      return () => clearTimeout(redirectTimer);
+    }
+  }, [currentStep, router]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -564,6 +585,27 @@ export default function CareerOnboarding() {
           <ChevronDown className="h-6 w-6" />
         </motion.button>
       </div>
+
+      {/* Add a transition message when redirecting */}
+      {onboardingCompleted && (
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white text-black p-8 rounded-xl max-w-md text-center"
+          >
+            <div className="mb-4 flex justify-center">
+              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+            <h2 className="text-xl font-bold mb-2">Redirecting you now!</h2>
+            <p className="text-gray-600">
+              Taking you to your personalized dashboard...
+            </p>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
