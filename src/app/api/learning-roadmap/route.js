@@ -130,7 +130,7 @@ export async function PATCH(req) {
     }
 
     // Parse request body
-    const { roadmapId, completedSteps } = await req.json();
+    const { roadmapId, completedSteps, selectedPivot } = await req.json();
 
     if (!roadmapId) {
       return NextResponse.json(
@@ -151,13 +151,14 @@ export async function PATCH(req) {
       return NextResponse.json({ error: "Roadmap not found" }, { status: 404 });
     }
 
-    // Update the roadmap with completed steps
+    // Update the roadmap with completed steps and selected pivot
     const updatedRoadmap = await prisma.learningRoadmap.update({
       where: {
         id: roadmapId,
       },
       data: {
         completedSteps: completedSteps || roadmap.completedSteps,
+        selectedPivot: selectedPivot || roadmap.selectedPivot,
         updatedAt: new Date(),
       },
     });

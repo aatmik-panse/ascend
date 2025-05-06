@@ -21,6 +21,7 @@ import {
   Award,
   LineChart,
   Loader2,
+  Star,
 } from "lucide-react";
 import {
   HoverCard,
@@ -34,7 +35,46 @@ const CareerPivot = () => {
   const [careerPaths, setCareerPaths] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingPath, setLoadingPath] = useState(null); // Track which path is currently loading
+  const [selectedPivots, setSelectedPivots] = useState({});
   const router = useRouter();
+
+  useEffect(() => {
+    // Load all selected pivots from localStorage
+    const loadSelectedPivots = () => {
+      const pivots = {};
+      
+      // Get all localStorage keys
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('roadmap-') && key.endsWith('-selectedPivot')) {
+          try {
+            const roadmapId = key.split('-')[1];
+            const pivotData = JSON.parse(localStorage.getItem(key));
+            pivots[roadmapId] = pivotData;
+          } catch (e) {
+            console.error('Error parsing pivot data:', e);
+          }
+        }
+      }
+      
+      setSelectedPivots(pivots);
+    };
+    
+    loadSelectedPivots();
+    
+    // Set up event listener for storage changes
+    const handleStorageChange = (e) => {
+      if (e.key && e.key.includes('-selectedPivot')) {
+        loadSelectedPivots();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchCareerRecommendations = async () => {
@@ -137,6 +177,13 @@ const CareerPivot = () => {
     }
   };
 
+  const handleViewSelectedPivot = (roadmapId) => {
+    router.push(`/roadmap/${roadmapId}`);
+  };
+
+  // Check if there are any selected pivots
+  const hasSelectedPivots = Object.keys(selectedPivots).length > 0;
+
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white text-black rounded-2xl">
       <div className="space-y-8">
@@ -155,6 +202,49 @@ const CareerPivot = () => {
             match for your professional growth.
           </p>
         </div>
+
+        {/* Display selected pivots if any */}
+        {hasSelectedPivots && (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Star className="h-5 w-5 text-yellow-500" />
+              <h2 className="text-xl font-bold text-gray-900">Your Selected Pivots</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Object.entries(selectedPivots).map(([roadmapId, pivotData]) => (
+                <Card 
+                  key={`selected-${roadmapId}`}
+                  className="bg-blue-50 border border-blue-200 shadow-sm hover:shadow-md transition-all duration-300"
+                >
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-center">
+                      <CardTitle className="text-lg font-semibold text-blue-800">
+                        Selected Pivot
+                      </CardTitle>
+                      <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                        <Star className="h-3 w-3 mr-1" />
+                        Active
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-blue-700">
+                      Week {pivotData.weekNumber}, Activity {pivotData.activityIndex + 1}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardFooter className="pt-3 pb-3 flex justify-end">
+                    <Button 
+                      onClick={() => handleViewSelectedPivot(roadmapId)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      size="sm"
+                    >
+                      View Pivot
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
