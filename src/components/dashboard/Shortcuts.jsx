@@ -7,7 +7,7 @@ const shortcuts = [
   {
     name: "Resume Booster",
     icon: <Rocket className="h-5 w-5" />,
-    href: "/tools/resume-booster",
+    href: "/tools/resume-enhancer",
     aria: "Open Resume Booster",
   },
   {
