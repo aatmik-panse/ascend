@@ -17,6 +17,7 @@ import {
   Trophy,
   Loader2,
   Star,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,7 @@ import { toast } from "sonner";
 import { motion } from "motion/react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { CustomAlert } from "@/components/ui/custom-alert";
 
 const RoadmapPage = () => {
   const params = useParams();
@@ -41,6 +43,11 @@ const RoadmapPage = () => {
   const [selectedPivot, setSelectedPivot] = useState(null);
   const [pivotProgress, setPivotProgress] = useState(0);
   const [focusMode, setFocusMode] = useState(false);
+  const [isPermanentlySelected, setIsPermanentlySelected] = useState(false);
+  
+  // Custom alert states
+  const [showSelectAlert, setShowSelectAlert] = useState(false);
+  const [showRegenerateAlert, setShowRegenerateAlert] = useState(false);
 
   useEffect(() => {
     // Load selected pivot from database first, then fallback to localStorage
@@ -62,6 +69,12 @@ const RoadmapPage = () => {
 
         const data = await response.json();
         setRoadmap(data.roadmap);
+
+        // Check if the roadmap is permanently selected
+        const isPermanent = localStorage.getItem(`roadmap-${id}-permanent`);
+        if (isPermanent === "true") {
+          setIsPermanentlySelected(true);
+        }
 
         // Initialize expanded state for all weeks
         const savedExpandedWeeks = localStorage.getItem(
@@ -195,17 +208,33 @@ const RoadmapPage = () => {
   };
 
   const handleSelectPivot = async (weekNumber, activityIndex) => {
+    // Check if roadmap is permanently selected and a pivot is already selected
+    if (isPermanentlySelected && selectedPivot) {
+      toast.error(
+        "This roadmap has been permanently selected. You cannot change your pivot."
+      );
+      return;
+    }
+
     const pivotInfo = {
       weekNumber,
       activityIndex,
     };
 
-    // If the same pivot is selected again, clear the selection
+    // If the same pivot is selected again, clear the selection (only if not permanently selected)
     if (
       selectedPivot &&
       selectedPivot.weekNumber === weekNumber &&
       selectedPivot.activityIndex === activityIndex
     ) {
+      // If permanently selected, don't allow clearing the pivot
+      if (isPermanentlySelected) {
+        toast.error(
+          "This roadmap has been permanently selected. You cannot remove your pivot."
+        );
+        return;
+      }
+
       setSelectedPivot(null);
       localStorage.removeItem(`roadmap-${id}-selectedPivot`);
 
@@ -229,6 +258,14 @@ const RoadmapPage = () => {
         console.error("Error saving pivot to database:", error);
       }
     } else {
+      // If permanently selected and trying to select a different pivot, show error
+      if (isPermanentlySelected && selectedPivot) {
+        toast.error(
+          "This roadmap has been permanently selected. You cannot change your pivot."
+        );
+        return;
+      }
+
       setSelectedPivot(pivotInfo);
       localStorage.setItem(
         `roadmap-${id}-selectedPivot`,
@@ -260,6 +297,15 @@ const RoadmapPage = () => {
 
         if (!response.ok) {
           console.error("Failed to save pivot to database");
+        } else {
+          // Show success message
+          if (isPermanentlySelected) {
+            toast.success("Pivot selected! This selection is permanent.");
+          } else {
+            toast.success(
+              "Pivot selected! You can change this later if needed."
+            );
+          }
         }
       } catch (error) {
         console.error("Error saving pivot to database:", error);
@@ -343,15 +389,52 @@ const RoadmapPage = () => {
     }
   };
 
-  const handleRegenerateRoadmap = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to regenerate this roadmap? Your current progress will be lost."
-      )
-    ) {
+  const handlePermanentlySelectRoadmap = () => {
+    // Show custom confirmation alert
+    setShowSelectAlert(true);
+  };
+  
+  const confirmPermanentSelection = async () => {
+    try {
+      // Mark the roadmap as permanently selected in localStorage
+      localStorage.setItem(`roadmap-${id}-permanent`, "true");
+      setIsPermanentlySelected(true);
+
+      // Show success message
+      toast.success(
+        "Roadmap permanently selected! Your learning journey is now set."
+      );
+
+      // If there's no pivot selected yet, expand the first week to encourage selection
+      if (!selectedPivot) {
+        setExpandedWeeks((prev) => ({
+          ...prev,
+          1: true,
+        }));
+        toast.info(
+          "Now select a pivot activity to focus on by clicking the star icon next to an activity."
+        );
+      }
+    } catch (error) {
+      console.error("Error selecting roadmap permanently:", error);
+      toast.error("Failed to permanently select roadmap");
+    }
+  };
+
+  const handleRegenerateRoadmap = () => {
+    // If roadmap is permanently selected, don't allow regeneration
+    if (isPermanentlySelected) {
+      toast.error(
+        "This roadmap has been permanently selected and cannot be regenerated."
+      );
       return;
     }
 
+    // Show custom confirmation alert
+    setShowRegenerateAlert(true);
+  };
+  
+  const confirmRegeneration = async () => {
     try {
       setLoading(true);
       const testId = roadmap.testId;
@@ -428,6 +511,38 @@ const RoadmapPage = () => {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-5xl mx-auto">
+      {/* Custom Alert for Permanent Selection */}
+      <CustomAlert
+        isOpen={showSelectAlert}
+        onClose={() => setShowSelectAlert(false)}
+        onConfirm={confirmPermanentSelection}
+        title="Confirm Permanent Selection"
+        message={
+          "Are you sure you want to permanently select this roadmap?\n\n" +
+          "This action cannot be undone, and you won't be able to:\n" +
+          "• Regenerate this roadmap\n" +
+          "• Change your pivot later\n\n" +
+          "This ensures consistency in your learning journey."
+        }
+        confirmText="Yes, Make Permanent"
+        cancelText="Cancel"
+        type="warning"
+      />
+      
+      {/* Custom Alert for Regeneration */}
+      <CustomAlert
+        isOpen={showRegenerateAlert}
+        onClose={() => setShowRegenerateAlert(false)}
+        onConfirm={confirmRegeneration}
+        title="Confirm Regeneration"
+        message={
+          "Are you sure you want to regenerate this roadmap?\n\n" +
+          "Your current progress will be lost, and a new roadmap will be generated based on your profile."
+        }
+        confirmText="Yes, Regenerate"
+        cancelText="Cancel"
+        type="warning"
+      />
       {focusMode && selectedPivot && (
         <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
           <div className="flex items-center">
@@ -466,16 +581,40 @@ const RoadmapPage = () => {
             </Button>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-100">
               {roadmap.title}
+              {isPermanentlySelected && (
+                <Badge className="ml-3 bg-green-100 text-green-800 border-green-200">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Permanently Selected
+                </Badge>
+              )}
             </h1>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            {!isPermanentlySelected && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handlePermanentlySelectRoadmap}
+                className="bg-green-600 hover:bg-green-700 text-white"
+                tabIndex="0"
+                aria-label="Permanently select this roadmap"
+              >
+                <CheckCircle className="mr-2 h-3.5 w-3.5" />
+                Choose This Roadmap
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"
               onClick={handleRegenerateRoadmap}
-              className="border-gray-300 text-gray-700"
+              className={`border-gray-300 ${
+                isPermanentlySelected
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-700"
+              }`}
               tabIndex="0"
               aria-label="Regenerate this roadmap"
+              disabled={isPermanentlySelected}
             >
               <RefreshCw className="mr-2 h-3.5 w-3.5" />
               Regenerate
