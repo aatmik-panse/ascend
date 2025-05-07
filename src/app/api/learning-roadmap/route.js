@@ -119,6 +119,8 @@ export async function GET(req) {
 // Update roadmap progress or details
 export async function PATCH(req) {
   try {
+    console.log("PATCH request received for learning roadmap");
+    
     // Authenticate the user
     const supabase = await createClient();
     const {
@@ -126,19 +128,26 @@ export async function PATCH(req) {
     } = await supabase.auth.getUser();
 
     if (!user) {
+      console.log("Unauthorized user tried to update roadmap");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Parse request body
-    const { roadmapId, completedSteps, selectedPivot } = await req.json();
+    const body = await req.json();
+    console.log("Request body:", body);
+    
+    const { roadmapId, completedSteps, selectedPivot } = body;
 
     if (!roadmapId) {
+      console.log("Missing roadmapId in PATCH request");
       return NextResponse.json(
         { error: "Roadmap ID is required" },
         { status: 400 }
       );
     }
 
+    console.log(`Looking for roadmap with ID: ${roadmapId} for user: ${user.id}`);
+    
     // Get the roadmap to verify ownership
     const roadmap = await prisma.learningRoadmap.findUnique({
       where: {
@@ -148,21 +157,36 @@ export async function PATCH(req) {
     });
 
     if (!roadmap) {
+      console.log(`Roadmap not found with ID: ${roadmapId}`);
       return NextResponse.json({ error: "Roadmap not found" }, { status: 404 });
     }
 
+    console.log(`Updating roadmap ${roadmapId} with new data`);
+    
+    // Prepare update data, being careful with null/undefined values
+    const updateData = {
+      updatedAt: new Date(),
+    };
+    
+    // Only include completedSteps if it's provided and is an array
+    if (completedSteps !== undefined && Array.isArray(completedSteps)) {
+      updateData.completedSteps = completedSteps;
+    }
+    
+    // Only include selectedPivot if it's explicitly provided (could be null to clear it)
+    if (selectedPivot !== undefined) {
+      updateData.selectedPivot = selectedPivot;
+    }
+    
     // Update the roadmap with completed steps and selected pivot
     const updatedRoadmap = await prisma.learningRoadmap.update({
       where: {
         id: roadmapId,
       },
-      data: {
-        completedSteps: completedSteps || roadmap.completedSteps,
-        selectedPivot: selectedPivot || roadmap.selectedPivot,
-        updatedAt: new Date(),
-      },
+      data: updateData,
     });
 
+    console.log(`Roadmap ${roadmapId} updated successfully`);
     return NextResponse.json({ roadmap: updatedRoadmap });
   } catch (error) {
     console.error("Error updating roadmap:", error);
@@ -181,16 +205,34 @@ async function generatePersonalizedRoadmap(
   selectedRecommendation,
   testId
 ) {
-  // Format user data for the AI prompt
+  // Extract detailed responses from onboarding data
+  const detailedResponses = onboardingData?.detailedResponses || {};
+  
+  // Format basic user data for the AI prompt
   const userProfile = {
-    jobTitle: onboardingData?.jobTitle || "Not specified",
-    experience: onboardingData?.experience || "Not specified",
+    jobTitle: onboardingData?.jobTitle || detailedResponses?.jobTitle || "Not specified",
+    experience: onboardingData?.experience || detailedResponses?.q26 || "Not specified",
     topSkills: onboardingData?.topSkills?.join(", ") || "Not specified",
-    timeForGrowth: onboardingData?.timeForGrowth || "4-7 hrs/week",
+    timeForGrowth: onboardingData?.timeForGrowth || detailedResponses?.q12 || "4-7 hrs/week",
     industryInterest: onboardingData?.industryInterest || "Not specified",
   };
 
   const targetRole = selectedRecommendation?.title || "Career transition";
+  
+  // Build a comprehensive user profile from all 50 questions
+  let detailedUserProfile = "";
+  
+  // Add all 50 question responses to provide complete context
+  for (const [key, value] of Object.entries(detailedResponses || {})) {
+    // Skip non-question fields or empty values
+    if (!key.startsWith('q') || !value || value.length === 0) continue;
+    
+    // For array values, join them with commas
+    const formattedValue = Array.isArray(value) ? value.join(", ") : value;
+    
+    // Add the question and response to the profile
+    detailedUserProfile += `\n    - ${key}: ${formattedValue}`;
+  }
 
   // Create the prompt for OpenAI
   const prompt = `
@@ -202,6 +244,8 @@ async function generatePersonalizedRoadmap(
     - Top Skills: ${userProfile.topSkills}
     - Weekly Learning Time Available: ${userProfile.timeForGrowth}
     - Industry Interest: ${userProfile.industryInterest}
+    
+    DETAILED USER PROFILE FROM ONBOARDING QUESTIONS:${detailedUserProfile}
     
     ${
       selectedRecommendation

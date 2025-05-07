@@ -96,7 +96,9 @@ const RoadmapPage = () => {
           );
         } else {
           // Fallback to localStorage if not in database
-          const savedPivot = localStorage.getItem(`roadmap-${id}-selectedPivot`);
+          const savedPivot = localStorage.getItem(
+            `roadmap-${id}-selectedPivot`
+          );
           if (savedPivot) {
             const pivotData = JSON.parse(savedPivot);
             setSelectedPivot(pivotData);
@@ -151,7 +153,10 @@ const RoadmapPage = () => {
   useEffect(() => {
     // Save focus mode preference to localStorage
     if (selectedPivot) {
-      localStorage.setItem(`roadmap-${id}-focusMode`, JSON.stringify(focusMode));
+      localStorage.setItem(
+        `roadmap-${id}-focusMode`,
+        JSON.stringify(focusMode)
+      );
     } else if (focusMode) {
       // If no pivot is selected, turn off focus mode
       setFocusMode(false);
@@ -278,20 +283,31 @@ const RoadmapPage = () => {
 
     // Save to database
     try {
+      console.log(`Updating roadmap progress for roadmap ID: ${id}`);
+      console.log(`Updated completed activities:`, updatedCompletedActivities);
+
+      // Make sure we're using the roadmap's actual ID, not the test ID
+      const actualRoadmapId = roadmap?.id || id;
+
       const response = await fetch("/api/learning-roadmap", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          roadmapId: id,
+          roadmapId: actualRoadmapId,
           completedSteps: updatedCompletedActivities,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update progress");
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Server error:", errorData);
+        throw new Error(errorData.error || "Failed to update progress");
       }
+
+      // Success notification
+      toast.success("Progress updated");
     } catch (error) {
       console.error("Error saving progress:", error);
       toast.error("Failed to save your progress");
@@ -420,7 +436,9 @@ const RoadmapPage = () => {
             </div>
             <div>
               <h2 className="font-medium text-blue-800">Focus Mode Active</h2>
-              <p className="text-sm text-blue-600">You're focusing on your selected pivot activity</p>
+              <p className="text-sm text-blue-600">
+                You&apos;re focusing on your selected pivot activity
+              </p>
             </div>
           </div>
           <Button
@@ -433,7 +451,7 @@ const RoadmapPage = () => {
           </Button>
         </div>
       )}
-      
+
       <div className="mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <div>
@@ -518,7 +536,8 @@ const RoadmapPage = () => {
                 className={`bg-white rounded-lg shadow-sm border ${
                   currentWeek === week.weekNumber
                     ? "border-blue-300 ring-1 ring-blue-200"
-                    : selectedPivot && selectedPivot.weekNumber === week.weekNumber
+                    : selectedPivot &&
+                      selectedPivot.weekNumber === week.weekNumber
                     ? "border-blue-500 ring-1 ring-blue-300"
                     : "border-gray-200"
                 }`}
@@ -540,7 +559,8 @@ const RoadmapPage = () => {
                       className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm ${
                         currentWeek === week.weekNumber
                           ? "bg-blue-500 text-white"
-                          : selectedPivot && selectedPivot.weekNumber === week.weekNumber
+                          : selectedPivot &&
+                            selectedPivot.weekNumber === week.weekNumber
                           ? "bg-blue-600 text-white"
                           : "bg-gray-100 text-gray-700"
                       }`}
@@ -550,11 +570,12 @@ const RoadmapPage = () => {
                     <div>
                       <h3 className="font-medium text-gray-900 flex items-center">
                         Week {week.weekNumber}
-                        {selectedPivot && selectedPivot.weekNumber === week.weekNumber && (
-                          <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                            Contains Pivot
-                          </span>
-                        )}
+                        {selectedPivot &&
+                          selectedPivot.weekNumber === week.weekNumber && (
+                            <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                              Contains Pivot
+                            </span>
+                          )}
                       </h3>
                       <p className="text-sm text-gray-600">{week.theme}</p>
                     </div>
@@ -695,7 +716,9 @@ const RoadmapPage = () => {
                                         className="text-xs text-blue-600 hover:text-blue-800 underline inline-flex items-center break-words"
                                       >
                                         <BookOpen className="h-3 w-3 mr-1 flex-shrink-0" />
-                                        <span className="break-all">Resource: {activity.resource}</span>
+                                        <span className="break-all">
+                                          Resource: {activity.resource}
+                                        </span>
                                       </a>
                                     )}
                                   </div>
@@ -729,12 +752,16 @@ const RoadmapPage = () => {
             <div className="mb-3">
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-gray-600">Progress</span>
-                <span className="font-medium text-blue-600">{pivotProgress}%</span>
+                <span className="font-medium text-blue-600">
+                  {pivotProgress}%
+                </span>
               </div>
               <Progress
                 value={pivotProgress}
                 className="h-2 bg-gray-100"
-                indicatorClassName={pivotProgress === 100 ? "bg-green-500" : "bg-blue-500"}
+                indicatorClassName={
+                  pivotProgress === 100 ? "bg-green-500" : "bg-blue-500"
+                }
               />
             </div>
             <div className="text-xs text-gray-500 mb-2">
@@ -744,9 +771,7 @@ const RoadmapPage = () => {
                   Completed! Great job!
                 </div>
               ) : (
-                <div>
-                  Mark the activity as complete to track your progress
-                </div>
+                <div>Mark the activity as complete to track your progress</div>
               )}
             </div>
             <div className="flex items-center mt-3 pt-2 border-t border-gray-100">
