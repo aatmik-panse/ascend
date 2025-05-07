@@ -33,32 +33,18 @@ export async function POST(request) {
     // Parse the request body
     const onboardingData = await request.json();
 
-    // Add detailed logging for debugging each field
+    // Add detailed logging for debugging
     console.log(
       "Received onboarding data:",
       JSON.stringify(onboardingData, null, 2)
     );
-    console.log("biggestConcern field:", onboardingData.biggestConcern);
+
     console.log(
       "Current user:",
       supabaseUser
         ? `ID: ${supabaseUser.id}, Email: ${supabaseUser.email}`
         : "Not authenticated"
     );
-    console.log(
-      "Prisma user:",
-      prismaUser
-        ? `ID: ${prismaUser.id}, Email: ${prismaUser.email}`
-        : "Not found in database"
-    );
-
-    // Validate required fields
-    if (!onboardingData.jobTitle) {
-      return NextResponse.json(
-        { error: "Job title is required" },
-        { status: 400 }
-      );
-    }
 
     let userId = null;
 
@@ -131,39 +117,7 @@ export async function POST(request) {
       }
     }
 
-    // Extract and log all fields that match our schema
-    const {
-      jobTitle,
-      experience,
-      topSkills: rawTopSkills,
-      enjoyDislike,
-      motivators,
-      timeForGrowth,
-      linkedinUrl,
-      industryInterest,
-      biggestConcern,
-    } = onboardingData;
-
-    // Filter out empty skills
-    const topSkills = Array.isArray(rawTopSkills)
-      ? rawTopSkills.filter(Boolean)
-      : [];
-
-    console.log("Individual fields extracted from request:");
-    console.log("- jobTitle:", jobTitle);
-    console.log("- experience:", experience);
-    console.log("- topSkills:", topSkills);
-    console.log("- enjoyDislike:", enjoyDislike);
-    console.log("- motivators:", motivators);
-    console.log("- timeForGrowth:", timeForGrowth);
-    console.log("- linkedinUrl:", linkedinUrl);
-    console.log("- industryInterest:", industryInterest);
-    console.log("- biggestConcern:", biggestConcern);
-
-    // Create onboarding record in database
-    console.log(`Creating onboarding data with userId: ${userId}`);
-
-    // Create the data object with explicit assignment of each field based on schema
+    // Create the data object with the JSON field as primary storage
     const createData = {
       // Connect to the User by ID if available
       ...(userId
@@ -174,18 +128,22 @@ export async function POST(request) {
           }
         : {}),
 
-      // Required fields
-      jobTitle,
-      experience,
-      motivators,
-      timeForGrowth,
-      industryInterest,
+      // Store all 50 question responses as the primary data source
+      detailedResponses: onboardingData,
 
-      // Optional fields
-      topSkills,
-      enjoyDislike: enjoyDislike || null,
-      linkedinUrl: linkedinUrl || null,
-      biggestConcern: biggestConcern || null,
+      // For backward compatibility, extract some fields for existing queries
+      // All these fields are now optional in the schema
+      jobTitle: onboardingData.jobTitle || null,
+      experience: onboardingData.experience || onboardingData.q26 || null,
+      motivators: onboardingData.motivators || null,
+      timeForGrowth: onboardingData.timeForGrowth || onboardingData.q12 || null,
+      industryInterest: onboardingData.industryInterest || null,
+      topSkills: Array.isArray(onboardingData.topSkills)
+        ? onboardingData.topSkills.filter(Boolean)
+        : [],
+      enjoyDislike: onboardingData.enjoyDislike || null,
+      linkedinUrl: onboardingData.linkedinUrl || null,
+      biggestConcern: onboardingData.biggestConcern || null,
     };
 
     // Log the full data object being sent to Prisma
@@ -199,30 +157,6 @@ export async function POST(request) {
     });
 
     console.log(`Successfully created onboarding record:`, result);
-
-    // Optionally, also store in Supabase if needed
-    // if (supabaseUser) {
-    //   // Insert the same data into Supabase using snake_case field names
-    //   const { error } = await supabase.from("onboarding_data").insert({
-    //     user_id: supabaseUser.id,
-    //     job_title: jobTitle,
-    //     experience,
-    //     top_skills: topSkills,
-    //     enjoy_dislike: enjoyDislike,
-    //     motivators,
-    //     time_for_growth: timeForGrowth,
-    //     linkedin_url: linkedinUrl,
-    //     industry_interest: industryInterest,
-    //     biggest_concern: biggestConcern,
-    //   });
-
-    //   if (error) {
-    //     console.error("Supabase insertion error:", error);
-    //     // Continue anyway since Prisma insertion succeeded
-    //   } else {
-    //     console.log("Successfully stored in Supabase as well");
-    //   }
-    // }
 
     // Return success response with the created data
     return NextResponse.json(

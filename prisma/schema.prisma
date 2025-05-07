@@ -33,21 +33,22 @@ model User {
 }
 
 model OnboardingData {
-  id               String   @id @default(cuid())
-  userId           String?
-  jobTitle         String
-  company          String? // Made optional since it's not always applicable
-  experience       String
-  topSkills        String[]
-  enjoyDislike     String?
-  motivators       String // TODO : multi select bana do ise 
-  timeForGrowth    String
-  linkedinUrl      String?
-  industryInterest String
-  biggestConcern   String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  User             User?    @relation(fields: [userId], references: [id])
+  id                String   @id @default(cuid())
+  userId            String?
+  jobTitle          String? // Now optional
+  company           String?
+  experience        String? // Now optional
+  topSkills         String[]
+  enjoyDislike      String?
+  motivators        String? // Now optional, TODO: multi select bana do ise
+  timeForGrowth     String? // Now optional
+  linkedinUrl       String?
+  industryInterest  String? // Now optional
+  biggestConcern    String?
+  detailedResponses Json? // Primary storage for all 50 question responses
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  User              User?    @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }

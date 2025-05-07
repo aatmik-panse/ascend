@@ -190,15 +190,37 @@ async function getOnboardingData(userId) {
 
 // Helper function to create a well-structured prompt
 function createPrompt(onboardingData) {
-  return `
-    Based on the following user profile, suggest 5 suitable career paths:
+  // First, extract all the detailed responses from the onboarding data
+  const detailedResponses = onboardingData.detailedResponses || {};
+  
+  // Start with the basic profile information
+  let promptText = `
+    Based on the following detailed user profile, suggest 5 suitable career paths:
     
-    Current Role: ${onboardingData.jobTitle || "Not specified"}
-    Experience Level: ${onboardingData.experience || "Not specified"}
-    Top Skills: ${onboardingData.topSkills.join(", ") || "Not specified"}
+    Current Role: ${onboardingData.jobTitle || detailedResponses.jobTitle || "Not specified"}
+    Experience Level: ${onboardingData.experience || detailedResponses.q26 || "Not specified"}
+    Top Skills: ${(onboardingData.topSkills || []).join(", ") || "Not specified"}
     Work Preferences: ${onboardingData.enjoyDislike || "Not specified"}
     Primary Motivators: ${onboardingData.motivators || "Not specified"}
-    Weekly Learning Time: ${onboardingData.timeForGrowth || "Not specified"}
+    Weekly Learning Time: ${onboardingData.timeForGrowth || detailedResponses.q12 || "Not specified"}
+    
+    DETAILED USER PROFILE FROM 50 QUESTIONS:
+`;
+
+  // Add all 50 question responses to provide complete context
+  for (const [key, value] of Object.entries(detailedResponses)) {
+    // Skip non-question fields or empty values
+    if (!key.startsWith('q') || !value || value.length === 0) continue;
+    
+    // For array values, join them with commas
+    const formattedValue = Array.isArray(value) ? value.join(", ") : value;
+    
+    // Add the question and response to the prompt
+    promptText += `    ${key}: ${formattedValue}\n`;
+  }
+  
+  // Add the final part of the prompt
+  promptText += `
     Industries of Interest: ${
       onboardingData.industryInterest || "Not specified"
     }
@@ -217,6 +239,8 @@ function createPrompt(onboardingData) {
     id, title, match, description, skills, growth, salary. 
     Ensure skills is an array of strings.
   `;
+  
+  return promptText;
 }
 
 // Helper function to call OpenAI with timeout handling

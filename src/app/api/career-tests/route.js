@@ -65,15 +65,33 @@ export async function POST(req) {
     });
 
     // Generate personalized test questions using OpenAI
-    const prompt = `
-      Create a personalized assessment test for the career path: ${
-        careerPath.title
-      }. 
-      
-      User profile:
-      Current Role: ${onboardingData?.jobTitle || "Not specified"}
-      Experience Level: ${onboardingData?.experience || "Not specified"}
+    // Extract detailed responses from onboarding data
+    const detailedResponses = onboardingData?.detailedResponses || {};
+    
+    // Build a comprehensive user profile from all 50 questions
+    let userProfileText = `
+      Current Role: ${onboardingData?.jobTitle || detailedResponses?.jobTitle || "Not specified"}
+      Experience Level: ${onboardingData?.experience || detailedResponses?.q26 || "Not specified"}
       Top Skills: ${onboardingData?.topSkills?.join(", ") || "Not specified"}
+    `;
+    
+    // Add all 50 question responses to provide complete context
+    for (const [key, value] of Object.entries(detailedResponses || {})) {
+      // Skip non-question fields or empty values
+      if (!key.startsWith('q') || !value || value.length === 0) continue;
+      
+      // For array values, join them with commas
+      const formattedValue = Array.isArray(value) ? value.join(", ") : value;
+      
+      // Add the question and response to the profile
+      userProfileText += `\n      ${key}: ${formattedValue}`;
+    }
+    
+    const prompt = `
+      Create a personalized assessment test for the career path: ${careerPath.title}. 
+      
+      Detailed user profile from onboarding questions:
+      ${userProfileText}
       
       The test should:
       1. Contain exactly 20 multiple-choice questions

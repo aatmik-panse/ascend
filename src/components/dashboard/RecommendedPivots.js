@@ -3,14 +3,53 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Loader2, Award } from "lucide-react";
+import { ArrowRight, Loader2, Award, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const RecommendedPivots = ({ className }) => {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedPivots, setSelectedPivots] = useState({});
   const router = useRouter();
+
+  useEffect(() => {
+    // Load all selected pivots from localStorage
+    const loadSelectedPivots = () => {
+      const pivots = {};
+      
+      // Get all localStorage keys
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('roadmap-') && key.endsWith('-selectedPivot')) {
+          try {
+            const roadmapId = key.split('-')[1];
+            const pivotData = JSON.parse(localStorage.getItem(key));
+            pivots[roadmapId] = pivotData;
+          } catch (e) {
+            console.error('Error parsing pivot data:', e);
+          }
+        }
+      }
+      
+      setSelectedPivots(pivots);
+    };
+    
+    loadSelectedPivots();
+    
+    // Set up event listener for storage changes
+    const handleStorageChange = (e) => {
+      if (e.key && e.key.includes('-selectedPivot')) {
+        loadSelectedPivots();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -65,6 +104,13 @@ export const RecommendedPivots = ({ className }) => {
   const handleExploreOne = (id) => {
     router.push(`/career_pivot/test/${id}`);
   };
+  
+  const handleViewSelectedPivot = (roadmapId) => {
+    router.push(`/roadmap/${roadmapId}`);
+  };
+
+  // Check if there are any selected pivots
+  const hasSelectedPivots = Object.keys(selectedPivots).length > 0;
 
   if (loading) {
     return (
@@ -122,6 +168,45 @@ export const RecommendedPivots = ({ className }) => {
       <p className="text-sm text-zinc-400 mb-4">
         Top AI-recommended roles for your pivot journey
       </p>
+
+      {/* Display selected pivots if any */}
+      {hasSelectedPivots && (
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Star className="h-4 w-4 text-yellow-500" />
+            <h4 className="text-sm font-semibold text-yellow-400">Your Selected Pivots</h4>
+          </div>
+          <div className="space-y-3">
+            {Object.entries(selectedPivots).map(([roadmapId, pivotData]) => (
+              <div
+                key={`selected-${roadmapId}`}
+                className="bg-blue-900/30 rounded-lg border border-blue-800/50 p-3 hover:border-blue-500 transition-colors cursor-pointer"
+                onClick={() => handleViewSelectedPivot(roadmapId)}
+                tabIndex="0"
+                aria-label="View your selected pivot"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleViewSelectedPivot(roadmapId);
+                  }
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4 text-yellow-500 flex-shrink-0" />
+                    <div className="text-sm text-white">
+                      Selected Pivot (Week {pivotData.weekNumber})
+                    </div>
+                  </div>
+                  <Badge className="bg-blue-600/30 text-blue-400 border-blue-700/50">
+                    View
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="space-y-4">
         {recommendations.map((rec) => (

@@ -16,6 +16,8 @@ import {
   ChevronUp,
   Trophy,
   Loader2,
+  Star,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +25,9 @@ import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { motion } from "motion/react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { CustomAlert } from "@/components/ui/custom-alert";
 
 const RoadmapPage = () => {
   const params = useParams();
@@ -35,8 +40,17 @@ const RoadmapPage = () => {
   const [expandedWeeks, setExpandedWeeks] = useState({});
   const [currentWeek, setCurrentWeek] = useState(1);
   const [completedActivities, setCompletedActivities] = useState([]);
+  const [selectedPivot, setSelectedPivot] = useState(null);
+  const [pivotProgress, setPivotProgress] = useState(0);
+  const [focusMode, setFocusMode] = useState(false);
+  const [isPermanentlySelected, setIsPermanentlySelected] = useState(false);
+
+  // Custom alert states
+  const [showSelectAlert, setShowSelectAlert] = useState(false);
+  const [showRegenerateAlert, setShowRegenerateAlert] = useState(false);
 
   useEffect(() => {
+    // Load selected pivot from database first, then fallback to localStorage
     const fetchRoadmap = async () => {
       try {
         setLoading(true);
@@ -56,9 +70,21 @@ const RoadmapPage = () => {
         const data = await response.json();
         setRoadmap(data.roadmap);
 
+        // Check if the roadmap is permanently selected
+        const isPermanent = localStorage.getItem(`roadmap-${id}-permanent`);
+        if (isPermanent === "true") {
+          setIsPermanentlySelected(true);
+        }
+
         // Initialize expanded state for all weeks
-        const expandedState = {};
-        if (data.roadmap?.weeks) {
+        const savedExpandedWeeks = localStorage.getItem(
+          `roadmap-${id}-expandedWeeks`
+        );
+        let expandedState = {};
+
+        if (savedExpandedWeeks) {
+          expandedState = JSON.parse(savedExpandedWeeks);
+        } else if (data.roadmap?.weeks) {
           data.roadmap.weeks.forEach((week) => {
             expandedState[week.weekNumber] = week.weekNumber === 1; // Only expand first week by default
           });
@@ -72,6 +98,41 @@ const RoadmapPage = () => {
         ) {
           setCompletedActivities(data.roadmap.completedSteps);
         }
+
+        // Load selected pivot from database first, then fallback to localStorage
+        if (data.roadmap?.selectedPivot) {
+          setSelectedPivot(data.roadmap.selectedPivot);
+          // Also update localStorage to keep them in sync
+          localStorage.setItem(
+            `roadmap-${id}-selectedPivot`,
+            JSON.stringify(data.roadmap.selectedPivot)
+          );
+        } else {
+          // Fallback to localStorage if not in database
+          const savedPivot = localStorage.getItem(
+            `roadmap-${id}-selectedPivot`
+          );
+          if (savedPivot) {
+            const pivotData = JSON.parse(savedPivot);
+            setSelectedPivot(pivotData);
+
+            // Save to database to keep them in sync
+            try {
+              await fetch("/api/learning-roadmap/pivot", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  roadmapId: id,
+                  selectedPivot: pivotData,
+                }),
+              });
+            } catch (error) {
+              console.error("Error syncing pivot to database:", error);
+            }
+          }
+        }
       } catch (error) {
         console.error("Error fetching roadmap:", error);
         setError(error.message || "Failed to load roadmap");
@@ -84,11 +145,172 @@ const RoadmapPage = () => {
     fetchRoadmap();
   }, [id]);
 
+  useEffect(() => {
+    // Save expanded weeks to localStorage
+    if (Object.keys(expandedWeeks).length > 0) {
+      localStorage.setItem(
+        `roadmap-${id}-expandedWeeks`,
+        JSON.stringify(expandedWeeks)
+      );
+    }
+  }, [expandedWeeks, id]);
+
+  useEffect(() => {
+    // Load focus mode preference from localStorage
+    const savedFocusMode = localStorage.getItem(`roadmap-${id}-focusMode`);
+    if (savedFocusMode) {
+      setFocusMode(JSON.parse(savedFocusMode));
+    }
+  }, [id]);
+
+  useEffect(() => {
+    // Save focus mode preference to localStorage
+    if (selectedPivot) {
+      localStorage.setItem(
+        `roadmap-${id}-focusMode`,
+        JSON.stringify(focusMode)
+      );
+    } else if (focusMode) {
+      // If no pivot is selected, turn off focus mode
+      setFocusMode(false);
+      localStorage.removeItem(`roadmap-${id}-focusMode`);
+    }
+  }, [focusMode, selectedPivot, id]);
+
+  useEffect(() => {
+    if (selectedPivot && roadmap) {
+      // Find the selected activity
+      const week = roadmap.weeks.find(
+        (w) => w.weekNumber === selectedPivot.weekNumber
+      );
+      if (week) {
+        const activityId = `week${selectedPivot.weekNumber}-activity${selectedPivot.activityIndex}`;
+        const isCompleted = completedActivities.includes(activityId);
+        setPivotProgress(isCompleted ? 100 : 0);
+      }
+    } else {
+      setPivotProgress(0);
+    }
+  }, [selectedPivot, completedActivities, roadmap]);
+
   const handleToggleWeek = (weekNumber) => {
-    setExpandedWeeks((prev) => ({
-      ...prev,
-      [weekNumber]: !prev[weekNumber],
-    }));
+    setExpandedWeeks((prev) => {
+      const updated = {
+        ...prev,
+        [weekNumber]: !prev[weekNumber],
+      };
+      localStorage.setItem(
+        `roadmap-${id}-expandedWeeks`,
+        JSON.stringify(updated)
+      );
+      return updated;
+    });
+  };
+
+  const handleSelectPivot = async (weekNumber, activityIndex) => {
+    // Check if roadmap is permanently selected and a pivot is already selected
+    if (isPermanentlySelected && selectedPivot) {
+      toast.error(
+        "This roadmap has been permanently selected. You cannot change your pivot."
+      );
+      return;
+    }
+
+    const pivotInfo = {
+      weekNumber,
+      activityIndex,
+    };
+
+    // If the same pivot is selected again, clear the selection (only if not permanently selected)
+    if (
+      selectedPivot &&
+      selectedPivot.weekNumber === weekNumber &&
+      selectedPivot.activityIndex === activityIndex
+    ) {
+      // If permanently selected, don't allow clearing the pivot
+      if (isPermanentlySelected) {
+        toast.error(
+          "This roadmap has been permanently selected. You cannot remove your pivot."
+        );
+        return;
+      }
+
+      setSelectedPivot(null);
+      localStorage.removeItem(`roadmap-${id}-selectedPivot`);
+
+      // Save to database - clear the selected pivot
+      try {
+        const response = await fetch("/api/learning-roadmap/pivot", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roadmapId: id,
+            selectedPivot: null,
+          }),
+        });
+
+        if (!response.ok) {
+          console.error("Failed to clear pivot in database");
+        }
+      } catch (error) {
+        console.error("Error saving pivot to database:", error);
+      }
+    } else {
+      // If permanently selected and trying to select a different pivot, show error
+      if (isPermanentlySelected && selectedPivot) {
+        toast.error(
+          "This roadmap has been permanently selected. You cannot change your pivot."
+        );
+        return;
+      }
+
+      setSelectedPivot(pivotInfo);
+      localStorage.setItem(
+        `roadmap-${id}-selectedPivot`,
+        JSON.stringify(pivotInfo)
+      );
+
+      // Expand the week containing the selected pivot
+      setExpandedWeeks((prev) => {
+        const updated = { ...prev, [weekNumber]: true };
+        localStorage.setItem(
+          `roadmap-${id}-expandedWeeks`,
+          JSON.stringify(updated)
+        );
+        return updated;
+      });
+
+      // Save to database
+      try {
+        const response = await fetch("/api/learning-roadmap/pivot", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roadmapId: id,
+            selectedPivot: pivotInfo,
+          }),
+        });
+
+        if (!response.ok) {
+          console.error("Failed to save pivot to database");
+        } else {
+          // Show success message
+          if (isPermanentlySelected) {
+            toast.success("Pivot selected! This selection is permanent.");
+          } else {
+            toast.success(
+              "Pivot selected! You can change this later if needed."
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Error saving pivot to database:", error);
+      }
+    }
   };
 
   const handleToggleActivity = async (weekNumber, activityIndex) => {
@@ -107,20 +329,31 @@ const RoadmapPage = () => {
 
     // Save to database
     try {
+      console.log(`Updating roadmap progress for roadmap ID: ${id}`);
+      console.log(`Updated completed activities:`, updatedCompletedActivities);
+
+      // Make sure we're using the roadmap's actual ID, not the test ID
+      const actualRoadmapId = roadmap?.id || id;
+
       const response = await fetch("/api/learning-roadmap", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          roadmapId: id,
+          roadmapId: actualRoadmapId,
           completedSteps: updatedCompletedActivities,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update progress");
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Server error:", errorData);
+        throw new Error(errorData.error || "Failed to update progress");
       }
+
+      // Success notification
+      toast.success("Progress updated");
     } catch (error) {
       console.error("Error saving progress:", error);
       toast.error("Failed to save your progress");
@@ -156,15 +389,52 @@ const RoadmapPage = () => {
     }
   };
 
-  const handleRegenerateRoadmap = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to regenerate this roadmap? Your current progress will be lost."
-      )
-    ) {
+  const handlePermanentlySelectRoadmap = () => {
+    // Show custom confirmation alert
+    setShowSelectAlert(true);
+  };
+
+  const confirmPermanentSelection = async () => {
+    try {
+      // Mark the roadmap as permanently selected in localStorage
+      localStorage.setItem(`roadmap-${id}-permanent`, "true");
+      setIsPermanentlySelected(true);
+
+      // Show success message
+      toast.success(
+        "Roadmap permanently selected! Your learning journey is now set."
+      );
+
+      // If there's no pivot selected yet, expand the first week to encourage selection
+      if (!selectedPivot) {
+        setExpandedWeeks((prev) => ({
+          ...prev,
+          1: true,
+        }));
+        toast.info(
+          "Now select a pivot activity to focus on by clicking the star icon next to an activity."
+        );
+      }
+    } catch (error) {
+      console.error("Error selecting roadmap permanently:", error);
+      toast.error("Failed to permanently select roadmap");
+    }
+  };
+
+  const handleRegenerateRoadmap = () => {
+    // If roadmap is permanently selected, don't allow regeneration
+    if (isPermanentlySelected) {
+      toast.error(
+        "This roadmap has been permanently selected and cannot be regenerated."
+      );
       return;
     }
 
+    // Show custom confirmation alert
+    setShowRegenerateAlert(true);
+  };
+
+  const confirmRegeneration = async () => {
     try {
       setLoading(true);
       const testId = roadmap.testId;
@@ -240,8 +510,64 @@ const RoadmapPage = () => {
   const progress = calculateProgress();
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto">
-      <div className="mb-8">
+    <div className="p-4 sm:p-6 md:p-8 max-w-5xl mx-auto">
+      {/* Custom Alert for Permanent Selection */}
+      <CustomAlert
+        isOpen={showSelectAlert}
+        onClose={() => setShowSelectAlert(false)}
+        onConfirm={confirmPermanentSelection}
+        title="Confirm Permanent Selection"
+        message={
+          "Are you sure you want to permanently select this roadmap?\n\n" +
+          "This action cannot be undone, and you won't be able to:\n" +
+          "• Regenerate this roadmap\n" +
+          "• Change your pivot later\n\n" +
+          "This ensures consistency in your learning journey."
+        }
+        confirmText="Yes, Make Permanent"
+        cancelText="Cancel"
+        type="warning"
+      />
+
+      {/* Custom Alert for Regeneration */}
+      <CustomAlert
+        isOpen={showRegenerateAlert}
+        onClose={() => setShowRegenerateAlert(false)}
+        onConfirm={confirmRegeneration}
+        title="Confirm Regeneration"
+        message={
+          "Are you sure you want to regenerate this roadmap?\n\n" +
+          "Your current progress will be lost, and a new roadmap will be generated based on your profile."
+        }
+        confirmText="Yes, Regenerate"
+        cancelText="Cancel"
+        type="warning"
+      />
+      {focusMode && selectedPivot && (
+        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="bg-blue-100 p-2 rounded-full mr-3">
+              <Star className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="font-medium text-blue-800">Focus Mode Active</h2>
+              <p className="text-sm text-blue-600">
+                You&apos;re focusing on your selected pivot activity
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFocusMode(false)}
+            className="border-blue-300 text-blue-700 hover:bg-blue-100"
+          >
+            Exit Focus Mode
+          </Button>
+        </div>
+      )}
+
+      <div className="mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <div>
             <Button
@@ -253,18 +579,42 @@ const RoadmapPage = () => {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Button>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-100">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-100">
               {roadmap.title}
+              {isPermanentlySelected && (
+                <Badge className="ml-3 bg-green-100 text-green-800 border-green-200">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Permanently Selected
+                </Badge>
+              )}
             </h1>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            {!isPermanentlySelected && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handlePermanentlySelectRoadmap}
+                className="bg-green-600 hover:bg-green-700 text-white"
+                tabIndex="0"
+                aria-label="Permanently select this roadmap"
+              >
+                <CheckCircle className="mr-2 h-3.5 w-3.5" />
+                Choose This Roadmap
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"
               onClick={handleRegenerateRoadmap}
-              className="border-gray-300 text-gray-700"
+              className={`border-gray-300 ${
+                isPermanentlySelected
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-700"
+              }`}
               tabIndex="0"
               aria-label="Regenerate this roadmap"
+              disabled={isPermanentlySelected}
             >
               <RefreshCw className="mr-2 h-3.5 w-3.5" />
               Regenerate
@@ -272,10 +622,10 @@ const RoadmapPage = () => {
           </div>
         </div>
 
-        <p className="text-gray-600 mb-6">{roadmap.description}</p>
+        <p className="text-gray-200 mb-6">{roadmap.description}</p>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-8">
-          <div className="flex items-center justify-between mb-2">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
             <h3 className="font-medium text-gray-900">Overall Progress</h3>
             <Badge
               className={`${
@@ -311,171 +661,303 @@ const RoadmapPage = () => {
         </div>
 
         <div className="space-y-4">
-          {roadmap.weeks.map((week) => (
-            <motion.div
-              key={`week-${week.weekNumber}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className={`bg-white rounded-lg shadow-sm border ${
-                currentWeek === week.weekNumber
-                  ? "border-blue-300 ring-1 ring-blue-200"
-                  : "border-gray-200"
-              }`}
-            >
-              <div
-                className="p-4 cursor-pointer flex justify-between items-center"
-                onClick={() => handleToggleWeek(week.weekNumber)}
-                tabIndex="0"
-                aria-label={`Toggle Week ${week.weekNumber} visibility`}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleToggleWeek(week.weekNumber);
-                  }
-                }}
+          {roadmap.weeks
+            .filter(
+              (week) =>
+                !selectedPivot || week.weekNumber === selectedPivot.weekNumber
+            )
+            .map((week) => (
+              <motion.div
+                key={`week-${week.weekNumber}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className={`bg-white rounded-lg shadow-sm border ${
+                  currentWeek === week.weekNumber
+                    ? "border-blue-300 ring-1 ring-blue-200"
+                    : selectedPivot &&
+                      selectedPivot.weekNumber === week.weekNumber
+                    ? "border-blue-500 ring-1 ring-blue-300"
+                    : "border-gray-200"
+                }`}
               >
-                <div className="flex items-center">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm ${
-                      currentWeek === week.weekNumber
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-100 text-gray-700"
-                    }`}
-                  >
-                    {week.weekNumber}
+                <div
+                  className="p-4 cursor-pointer flex justify-between items-center"
+                  onClick={() => handleToggleWeek(week.weekNumber)}
+                  tabIndex="0"
+                  aria-label={`Toggle Week ${week.weekNumber} visibility`}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleToggleWeek(week.weekNumber);
+                    }
+                  }}
+                >
+                  <div className="flex items-center">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm ${
+                        currentWeek === week.weekNumber
+                          ? "bg-blue-500 text-white"
+                          : selectedPivot &&
+                            selectedPivot.weekNumber === week.weekNumber
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {week.weekNumber}
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-900 flex items-center">
+                        Week {week.weekNumber}
+                        {selectedPivot &&
+                          selectedPivot.weekNumber === week.weekNumber && (
+                            <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                              Contains Pivot
+                            </span>
+                          )}
+                      </h3>
+                      <p className="text-sm text-gray-600">{week.theme}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900">
-                      Week {week.weekNumber}
-                    </h3>
-                    <p className="text-sm text-gray-600">{week.theme}</p>
+                  <div className="flex items-center">
+                    {expandedWeeks[week.weekNumber] ? (
+                      <ChevronUp className="h-5 w-5 text-gray-500" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-gray-500" />
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center">
-                  {expandedWeeks[week.weekNumber] ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500" />
-                  )}
-                </div>
-              </div>
 
-              {expandedWeeks[week.weekNumber] && (
-                <div className="px-4 pb-4 pt-2 border-t border-gray-100">
-                  <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-1">
-                      Goals
-                    </h4>
-                    <p className="text-sm text-gray-600">{week.goals}</p>
-                  </div>
+                {expandedWeeks[week.weekNumber] && (
+                  <div className="px-4 pb-4 pt-2 border-t border-gray-100">
+                    <div className="mb-4">
+                      <h4 className="text-sm font-medium text-gray-700 mb-1">
+                        Goals
+                      </h4>
+                      <p className="text-sm text-gray-600">{week.goals}</p>
+                    </div>
 
-                  <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">
-                      Activities
-                    </h4>
-                    <div className="space-y-3">
-                      {week.activities.map((activity, activityIndex) => {
-                        const activityId = `week${week.weekNumber}-activity${activityIndex}`;
-                        const isCompleted =
-                          completedActivities.includes(activityId);
-                        return (
-                          <div
-                            key={activityId}
-                            className={`p-3 rounded-md border ${
-                              isCompleted
-                                ? "bg-green-50 border-green-200"
-                                : "bg-gray-50 border-gray-200 hover:bg-gray-100"
-                            } transition-colors`}
-                          >
-                            <div className="flex">
+                    <div className="mb-4">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">
+                        Activities
+                      </h4>
+                      <div className="space-y-3">
+                        {week.activities
+                          .filter(
+                            (_, activityIndex) =>
+                              !selectedPivot ||
+                              (selectedPivot.weekNumber === week.weekNumber &&
+                                selectedPivot.activityIndex === activityIndex)
+                          )
+                          .map((activity, activityIndex) => {
+                            const activityId = `week${week.weekNumber}-activity${activityIndex}`;
+                            const isCompleted =
+                              completedActivities.includes(activityId);
+                            const isPivot =
+                              selectedPivot &&
+                              selectedPivot.weekNumber === week.weekNumber &&
+                              selectedPivot.activityIndex === activityIndex;
+                            return (
                               <div
-                                className="mr-3 cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleToggleActivity(
-                                    week.weekNumber,
-                                    activityIndex
-                                  );
-                                }}
-                                tabIndex="0"
-                                aria-label={`Mark activity ${
-                                  isCompleted ? "incomplete" : "complete"
-                                }`}
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter" || e.key === " ") {
-                                    e.preventDefault();
-                                    handleToggleActivity(
-                                      week.weekNumber,
-                                      activityIndex
-                                    );
-                                  }
-                                }}
+                                key={activityId}
+                                className={`p-3 rounded-md border ${
+                                  isCompleted
+                                    ? "bg-green-50 border-green-200"
+                                    : isPivot
+                                    ? "bg-blue-50 border-blue-200"
+                                    : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                                } transition-colors`}
                               >
-                                {isCompleted ? (
-                                  <CheckCircle className="h-5 w-5 text-green-500" />
-                                ) : (
-                                  <Circle className="h-5 w-5 text-gray-300" />
-                                )}
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between mb-1">
-                                  <div className="flex items-center">
-                                    <Badge className="mr-2 bg-gray-200 text-gray-800 border-gray-300">
-                                      {getActivityIcon(activity.type)}
-                                      <span className="ml-1 capitalize">
-                                        {activity.type || "Task"}
-                                      </span>
-                                    </Badge>
-                                    <h5 className="font-medium text-gray-100">
-                                      {activity.title}
-                                    </h5>
+                                <div className="flex">
+                                  <div
+                                    className="mr-3 cursor-pointer"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleToggleActivity(
+                                        week.weekNumber,
+                                        activityIndex
+                                      );
+                                    }}
+                                    tabIndex="0"
+                                    aria-label={`Mark activity ${
+                                      isCompleted ? "incomplete" : "complete"
+                                    }`}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter" || e.key === " ") {
+                                        e.preventDefault();
+                                        handleToggleActivity(
+                                          week.weekNumber,
+                                          activityIndex
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    {isCompleted ? (
+                                      <CheckCircle className="h-5 w-5 text-green-500" />
+                                    ) : (
+                                      <Circle className="h-5 w-5 text-gray-300" />
+                                    )}
                                   </div>
-                                  <div className="flex items-center text-xs text-gray-500">
-                                    <Clock className="h-3 w-3 mr-1" />
-                                    {activity.estimatedTime}
+                                  <div className="flex-1">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1 gap-2">
+                                      <div className="flex flex-wrap items-center gap-2">
+                                        <Badge className="bg-gray-200 text-gray-800 border-gray-300">
+                                          {getActivityIcon(activity.type)}
+                                          <span className="ml-1 capitalize">
+                                            {activity.type || "Task"}
+                                          </span>
+                                        </Badge>
+                                        <h5 className="font-medium text-gray-100">
+                                          {activity.title}
+                                        </h5>
+                                      </div>
+                                      <div className="flex items-center mt-2 sm:mt-0">
+                                        <div className="flex items-center text-xs text-gray-500 mr-2">
+                                          <Clock className="h-3 w-3 mr-1" />
+                                          {activity.estimatedTime}
+                                        </div>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleSelectPivot(
+                                              week.weekNumber,
+                                              activityIndex
+                                            );
+                                          }}
+                                          className={`text-xs px-2 py-1 h-auto ${
+                                            isPivot
+                                              ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                              : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                                          }`}
+                                        >
+                                          {isPivot
+                                            ? "Unselect Pivot"
+                                            : "Select as Pivot"}
+                                        </Button>
+                                      </div>
+                                    </div>
+                                    <p className="text-sm text-gray-600 mb-2">
+                                      {activity.description}
+                                    </p>
+                                    {activity.resource && (
+                                      <a
+                                        href={
+                                          activity.resource.startsWith("http")
+                                            ? activity.resource
+                                            : `https://www.google.com/search?q=${encodeURIComponent(
+                                                activity.resource
+                                              )}`
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-blue-600 hover:text-blue-800 underline inline-flex items-center break-words"
+                                      >
+                                        <BookOpen className="h-3 w-3 mr-1 flex-shrink-0" />
+                                        <span className="break-all">
+                                          Resource: {activity.resource}
+                                        </span>
+                                      </a>
+                                    )}
                                   </div>
                                 </div>
-                                <p className="text-sm text-gray-600 mb-2">
-                                  {activity.description}
-                                </p>
-                                {activity.resource && (
-                                  <a
-                                    href={
-                                      activity.resource.startsWith("http")
-                                        ? activity.resource
-                                        : `https://www.google.com/search?q=${encodeURIComponent(
-                                            activity.resource
-                                          )}`
-                                    }
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-blue-600 hover:text-blue-800 underline inline-flex items-center"
-                                  >
-                                    <BookOpen className="h-3 w-3 mr-1" />
-                                    Resource: {activity.resource}
-                                  </a>
-                                )}
                               </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                            );
+                          })}
+                      </div>
 
-                    <div className="mt-4">
-                      <h4 className="text-sm font-medium text-gray-700 mb-1">
-                        Expected Outcomes
-                      </h4>
-                      <p className="text-sm text-gray-600">{week.outcomes}</p>
+                      <div className="mt-4">
+                        <h4 className="text-sm font-medium text-gray-700 mb-1">
+                          Expected Outcomes
+                        </h4>
+                        <p className="text-sm text-gray-600">{week.outcomes}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </motion.div>
-          ))}
+                )}
+              </motion.div>
+            ))}
         </div>
       </div>
+
+      {selectedPivot && (
+        <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
+          <div className="bg-white p-4 rounded-lg shadow-lg mb-4 w-64 border border-blue-200">
+            <h4 className="font-medium text-gray-800 mb-2 flex items-center">
+              <Star className="h-4 w-4 text-yellow-500 mr-2" />
+              Pivot Focus
+            </h4>
+            <div className="mb-3">
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-gray-600">Progress</span>
+                <span className="font-medium text-blue-600">
+                  {pivotProgress}%
+                </span>
+              </div>
+              <Progress
+                value={pivotProgress}
+                className="h-2 bg-gray-100"
+                indicatorClassName={
+                  pivotProgress === 100 ? "bg-green-500" : "bg-blue-500"
+                }
+              />
+            </div>
+            <div className="text-xs text-gray-500 mb-2">
+              {pivotProgress === 100 ? (
+                <div className="flex items-center text-green-600">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Completed! Great job!
+                </div>
+              ) : (
+                <div>Mark the activity as complete to track your progress</div>
+              )}
+            </div>
+            <div className="flex items-center mt-3 pt-2 border-t border-gray-100">
+              <Switch
+                id="focus-mode"
+                checked={focusMode}
+                onCheckedChange={setFocusMode}
+              />
+              <Label
+                htmlFor="focus-mode"
+                className="ml-2 text-sm text-gray-700 cursor-pointer"
+              >
+                Focus Mode
+              </Label>
+            </div>
+          </div>
+          <Button
+            onClick={async () => {
+              setSelectedPivot(null);
+              localStorage.removeItem(`roadmap-${id}-selectedPivot`);
+
+              // Clear from database
+              try {
+                const response = await fetch("/api/learning-roadmap/pivot", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    roadmapId: id,
+                    selectedPivot: null,
+                  }),
+                });
+
+                if (!response.ok) {
+                  console.error("Failed to clear pivot in database");
+                }
+              } catch (error) {
+                console.error("Error clearing pivot from database:", error);
+              }
+            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+          >
+            Clear Pivot Focus
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

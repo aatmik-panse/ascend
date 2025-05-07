@@ -133,9 +133,9 @@ const RecommendationCard = ({
         )}
 
         {/* Updated button layout for better mobile visibility */}
-        <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
+        <div className="flex flex-col md:flex-row gap-2 md:gap-3 mt-4">
           <Button
-            className="w-full bg-black hover:bg-gray-800 text-white py-2"
+            className="w-full bg-black hover:bg-gray-800 text-white py-2 text-sm md:text-base flex-1"
             onClick={handleRedirect}
             tabIndex="0"
             aria-label={`Go to ${recommendation.title} course`}
@@ -145,20 +145,18 @@ const RecommendationCard = ({
 
           <Button
             variant="outline"
-            className="w-full border-gray-300 py-2"
+            className="w-full border-gray-300 py-2 text-sm md:text-base flex-1"
             onClick={handleRoadmapClick}
             tabIndex="0"
             aria-label={showRoadmap ? "Hide roadmap" : "Show roadmap"}
           >
             <Map className="h-4 w-4 mr-1.5" />
-            <span className="min-w-[50px]">
-              {showRoadmap ? "Hide" : "Roadmap"}
-            </span>
+            <span>{showRoadmap ? "Hide" : "Roadmap"}</span>
           </Button>
 
           {isSelected ? (
             <Button
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-2"
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-2 text-sm md:text-base flex-1"
               onClick={handleSelectRoadmap}
               tabIndex="0"
               aria-label="View selected roadmap"
@@ -167,7 +165,7 @@ const RecommendationCard = ({
             </Button>
           ) : (
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 text-sm md:text-base flex-1"
               onClick={handleSelectRoadmap}
               disabled={isLoading}
               tabIndex="0"

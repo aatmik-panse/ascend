@@ -38,11 +38,44 @@ const CareerPathTest = () => {
   const [results, setResults] = useState(null);
   const [selectedRoadmapIndex, setSelectedRoadmapIndex] = useState(0);
   const [dataSource, setDataSource] = useState("api"); // 'api' or 'cache'
+  const [isPermanentlySelected, setIsPermanentlySelected] = useState(false);
+  const [permanentRoadmapId, setPermanentRoadmapId] = useState(null);
 
   useEffect(() => {
+    // Check if any roadmap has been permanently selected
+    const checkForPermanentRoadmap = () => {
+      // Look through localStorage for any roadmap-*-permanent keys
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.match(/roadmap-.*-permanent/)) {
+          const isPermanent = localStorage.getItem(key) === "true";
+
+          if (isPermanent) {
+            // Extract the roadmap ID from the key
+            const roadmapId = key.split("-")[1];
+            setIsPermanentlySelected(true);
+            setPermanentRoadmapId(roadmapId);
+            return roadmapId;
+          }
+        }
+      }
+      return null;
+    };
+
     const fetchTestData = async () => {
       try {
         setLoading(true);
+
+        // Check if any roadmap is permanently selected
+        const permanentId = checkForPermanentRoadmap();
+
+        // If a roadmap is permanently selected and it's not the current one,
+        // redirect to that roadmap instead
+        if (permanentId && permanentId !== pathId) {
+          toast.info("You have a permanently selected roadmap. Redirecting...");
+          router.push(`/roadmap/${permanentId}`);
+          return;
+        }
 
         // First try to load data from localStorage
         const cachedCareerPath = localStorage.getItem(`career-path-${pathId}`);
@@ -482,21 +515,51 @@ const CareerPathTest = () => {
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
                   <BookOpen className="h-5 w-5 mr-2" />
-                  Recommended Learning Resources
+                  {isPermanentlySelected
+                    ? "Your Selected Learning Path"
+                    : "Recommended Learning Resources"}
                 </h3>
+
+                {isPermanentlySelected && (
+                  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 flex items-start">
+                    <CheckCircle className="h-5 w-5 mr-2 mt-0.5 text-green-600 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium">
+                        You have permanently selected a roadmap
+                      </p>
+                      <p className="text-sm mt-1">
+                        Only your selected learning path is shown below. This
+                        ensures consistency in your learning journey.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 gap-4">
                   {results?.recommendations &&
                     test?.recommendations &&
-                    test.recommendations.map((recommendation, index) => (
-                      <RecommendationCard
-                        key={index}
-                        recommendation={recommendation}
-                        index={index}
-                        testId={test.id}
-                        isSelected={index === selectedRoadmapIndex}
-                        onRoadmapSelect={setSelectedRoadmapIndex}
-                      />
-                    ))}
+                    test.recommendations
+                      // If permanently selected, only show the selected roadmap
+                      .filter(
+                        (_, index) =>
+                          !isPermanentlySelected ||
+                          index === selectedRoadmapIndex
+                      )
+                      .map((recommendation, index) => (
+                        <RecommendationCard
+                          key={index}
+                          recommendation={recommendation}
+                          index={
+                            isPermanentlySelected ? selectedRoadmapIndex : index
+                          }
+                          testId={test.id}
+                          isSelected={
+                            isPermanentlySelected ||
+                            index === selectedRoadmapIndex
+                          }
+                          onRoadmapSelect={setSelectedRoadmapIndex}
+                        />
+                      ))}
                 </div>
 
                 {(!results?.recommendations ||
@@ -511,12 +574,25 @@ const CareerPathTest = () => {
                   <div className="mt-6 sm:mt-8 flex justify-center">
                     <Button
                       onClick={handleViewRoadmap}
-                      className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
+                      className={`w-full sm:w-auto ${
+                        isPermanentlySelected
+                          ? "bg-green-600 hover:bg-green-700"
+                          : "bg-blue-600 hover:bg-blue-700"
+                      } text-white`}
                       tabIndex="0"
                       aria-label="View your personalized learning roadmap"
                     >
-                      <BookOpen className="h-5 w-5 mr-2" />
-                      View My Learning Roadmap
+                      {isPermanentlySelected ? (
+                        <>
+                          <CheckCircle className="h-5 w-5 mr-2" />
+                          Continue With My Selected Roadmap
+                        </>
+                      ) : (
+                        <>
+                          <BookOpen className="h-5 w-5 mr-2" />
+                          View My Learning Roadmap
+                        </>
+                      )}
                     </Button>
                   </div>
                 )}
