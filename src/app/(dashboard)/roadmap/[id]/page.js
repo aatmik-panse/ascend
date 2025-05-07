@@ -44,7 +44,7 @@ const RoadmapPage = () => {
   const [pivotProgress, setPivotProgress] = useState(0);
   const [focusMode, setFocusMode] = useState(false);
   const [isPermanentlySelected, setIsPermanentlySelected] = useState(false);
-  
+
   // Custom alert states
   const [showSelectAlert, setShowSelectAlert] = useState(false);
   const [showRegenerateAlert, setShowRegenerateAlert] = useState(false);
@@ -393,7 +393,7 @@ const RoadmapPage = () => {
     // Show custom confirmation alert
     setShowSelectAlert(true);
   };
-  
+
   const confirmPermanentSelection = async () => {
     try {
       // Mark the roadmap as permanently selected in localStorage
@@ -433,7 +433,7 @@ const RoadmapPage = () => {
     // Show custom confirmation alert
     setShowRegenerateAlert(true);
   };
-  
+
   const confirmRegeneration = async () => {
     try {
       setLoading(true);
@@ -528,7 +528,7 @@ const RoadmapPage = () => {
         cancelText="Cancel"
         type="warning"
       />
-      
+
       {/* Custom Alert for Regeneration */}
       <CustomAlert
         isOpen={showRegenerateAlert}
@@ -622,7 +622,7 @@ const RoadmapPage = () => {
           </div>
         </div>
 
-        <p className="text-gray-600 mb-6">{roadmap.description}</p>
+        <p className="text-gray-200 mb-6">{roadmap.description}</p>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
