@@ -55,6 +55,7 @@ const videos = [
       "Discover Jessica's framework for maintaining career momentum in volatile markets",
   },
 ];
+
 function VideoSection() {
   const router = useRouter();
 
