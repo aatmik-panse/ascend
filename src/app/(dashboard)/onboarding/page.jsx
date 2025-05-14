@@ -31,6 +31,10 @@ export default function CareerOnboarding() {
   // Add a boolean state to track when onboarding is completed
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
 
+  // States for midpoint achievement message
+  const [showMidpointMessage, setShowMidpointMessage] = useState(false);
+  const [midpointMessageShownThisSession, setMidpointMessageShownThisSession] = useState(false);
+
   // Build initial form data for 50 questions
   const initialForm = questions.reduce((acc, q) => {
     if (q.type === "checkbox") acc[q.field] = [];
@@ -45,6 +49,12 @@ export default function CareerOnboarding() {
 
   // totalQuestions = index of confirm step
   const totalQuestions = questions.findIndex((q) => q.id === "confirm");
+
+  // Constants for question indexing
+  const FIRST_QUESTION_INDEX = 1; // Index of 'q1' in the questions array
+  const LAST_QUESTION_INDEX = 50;  // Index of 'q50' in the questions array
+  const TOTAL_CAMPAIGN_QUESTIONS = 50;
+  const TWENTY_FIFTH_QUESTION_INDEX = 25; // Index of 'q25'
 
   // Fix mobile viewport height issues
   useEffect(() => {
@@ -115,7 +125,16 @@ export default function CareerOnboarding() {
     if (cur?.field && inputRefs.current[cur.field]) {
       setTimeout(() => inputRefs.current[cur.field].focus(), 400);
     }
-  }, [currentStep]);
+
+    // Midpoint achievement message logic
+    if (currentStep === TWENTY_FIFTH_QUESTION_INDEX + 1 && !midpointMessageShownThisSession) {
+      setShowMidpointMessage(true);
+      setMidpointMessageShownThisSession(true);
+      setTimeout(() => {
+        setShowMidpointMessage(false);
+      }, 5000); // Show message for 5 seconds
+    }
+  }, [currentStep, midpointMessageShownThisSession]);
 
   // Add a useEffect to redirect to dashboard after showing completion message
   useEffect(() => {
@@ -249,7 +268,7 @@ export default function CareerOnboarding() {
       ? 0
       : currentStep > totalQuestions
       ? 100
-      : (currentStep / totalQuestions) * 100;
+      : Math.round((currentStep / totalQuestions) * 100);
 
   const current = questions[currentStep];
 
@@ -461,6 +480,26 @@ export default function CareerOnboarding() {
                 }}
                 className="flex flex-col"
               >
+                {/* Remaining Questions Counter */}
+                {currentStep >= FIRST_QUESTION_INDEX && currentStep <= LAST_QUESTION_INDEX && (
+                  <div className="mb-2 text-right text-sm text-sky-400">
+                    Question {(LAST_QUESTION_INDEX - currentStep) + 1} of {TOTAL_CAMPAIGN_QUESTIONS}
+                  </div>
+                )}
+
+                {/* Midpoint Achievement Message */}
+                {showMidpointMessage && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                    className="mb-4 p-3 bg-green-500/20 text-green-300 rounded-md text-center text-sm"
+                  >
+                    Awesome! You're halfway there. Keep up the great work!
+                  </motion.div>
+                )}
+
                 {/* Question */}
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium mb-4 leading-tight">
                   {current.title}
@@ -645,17 +684,17 @@ const questions = [
   },
   {
     id: "q4",
-    title: "What’s your main reason for considering a pivot?",
+    title: "What's your main reason for considering a pivot?",
     field: "q4",
     type: "checkbox",
     options: [
       "I feel stuck and see no growth",
-      "I’m not passionate about my current work",
+      "I'm not passionate about my current work",
       "I want more flexibility or a better lifestyle",
-      "I’m burned out and mentally exhausted",
+      "I'm burned out and mentally exhausted",
       "I want to follow a different passion or purpose",
-      "I’m curious about other industries or roles",
-      "I’m afraid of becoming irrelevant in my field",
+      "I'm curious about other industries or roles",
+      "I'm afraid of becoming irrelevant in my field",
     ],
   },
   {
@@ -690,7 +729,7 @@ const questions = [
   {
     id: "q8",
     title:
-      "What’s one skill you’d love to use more in your work but currently can’t? Why?",
+      "What's one skill you'd love to use more in your work but currently can't? Why?",
     field: "q8",
     type: "textarea",
   },
@@ -733,7 +772,7 @@ const questions = [
       "Less than 3 months",
       "3–6 months part-time",
       "6–12 months serious effort",
-      "I’d consider going back to school if needed",
+      "I'd consider going back to school if needed",
     ],
   },
   {
@@ -756,9 +795,9 @@ const questions = [
     field: "q15",
     type: "radio",
     options: [
-      "Yes, I’m okay with it",
+      "Yes, I'm okay with it",
       "Maybe, if the outcome is worth it",
-      "No, I can’t afford to go backward",
+      "No, I can't afford to go backward",
     ],
   },
   {
@@ -783,20 +822,20 @@ const questions = [
   {
     id: "q18",
     title:
-      "If you don’t pivot now, what might your life look like in 1–2 years?",
+      "If you don't pivot now, what might your life look like in 1–2 years?",
     field: "q18",
     type: "textarea",
   },
   {
     id: "q19",
     title:
-      "What’s the worst-case scenario if you try and fail? Can you live with it?",
+      "What's the worst-case scenario if you try and fail? Can you live with it?",
     field: "q19",
     type: "textarea",
   },
   {
     id: "q20",
-    title: "What’s the best-case scenario if you succeed?",
+    title: "What's the best-case scenario if you succeed?",
     field: "q20",
     type: "textarea",
   },
@@ -816,7 +855,7 @@ const questions = [
   {
     id: "q23",
     title:
-      "If your career were a book, what chapter are you in right now? What’s the title of the next one?",
+      "If your career were a book, what chapter are you in right now? What's the title of the next one?",
     field: "q23",
     type: "textarea",
   },
@@ -854,14 +893,14 @@ const questions = [
   },
   {
     id: "q28",
-    title: "Is there a “deadline” for your pivot due to personal/life factors?",
+    title: "Is there a \"deadline\" for your pivot due to personal/life factors?",
     field: "q28",
     type: "radio",
     options: [
       "Yes, within 3 months",
       "Yes, within 1 year",
-      "Not really, it’s open-ended",
-      "I don’t know",
+      "Not really, it's open-ended",
+      "I don't know",
     ],
   },
   {
@@ -881,7 +920,7 @@ const questions = [
   {
     id: "q31",
     title:
-      "What types of roles or industries have you been told you’d be good at?",
+      "What types of roles or industries have you been told you'd be good at?",
     field: "q31",
     type: "textarea",
   },
@@ -908,20 +947,20 @@ const questions = [
   {
     id: "q35",
     title:
-      "What’s holding you back the most — fear of the unknown, failure, judgment, money, time, or something else?",
+      "What's holding you back the most — fear of the unknown, failure, judgment, money, time, or something else?",
     field: "q35",
     type: "textarea",
   },
   {
     id: "q36",
     title:
-      "What’s one belief you have about career pivots that may not be true?",
+      "What's one belief you have about career pivots that may not be true?",
     field: "q36",
     type: "textarea",
   },
   {
     id: "q37",
-    title: "How much do others’ opinions influence your career decisions?",
+    title: "How much do others' opinions influence your career decisions?",
     field: "q37",
     type: "scale",
   },
@@ -940,7 +979,7 @@ const questions = [
     type: "radio",
     options: [
       "Yes, actively testing it",
-      "I’ve done a bit, but not enough",
+      "I've done a bit, but not enough",
       "Not yet, but I plan to",
       "No, I have no idea how to",
     ],
@@ -948,13 +987,13 @@ const questions = [
   {
     id: "q40",
     title:
-      "What’s a small experiment or pilot you could do this month to test your pivot?",
+      "What's a small experiment or pilot you could do this month to test your pivot?",
     field: "q40",
     type: "textarea",
   },
   {
     id: "q41",
-    title: "What does your version of a “safe pivot” look.like?",
+    title: "What does your version of a \"safe pivot\" look.like?",
     field: "q41",
     type: "textarea",
   },
@@ -968,7 +1007,7 @@ const questions = [
       "1–3 months",
       "3–6 months",
       "6–12 months",
-      "I’m not willing to wait",
+      "I'm not willing to wait",
     ],
   },
   {
@@ -995,7 +1034,7 @@ const questions = [
   {
     id: "q46",
     title:
-      "What signals (in your company, industry, or economy) are telling you it’s time to move?",
+      "What signals (in your company, industry, or economy) are telling you it's time to move?",
     field: "q46",
     type: "textarea",
   },
@@ -1009,7 +1048,7 @@ const questions = [
   {
     id: "q48",
     title:
-      "If money, status, or time didn’t matter, what would you love to do all day?",
+      "If money, status, or time didn't matter, what would you love to do all day?",
     field: "q48",
     type: "textarea",
   },
@@ -1022,7 +1061,7 @@ const questions = [
   {
     id: "q50",
     title:
-      "What’s your personal definition of success? Has it changed recently?",
+      "What's your personal definition of success? Has it changed recently?",
     field: "q50",
     type: "textarea",
   },
