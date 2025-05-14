@@ -17,9 +17,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 
+// Define localStorage keys
+const ONBOARDING_CURRENT_STEP_KEY = "careerOnboardingCurrentStep";
+const ONBOARDING_FORM_DATA_KEY = "careerOnboardingFormData";
+const ONBOARDING_MIDPOINT_MESSAGE_SHOWN_KEY = "careerOnboardingMidpointMessageShown";
+
 export default function CareerOnboarding() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(0);
+
+  // Initialize state from localStorage or defaults
+  const [currentStep, setCurrentStep] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedStep = localStorage.getItem(ONBOARDING_CURRENT_STEP_KEY);
+      return savedStep ? parseInt(savedStep, 10) : 0;
+    }
+    return 0;
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState(null);
   const [validationError, setValidationError] = useState(false);
@@ -27,15 +41,18 @@ export default function CareerOnboarding() {
   const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
   const [touchStartY, setTouchStartY] = useState(0);
   const formRef = useRef(null);
-
-  // Add a boolean state to track when onboarding is completed
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
 
-  // States for midpoint achievement message
   const [showMidpointMessage, setShowMidpointMessage] = useState(false);
-  const [midpointMessageShownThisSession, setMidpointMessageShownThisSession] = useState(false);
+  const [midpointMessageShownThisSession, setMidpointMessageShownThisSession] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedMidpointFlag = localStorage.getItem(ONBOARDING_MIDPOINT_MESSAGE_SHOWN_KEY);
+      return savedMidpointFlag ? JSON.parse(savedMidpointFlag) : false;
+    }
+    return false;
+  });
 
-  // Build initial form data for 50 questions
+  // Build initial form data for 50 questions - potentially load from localStorage
   const initialForm = questions.reduce((acc, q) => {
     if (q.type === "checkbox") acc[q.field] = [];
     else if (q.type === "scale") acc[q.field] = "";
@@ -43,7 +60,22 @@ export default function CareerOnboarding() {
     return acc;
   }, {});
 
-  const [formData, setFormData] = useState(initialForm);
+  const [formData, setFormData] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedFormData = localStorage.getItem(ONBOARDING_FORM_DATA_KEY);
+      if (savedFormData) {
+        try {
+          return JSON.parse(savedFormData);
+        } catch (e) {
+          console.error("Error parsing saved form data from localStorage:", e);
+          // Fallback to initialForm if parsing fails
+          return initialForm;
+        }
+      }
+    }
+    return initialForm;
+  });
+
   const [submissionRequested, setSubmissionRequested] = useState(false);
   const inputRefs = useRef({});
 
@@ -55,6 +87,15 @@ export default function CareerOnboarding() {
   const LAST_QUESTION_INDEX = 50;  // Index of 'q50' in the questions array
   const TOTAL_CAMPAIGN_QUESTIONS = 50;
   const TWENTY_FIFTH_QUESTION_INDEX = 25; // Index of 'q25'
+
+  // Effect to save progress to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(ONBOARDING_CURRENT_STEP_KEY, currentStep.toString());
+      localStorage.setItem(ONBOARDING_FORM_DATA_KEY, JSON.stringify(formData));
+      localStorage.setItem(ONBOARDING_MIDPOINT_MESSAGE_SHOWN_KEY, JSON.stringify(midpointMessageShownThisSession));
+    }
+  }, [currentStep, formData, midpointMessageShownThisSession]);
 
   // Fix mobile viewport height issues
   useEffect(() => {
@@ -142,6 +183,13 @@ export default function CareerOnboarding() {
     if (currentStep === questions.length - 1) {
       // Mark onboarding as completed
       setOnboardingCompleted(true);
+
+      // Clear stored progress
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(ONBOARDING_CURRENT_STEP_KEY);
+        localStorage.removeItem(ONBOARDING_FORM_DATA_KEY);
+        localStorage.removeItem(ONBOARDING_MIDPOINT_MESSAGE_SHOWN_KEY);
+      }
 
       // Set a timeout to redirect to dashboard after showing completion message
       const redirectTimer = setTimeout(() => {
